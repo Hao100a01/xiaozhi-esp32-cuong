@@ -1,0 +1,21 @@
+{
+    "type": "uta-robot",
+    "target": "esp32s3",
+    "builds": [
+        {
+            "name": "uta-robot",
+            "sdkconfig_append": [
+                "CONFIG_BOARD_TYPE_UTA_ROBOT=y",
+                "CONFIG_SPIRAM=y",
+                "CONFIG_SPIRAM_MODE_OCT=y",
+                "CONFIG_USE_AFE_WAKE_WORD=y",
+                "CONFIG_SR_WN_WN9_NIHAOXIAOZHI_TTS=n",
+                "CONFIG_SR_WN_WN9_HILILI_TTS=y",
+                "CONFIG_HTTPD_MAX_REQ_HDR_LEN=1024",
+                "CONFIG_MP4_EXTRACTOR_SUPPORT=y",
+                "CONFIG_VIDEO_DECODER_SW_H264_SUPPORT=y",
+                "CONFIG_VIDEO_DECODER_SW_MJPEG_SUPPORT=y"
+            ]
+        }
+    ]
+}

@@ -18,3 +18,7 @@ main/mmap_generate_emoji.h
 *.bin
 mmap_generate_*.h
 .clangd
+
+# Bộ nhớ đệm và đường dẫn môi trường Graphify riêng của từng máy.
+graphify-out/cache/
+graphify-out/.*

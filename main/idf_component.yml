@@ -1,5 +1,18 @@
 ## IDF Component Manager Manifest File
 dependencies:
+  # Tách MP4 và giải mã video chỉ dành cho UTA-robot.
+  espressif/esp_extractor:
+    version: "~1.0.0"
+    matches:
+    - if: "$CONFIG{BOARD_TYPE_UTA_ROBOT} == True"
+    rules:
+    - if: "target == esp32s3"
+  espressif/esp_video_codec:
+    version: "~0.5.7"
+    matches:
+    - if: "$CONFIG{BOARD_TYPE_UTA_ROBOT} == True"
+    rules:
+    - if: "target == esp32s3"
   waveshare/esp_lcd_sh8601: 1.0.2
   espressif/esp_lcd_co5300: ^2.1.0
   espressif/esp_lcd_ili9341: ^2.1.0

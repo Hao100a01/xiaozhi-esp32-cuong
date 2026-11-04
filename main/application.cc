@@ -777,6 +777,40 @@ void Application::StartListening() { xEventGroupSetBits(event_group_, MAIN_EVENT
 
 void Application::StopListening() { xEventGroupSetBits(event_group_, MAIN_EVENT_STOP_LISTENING); }
 
+void Application::PrepareLocalPlayback(std::function<void(bool)> ready) {
+    if (!ready)
+        return;
+    Schedule([this, ready = std::move(ready)]() {
+        auto state = GetDeviceState();
+        if (state == kDeviceStateNotifying) {
+            StopNotification();
+            state = GetDeviceState();
+        }
+        if (state != kDeviceStateIdle && state != kDeviceStateListening &&
+            state != kDeviceStateSpeaking) {
+            ready(false);
+            return;
+        }
+        if (state == kDeviceStateSpeaking || state == kDeviceStateListening) {
+            AbortSpeaking(kAbortReasonNone);
+        }
+        if (state != kDeviceStateIdle && protocol_) {
+            protocol_->SendStopListening();
+        }
+        if (!SetDeviceState(kDeviceStateIdle)) {
+            ready(false);
+            return;
+        }
+        audio_service_.EnableVoiceProcessing(false);
+        for (int i = 0; i < MAX_SEND_PACKETS_IN_QUEUE; ++i) {
+            if (!audio_service_.PopPacketFromSendQueue())
+                break;
+        }
+        audio_service_.ResetDecoder();
+        ready(true);
+    });
+}
+
 void Application::HandleToggleChatEvent() {
     auto state = GetDeviceState();
 

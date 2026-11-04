@@ -35,6 +35,7 @@ config CUSTOM_ASSETS_FILE
 
 choice
     prompt "Default Language"
+    default LANGUAGE_VI_VN if BOARD_TYPE_UTA_ROBOT
     default LANGUAGE_ZH_CN
     help
         Select device display language
@@ -436,6 +437,9 @@ choice BOARD_TYPE
         depends on IDF_TARGET_ESP32C3
     config BOARD_TYPE_TAIJI_PI_S3
         bool "Taiji Pi ESP32-S3 (太极小派)"
+        depends on IDF_TARGET_ESP32S3
+    config BOARD_TYPE_UTA_ROBOT
+        bool "UTA-robot (ESP32-S3-N16R8)"
         depends on IDF_TARGET_ESP32S3
     config BOARD_TYPE_WAVESHARE_ESP32_C5_TOUCH_LCD_1_69
         bool "Waveshare ESP32-C5-Touch-LCD-1.69"

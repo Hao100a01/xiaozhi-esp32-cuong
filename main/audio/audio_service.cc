@@ -639,6 +639,35 @@ std::unique_ptr<AudioStreamPacket> AudioService::PopPacketFromSendQueue() {
     return packet;
 }
 
+uint32_t AudioService::GetPlaybackGeneration() {
+    std::lock_guard<std::mutex> lock(audio_queue_mutex_);
+    return playback_generation_;
+}
+
+bool AudioService::PushPcmToPlaybackQueue(std::vector<int16_t>&& pcm, uint32_t generation) {
+    // Mỗi khối tối đa 20 ms ở 48 kHz; không nhận khối rỗng hoặc lớn không giới hạn.
+    if (pcm.empty() || pcm.size() > 960) {
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(audio_queue_mutex_);
+    if (!audio_queue_cv_.wait_for(lock, std::chrono::milliseconds(40),
+                                  [this, generation]() {
+                                      return service_stopped_.load() ||
+                                             generation != playback_generation_ ||
+                                             !audio_playback_queue_.full();
+                                  }) ||
+        service_stopped_.load() || generation != playback_generation_) {
+        return false;
+    }
+    AudioTask task;
+    task.type = kAudioTaskTypeDecodeToPlaybackQueue;
+    task.pcm = std::move(pcm);
+    playback_drained_notified_ = false;
+    audio_playback_queue_.push_back(std::move(task));
+    audio_queue_cv_.notify_all();
+    return true;
+}
+
 void AudioService::EncodeWakeWord() {
     if (audio_engine_) {
         audio_engine_->EncodeWakeWordData();

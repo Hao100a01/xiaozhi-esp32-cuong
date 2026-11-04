@@ -118,7 +118,9 @@ public:
     AecMode GetAecMode() const { return aec_mode_; }
     void PlaySound(const std::string_view& sound);
     AudioService& GetAudioService() { return audio_service_; }
-    
+    // Chuẩn bị nguồn phát cục bộ trên tác vụ chính, không đóng kênh điều khiển MCP.
+    void PrepareLocalPlayback(std::function<void(bool)> ready);
+
     /**
      * Reset protocol resources (thread-safe)
      * Can be called from any task to release resources allocated after network connected
