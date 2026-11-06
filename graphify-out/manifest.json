@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "main/application.cc": {
-    "mtime": 1793794683.3389783,
-    "seen": 1793794743.9420903,
-    "ast_hash": "8f00b8285bbc5fa42483fdf74c2105b1",
+    "mtime": 1793938866.0494106,
+    "seen": 1793938965.6895118,
+    "ast_hash": "6f0302b333a69d86309f5ffea1813cc3",
     "semantic_hash": ""
   },
   "main/application.h": {
@@ -888,9 +888,9 @@
     "semantic_hash": ""
   },
   "main/boards/common/board.h": {
-    "mtime": 1790845492.7294815,
-    "seen": 1793774045.9515224,
-    "ast_hash": "8a72f0581ddb0d5633795120876a92cc",
+    "mtime": 1793938865.639675,
+    "seen": 1793938965.6900792,
+    "ast_hash": "122b63494e77be81a389d4823cccb926",
     "semantic_hash": ""
   },
   "main/boards/common/button.cc": {
@@ -1086,15 +1086,15 @@
     "semantic_hash": ""
   },
   "main/boards/common/wifi_board.cc": {
-    "mtime": 1790845492.7491627,
-    "seen": 1793774045.9515224,
-    "ast_hash": "17140e3ebd2e1bc2d58cec16541f9ab5",
+    "mtime": 1793950946.3612256,
+    "seen": 1793951812.2335975,
+    "ast_hash": "6d5da15a7c58a434142024cf847f592e",
     "semantic_hash": ""
   },
   "main/boards/common/wifi_board.h": {
-    "mtime": 1790845492.750132,
-    "seen": 1793774045.9515224,
-    "ast_hash": "e3fb8dc2a58532095d366bf44796bdcf",
+    "mtime": 1793871265.7755055,
+    "seen": 1793871297.2412083,
+    "ast_hash": "dd186e2064e192d32d9c8615e1c98bf8",
     "semantic_hash": ""
   },
   "main/boards/common/xpower.h": {
@@ -4914,9 +4914,9 @@
     "semantic_hash": ""
   },
   "main/idf_component.yml": {
-    "mtime": 1793794702.6660836,
-    "seen": 1793794743.9430904,
-    "ast_hash": "0fdbee6e93f305e61e74e7adc8fe0486",
+    "mtime": 1793947160.927169,
+    "seen": 1793947362.2427647,
+    "ast_hash": "14a3468831427f15200869c5932a4f41",
     "semantic_hash": ""
   },
   "main/led/circular_strip.cc": {
@@ -4968,9 +4968,9 @@
     "semantic_hash": ""
   },
   "main/mcp_server.cc": {
-    "mtime": 1793794683.5428424,
-    "seen": 1793794743.9430904,
-    "ast_hash": "b289aabfb297b5359c51263468526f4d",
+    "mtime": 1793871265.795401,
+    "seen": 1793871297.2422109,
+    "ast_hash": "115b5864c221e115f64fceebcb355384",
     "semantic_hash": ""
   },
   "main/mcp_server.h": {
@@ -5094,9 +5094,9 @@
     "semantic_hash": ""
   },
   "scripts/build.py": {
-    "mtime": 1793794683.5481248,
-    "seen": 1793794743.9430904,
-    "ast_hash": "978620cdf2f4aab74f5d3a0df97aac58",
+    "mtime": 1793857396.5402136,
+    "seen": 1793857459.569367,
+    "ast_hash": "4e49bda42bfe13ba0e046cede25e0a6c",
     "semantic_hash": ""
   },
   "scripts/build_default_assets.py": {
@@ -5190,9 +5190,9 @@
     "semantic_hash": ""
   },
   "scripts/tests/test_build.py": {
-    "mtime": 1793794683.5533159,
-    "seen": 1793794743.9430904,
-    "ast_hash": "654180019904d8f29e2d8733a7bc332a",
+    "mtime": 1793857397.141012,
+    "seen": 1793857459.5703557,
+    "ast_hash": "4e6e6950b2b6de245a01bb902e1eb77f",
     "semantic_hash": ""
   },
   "scripts/tests/test_build_default_assets.py": {
@@ -5370,9 +5370,9 @@
     "semantic_hash": ""
   },
   "main/CMakeLists.txt": {
-    "mtime": 1793794701.8547,
-    "seen": 1793794743.9430904,
-    "ast_hash": "6790182d9433f120d726b9b2369c2854",
+    "mtime": 1793951233.4175317,
+    "seen": 1793951812.2347727,
+    "ast_hash": "6bdfa8c623aa86c0f7166971cca640b8",
     "semantic_hash": ""
   },
   "main/audio/README.md": {
@@ -10086,93 +10086,93 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/config.json": {
-    "mtime": 1793794465.7424502,
-    "seen": 1793794743.9420903,
-    "ast_hash": "9c545ba15e13fc957b118cd29099d613",
+    "mtime": 1793857315.9546938,
+    "seen": 1793857362.6400862,
+    "ast_hash": "d3f669f6ba7187440315bca72f76890b",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_helpers.h": {
-    "mtime": 1793792573.204181,
-    "seen": 1793792750.6845522,
-    "ast_hash": "e87a3722185f4005fba8ad55b0ded7e3",
+    "mtime": 1793948725.7839808,
+    "seen": 1793948843.9363062,
+    "ast_hash": "d6652e76d56ede0dec5a813bf760b4d2",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_player.cc": {
-    "mtime": 1793792805.4608128,
-    "seen": 1793792830.96992,
-    "ast_hash": "78251609ed8a1310934535ec0e1b2fd0",
+    "mtime": 1793868970.1801777,
+    "seen": 1793869188.5436902,
+    "ast_hash": "717768ee6c21bf59d7235a55795c2648",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_player.h": {
-    "mtime": 1793792573.175847,
-    "seen": 1793792750.6845522,
-    "ast_hash": "4bd5f6c7f1c89dc7ddb0fbe61e9a5ddf",
+    "mtime": 1793868970.157987,
+    "seen": 1793869188.5436902,
+    "ast_hash": "83648ecd3c0863180acf132c3c06f87e",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_robot.cc": {
-    "mtime": 1793792619.0482304,
-    "seen": 1793792750.6845522,
-    "ast_hash": "898193cb53c94b741f7a04eebf77e6c2",
+    "mtime": 1793952133.4382584,
+    "seen": 1793952310.3565423,
+    "ast_hash": "deb32c1c0df3cc7079455057a7c519cf",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_settings.cc": {
-    "mtime": 1793792573.2225177,
-    "seen": 1793792750.6845522,
-    "ast_hash": "51cc1d6eb97f995dfc833caae006b34d",
+    "mtime": 1793949420.7965584,
+    "seen": 1793949484.0064833,
+    "ast_hash": "1864fbf78399b43c78a2a78b2395afc7",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_settings.h": {
-    "mtime": 1793792573.2120686,
-    "seen": 1793792750.6845522,
-    "ast_hash": "2e2a4c4a72cabee4a33333689e6a0658",
+    "mtime": 1793949420.7949574,
+    "seen": 1793949484.0064833,
+    "ast_hash": "e7ccde6fe75e16d47b22f718de5a4e42",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_web_page.h": {
-    "mtime": 1793792262.8200266,
-    "seen": 1793792750.6845522,
-    "ast_hash": "91cd02341019b6bda8bfc3d847647b54",
+    "mtime": 1793950139.6990063,
+    "seen": 1793950165.2135575,
+    "ast_hash": "48486c4f5741387b1b1da3eec20b6a7b",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_web_server.cc": {
-    "mtime": 1793792573.266389,
-    "seen": 1793792750.6845522,
-    "ast_hash": "6943f680be9314c056e8293bdacef033",
+    "mtime": 1793951721.3009672,
+    "seen": 1793951812.2335975,
+    "ast_hash": "a2310f712a6e66c8d37f3777a8c6bc47",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_web_server.h": {
-    "mtime": 1793792162.3585896,
-    "seen": 1793792750.6845522,
-    "ast_hash": "5a73a8af2149850304daa213f840c7dc",
+    "mtime": 1793947557.3851743,
+    "seen": 1793947702.9929671,
+    "ast_hash": "91c51311908139c847d8ddb1be057a2d",
     "semantic_hash": ""
   },
   "scripts/tests/cpp/uta_helpers_test.cc": {
-    "mtime": 1793790453.1935925,
-    "seen": 1793792750.6855526,
-    "ast_hash": "3343cd6c37dae639dc236f9ddce4b034",
+    "mtime": 1793948725.787212,
+    "seen": 1793948843.938306,
+    "ast_hash": "fe63b47779c4b47c92bddce4559cd995",
     "semantic_hash": ""
   },
   "scripts/tests/test_uta_robot.py": {
-    "mtime": 1793785381.7875133,
-    "seen": 1793789067.741242,
-    "ast_hash": "a05d7e7947003bf0c9c67f0aa225a591",
+    "mtime": 1793865106.9745133,
+    "seen": 1793865396.666095,
+    "ast_hash": "10ea1e23997357f9c26ca03b3e860a21",
     "semantic_hash": ""
   },
   "scripts/tests/uta_web_test.cjs": {
-    "mtime": 1793792572.2402816,
-    "seen": 1793792750.6855526,
-    "ast_hash": "f914315046172447c92492482d929646",
+    "mtime": 1793949433.038267,
+    "seen": 1793949484.007661,
+    "ast_hash": "2e97fa817fd8cd21abedbd31ddd46e39",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/README.md": {
-    "mtime": 1793794466.1340957,
-    "seen": 1793794743.9430904,
-    "ast_hash": "d442449ed98537869cdec1509b309426",
+    "mtime": 1793948277.2119014,
+    "seen": 1793948346.6513531,
+    "ast_hash": "524a999e915b3234fbd4f2a17d97450b",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_display.h": {
-    "mtime": 1793792573.1111739,
-    "seen": 1793792750.6845522,
-    "ast_hash": "998f8fde38bd5ac1da8e623d831057e3",
+    "mtime": 1793951240.4048922,
+    "seen": 1793951812.2335975,
+    "ast_hash": "d6e29a16fe4b9aecc3d6db8ca4f64050",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_h264.h": {
@@ -10182,9 +10182,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_motion.h": {
-    "mtime": 1793792805.8576996,
-    "seen": 1793792830.96992,
-    "ast_hash": "7950675a637c05e351cb97d8262706fe",
+    "mtime": 1793948277.2086499,
+    "seen": 1793948346.6502595,
+    "ast_hash": "1ee50cb980047e9a9823db26030e4332",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_spectrum.h": {
@@ -10194,9 +10194,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_video_player.cc": {
-    "mtime": 1793792618.6729507,
-    "seen": 1793792750.6845522,
-    "ast_hash": "364b75868fde30f9c411362fb428ead0",
+    "mtime": 1793869317.7336416,
+    "seen": 1793869347.694416,
+    "ast_hash": "fea5ed8c0ffa86061a126b6e715145ab",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_video_player.h": {
@@ -10857,6 +10857,528 @@
     "mtime": 1793794683.3517966,
     "seen": 1793794743.94409,
     "ast_hash": "ca4141edc9edb8a780a9dff2fdac1c82",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_location.cc": {
+    "mtime": 1793865419.3427784,
+    "seen": 1793865463.1303062,
+    "ast_hash": "aa3bfdce819f826342316d56f3ebdbcb",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_location.h": {
+    "mtime": 1793864918.0286343,
+    "seen": 1793865396.6655633,
+    "ast_hash": "77194cc160da2a00157aecbdb9e9607f",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_location_portal.cc": {
+    "mtime": 1793950547.6733048,
+    "seen": 1793950624.4951015,
+    "ast_hash": "3a20c541beafe4da1aae7389e4921dde",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_location_portal.h": {
+    "mtime": 1793950549.9963403,
+    "seen": 1793950624.4951015,
+    "ast_hash": "6f6a5ae249c5534dc20bdddb3f45cf53",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_provinces.h": {
+    "mtime": 1793865044.4414735,
+    "seen": 1793865396.6655633,
+    "ast_hash": "40853d66b8cc5a496e7bab59101b8862",
+    "semantic_hash": ""
+  },
+  "scripts/tests/uta_location_test.cjs": {
+    "mtime": 1793950575.0747695,
+    "seen": 1793950624.4972334,
+    "ast_hash": "21be811a2cbb42c7c707402df5186083",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_location_json.h": {
+    "mtime": 1793865418.8273478,
+    "seen": 1793865463.1303062,
+    "ast_hash": "7054c3a54223e335314dfcbe434650d2",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/uta_font_clock.inc": {
+    "mtime": 1793866539.4484456,
+    "seen": 1793866624.9213748,
+    "ast_hash": "6d7055191fe324f81278caefcf1dc04a",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/uta_font_small.inc": {
+    "mtime": 1793866539.4197881,
+    "seen": 1793866624.9213748,
+    "ast_hash": "7c83029374514f6fd752698991065898",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/uta_font_temperature.inc": {
+    "mtime": 1793866539.4596708,
+    "seen": 1793866624.9213748,
+    "ast_hash": "2323445c564678f6445927685809ca3a",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_display.cc": {
+    "mtime": 1793946094.7042854,
+    "seen": 1793946243.2174406,
+    "ast_hash": "a283dfbda41bdf5a9c7a09a01e3156e9",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_ui_assets.cc": {
+    "mtime": 1793866493.1466784,
+    "seen": 1793866624.9213748,
+    "ast_hash": "9a9d977b2c3dd8e3c7fd617aa8f7bdb7",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_ui_assets.h": {
+    "mtime": 1793866320.02362,
+    "seen": 1793866624.9213748,
+    "ast_hash": "1e943fabe293d1ffaeba04ec19c9a7b5",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_weather.cc": {
+    "mtime": 1793865899.086308,
+    "seen": 1793866624.9213748,
+    "ast_hash": "ac7c9be41276cc44f6dce6c28d8caef3",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_weather.h": {
+    "mtime": 1793865898.4949572,
+    "seen": 1793866624.9213748,
+    "ast_hash": "84d66b601775fdb2a6bd67bf447b0c22",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_weather_data.h": {
+    "mtime": 1793866493.11083,
+    "seen": 1793866624.9213748,
+    "ast_hash": "a04843de9829f8a54f2210c10af66b11",
+    "semantic_hash": ""
+  },
+  "scripts/prepare_uta_ui_assets.ps1": {
+    "mtime": 1793866535.3315582,
+    "seen": 1793866624.9225953,
+    "ast_hash": "ae26eeac90d116f9bd43828fd71df153",
+    "semantic_hash": ""
+  },
+  "scripts/preview_uta_ui.py": {
+    "mtime": 1793866321.6643856,
+    "seen": 1793866624.9225953,
+    "ast_hash": "5a696796964ce7ec9f58815f5ff90ac0",
+    "semantic_hash": ""
+  },
+  "scripts/tests/cpp/uta_weather_test.cc": {
+    "mtime": 1793866493.2089193,
+    "seen": 1793866624.9225953,
+    "ast_hash": "be6cfaa5fa938b5f48cae025cc44b224",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_uta_ui_assets.py": {
+    "mtime": 1793866535.840927,
+    "seen": 1793866624.9225953,
+    "ast_hash": "097df4b414d1848e177ce6093985c13f",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_uta_weather.py": {
+    "mtime": 1793866489.941703,
+    "seen": 1793866624.9225953,
+    "ast_hash": "d02318390e2900e710b8bd6a8c4b1748",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/README.md": {
+    "mtime": 1793867735.550642,
+    "seen": 1793867826.441341,
+    "ast_hash": "f4370158abd792f68908667878073bc9",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/atfuta-original.png": {
+    "mtime": 1792380864.616665,
+    "seen": 1793866624.9235766,
+    "ast_hash": "624c15246a97eab6a02ee1001ad7ab7d",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-0.png": {
+    "mtime": 1793866539.301708,
+    "seen": 1793866624.9235766,
+    "ast_hash": "8baeb8fcd795a96312abf828ea6c3ff7",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-1.png": {
+    "mtime": 1793866539.3033504,
+    "seen": 1793866624.9235766,
+    "ast_hash": "1c5ff8bd371db061c4e3a9e8acf3a37f",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-10.png": {
+    "mtime": 1793866539.3168619,
+    "seen": 1793866624.9235766,
+    "ast_hash": "2b3ce498bea68092098102db64265f57",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-11.png": {
+    "mtime": 1793866539.3179595,
+    "seen": 1793866624.9235766,
+    "ast_hash": "3de92ff30cb637e59e998298aa822163",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-2.png": {
+    "mtime": 1793866539.3050332,
+    "seen": 1793866624.9235766,
+    "ast_hash": "93bab124612cda8610dd65cd6e6bc1fb",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-3.png": {
+    "mtime": 1793866539.3061457,
+    "seen": 1793866624.9235766,
+    "ast_hash": "d93b6e20d7aae9ba77393dca9b73ec22",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-4.png": {
+    "mtime": 1793866539.3072724,
+    "seen": 1793866624.9235766,
+    "ast_hash": "ab75f0b73c87b662b58b606471882b98",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-5.png": {
+    "mtime": 1793866539.3083518,
+    "seen": 1793866624.9235766,
+    "ast_hash": "5cccd480ced8e4eefb6b2078a7fb497b",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-6.png": {
+    "mtime": 1793866539.309541,
+    "seen": 1793866624.9235766,
+    "ast_hash": "fe88c489b6d2a9f598e88d209abaa38e",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-7.png": {
+    "mtime": 1793866539.3106172,
+    "seen": 1793866624.9235766,
+    "ast_hash": "e69e3412da536a845ae9eac5e943bffa",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-8.png": {
+    "mtime": 1793866539.3135545,
+    "seen": 1793866624.9235766,
+    "ast_hash": "d00265a13af5a0dda5d7e568bb8e004d",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/icon-9.png": {
+    "mtime": 1793866539.3158202,
+    "seen": 1793866624.9235766,
+    "ast_hash": "48bef460dbd8c63a302677278af1fa60",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/preview-boot.png": {
+    "mtime": 1793866539.6566432,
+    "seen": 1793866624.9235766,
+    "ast_hash": "9e1a4ce7f9d2bcd7ce8867c8a828e9ad",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/preview-icons.png": {
+    "mtime": 1793866539.3195941,
+    "seen": 1793866624.9235766,
+    "ast_hash": "b451089e3d5d867ad9f01f56514a8aff",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/preview-neon.png": {
+    "mtime": 1793866539.706662,
+    "seen": 1793866624.9235766,
+    "ast_hash": "5af7fb61ff90189205786efc2f2fe423",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/preview-no-data.png": {
+    "mtime": 1793866539.750811,
+    "seen": 1793866624.9235766,
+    "ast_hash": "1892f7f8edba97e7b52e19a61e6bf844",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/preview-rain.png": {
+    "mtime": 1793866539.8057854,
+    "seen": 1793866624.9235766,
+    "ast_hash": "822d5a01c1ae19e4cdd7d925039b63fc",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/uta_boot.png": {
+    "mtime": 1793866538.8303185,
+    "seen": 1793866624.9235766,
+    "ast_hash": "f6eb732e125eadcb4520ed5ed2b77dd7",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/uta_neon.png": {
+    "mtime": 1793866539.2765892,
+    "seen": 1793866624.9235766,
+    "ast_hash": "df431eccb49d33d6b0119ed1b3251b1c",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/manifest.json": {
+    "mtime": 1793867352.2009583,
+    "seen": 1793867826.440286,
+    "ast_hash": "e0029bc5f28d4a25709a26f893db0ea1",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_display_emotions.cc": {
+    "mtime": 1793951445.9417691,
+    "seen": 1793951812.2335975,
+    "ast_hash": "7779b858908ce34981c304efaec5cdc1",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_emotion_assets.cc": {
+    "mtime": 1793951438.4638152,
+    "seen": 1793951812.2335975,
+    "ast_hash": "9ae95fb73ac09ec22c4b7aee4dd804ed",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_emotion_assets.h": {
+    "mtime": 1793951238.3745942,
+    "seen": 1793951812.2335975,
+    "ast_hash": "49686fab80e57e7b22cd78b0ac32b9fe",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_emotion_catalog.inc": {
+    "mtime": 1793867347.827839,
+    "seen": 1793867826.440286,
+    "ast_hash": "c1e96db9c8836b251e655ce0ea27bc53",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_emotions.h": {
+    "mtime": 1793867853.6113477,
+    "seen": 1793867918.4633033,
+    "ast_hash": "0464b4c0fbfd0fe7a5f005dd0e757ce8",
+    "semantic_hash": ""
+  },
+  "scripts/prepare_uta_emotions.py": {
+    "mtime": 1793951236.486018,
+    "seen": 1793951812.2347727,
+    "ast_hash": "0a131aca0d142a8613db0d3af7d28310",
+    "semantic_hash": ""
+  },
+  "scripts/preview_uta_emotions.ps1": {
+    "mtime": 1793867532.7880576,
+    "seen": 1793867826.441341,
+    "ast_hash": "915dd73672d753b1c92c524708bf1670",
+    "semantic_hash": ""
+  },
+  "scripts/tests/cpp/uta_emotions_test.cc": {
+    "mtime": 1793867738.2812967,
+    "seen": 1793867826.441341,
+    "ast_hash": "d3b595407561a09520eabd092cb24115",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_uta_emotions.py": {
+    "mtime": 1793951357.4227457,
+    "seen": 1793951812.2347727,
+    "ast_hash": "de4225e96e95a2241eef9f7169a2a4a1",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/README.md": {
+    "mtime": 1793951267.3280017,
+    "seen": 1793951812.235779,
+    "ast_hash": "166204b3c7c4b82a4d9cce6170051f65",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/1macdinh.gif": {
+    "mtime": 1793867352.1488633,
+    "seen": 1793867826.4418604,
+    "ast_hash": "d12113ca4b2d22ae2fa4e18775b9fb38",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/binhthuong.gif": {
+    "mtime": 1793867352.1548634,
+    "seen": 1793867826.4418604,
+    "ast_hash": "f60fdc936d9cfac8e0da4f9c29e044aa",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/buon.gif": {
+    "mtime": 1793867352.1648638,
+    "seen": 1793867826.4418604,
+    "ast_hash": "292c7c16640cd89d8e5ca680c09738b1",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/buon2.gif": {
+    "mtime": 1793867352.1668625,
+    "seen": 1793867826.4418604,
+    "ast_hash": "b111437e7f3b038b55bb530d94f50d06",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/buonngu.gif": {
+    "mtime": 1793867352.1752982,
+    "seen": 1793867826.4418604,
+    "ast_hash": "1415ba51af2ca6bfff6a9839c6598217",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/camlang.gif": {
+    "mtime": 1793867352.1966517,
+    "seen": 1793867826.4418604,
+    "ast_hash": "856dfbccc0204bec55a977144252d575",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/chamhoi.gif": {
+    "mtime": 1793867352.1817012,
+    "seen": 1793867826.4418604,
+    "ast_hash": "5d42d4fe293d12980400c1ae0c7d5725",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/cuoito.gif": {
+    "mtime": 1793867352.1628644,
+    "seen": 1793867826.4418604,
+    "ast_hash": "e558b1f8c7b4a04459e361f86b346baf",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/domohoi.gif": {
+    "mtime": 1793867352.1922133,
+    "seen": 1793867826.4418604,
+    "ast_hash": "d3bdbb1776f6068ae9632f3d5a8f8053",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/doxet.gif": {
+    "mtime": 1793867352.194221,
+    "seen": 1793867826.4418604,
+    "ast_hash": "3df85cd36c810d1e5165c3f29b858957",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/duamat.gif": {
+    "mtime": 1793867352.1801746,
+    "seen": 1793867826.4418604,
+    "ast_hash": "1ffed47c5ccb0f196ff1fb642d32ad19",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/hoamat.gif": {
+    "mtime": 1793867352.186702,
+    "seen": 1793867826.4418604,
+    "ast_hash": "caab8f64b299055255d62b64bdb492a7",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/khongchiudau.gif": {
+    "mtime": 1793867352.188703,
+    "seen": 1793867826.4418604,
+    "ast_hash": "59b8009fcca916a1027840a704c5cc86",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/ngacnhien2.gif": {
+    "mtime": 1793867352.1720972,
+    "seen": 1793867826.4418604,
+    "ast_hash": "df31c540ffd53b73c3d618ddd47e58eb",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/nhaymat.gif": {
+    "mtime": 1793867352.1780918,
+    "seen": 1793867826.4418604,
+    "ast_hash": "e72daf128094574f306b714efca2e3f3",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/nheomat.gif": {
+    "mtime": 1793867352.1991165,
+    "seen": 1793867826.4418604,
+    "ast_hash": "e715400112077a6869d5d145d08e7858",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/preview-emotions.png": {
+    "mtime": 1793867535.4018586,
+    "seen": 1793867826.4418604,
+    "ast_hash": "4ce3a4134feabc6739d53e9a00b3388e",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/suynghi2.gif": {
+    "mtime": 1793867352.1847017,
+    "seen": 1793867826.4418604,
+    "ast_hash": "85d04b1cb161b36e54911075b229d118",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/tucgian.gif": {
+    "mtime": 1793867352.1688628,
+    "seen": 1793867826.4418604,
+    "ast_hash": "afe51b91a5af59f368c0f9fbca609c54",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/tucgian2.gif": {
+    "mtime": 1793867352.170009,
+    "seen": 1793867826.4418604,
+    "ast_hash": "dacf3c2560aae350da6a06fbd459eb7c",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/vuimung.gif": {
+    "mtime": 1793867352.1608658,
+    "seen": 1793867826.4418604,
+    "ast_hash": "71e5925654f25f1fc62fd1f721940ca6",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/assets/emotions/vuive.gif": {
+    "mtime": 1793867352.1578672,
+    "seen": 1793867826.4418604,
+    "ast_hash": "ac9f3f827578d77d2c06f9cb80dc8e00",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_media_mcp.cc": {
+    "mtime": 1793868970.1972065,
+    "seen": 1793869188.5436902,
+    "ast_hash": "125576698a02bc0278e84484ccbe70fa",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_media_mcp.h": {
+    "mtime": 1793868618.494803,
+    "seen": 1793869188.5436902,
+    "ast_hash": "a046eb72a7d7449e9cc235ac481e613c",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_media_policy.h": {
+    "mtime": 1793868405.8751132,
+    "seen": 1793869188.5436902,
+    "ast_hash": "8a6031b69f91d202822229030a8cb6b3",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_media_response.h": {
+    "mtime": 1793868970.2118483,
+    "seen": 1793869188.5436902,
+    "ast_hash": "b06970dce685255e5ac6a0dccdf2bfb8",
+    "semantic_hash": ""
+  },
+  "scripts/tests/cpp/uta_media_test.cc": {
+    "mtime": 1793869157.529318,
+    "seen": 1793869188.5447435,
+    "ast_hash": "1c79f03444739c905d84d9e507ec692f",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_uta_media.py": {
+    "mtime": 1793869134.732766,
+    "seen": 1793869188.5447435,
+    "ast_hash": "d26b4f3bf5ac878ca0d906cec6d4ee70",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_wifi_network_info.py": {
+    "mtime": 1793871264.1099334,
+    "seen": 1793871297.2422109,
+    "ast_hash": "206af3c65bfa20cc8df5f3b7d0b5a7bb",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_reply_gesture.h": {
+    "mtime": 1793938887.9748435,
+    "seen": 1793938965.6900792,
+    "ast_hash": "c69bea9559ac4ee5446abb6ccad9a89d",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_portal_style.h": {
+    "mtime": 1793950548.1613193,
+    "seen": 1793950624.4951015,
+    "ast_hash": "43a9de231f14ccf4c5babd03c543fffd",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_range_sensors.h": {
+    "mtime": 1793952151.9613051,
+    "seen": 1793952310.3565423,
+    "ast_hash": "766abedae475fa0b6ceb5701141278e6",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_cob_lights.h": {
+    "mtime": 1793947557.3829794,
+    "seen": 1793947702.9929671,
+    "ast_hash": "cf277433e81e9803f5e8db4d12847d74",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_pwm_bank.h": {
+    "mtime": 1793947653.9144719,
+    "seen": 1793947702.9929671,
+    "ast_hash": "c2a46d7e15ab944496906a4f08426de0",
     "semantic_hash": ""
   }
 }

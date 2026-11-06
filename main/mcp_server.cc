@@ -37,17 +37,22 @@ void McpServer::AddCommonTools() {
     // Do not add custom tools here.
     // Custom tools must be added in the board's InitializeTools function.
 
-    AddTool("self.get_device_status",
-            "Provides the real-time information of the device, including the current status of the "
-            "audio speaker, screen, battery, network, etc.\n"
-            "Use this tool for: \n"
-            "1. Answering questions about current condition (e.g. what is the current volume of "
-            "the audio speaker?)\n"
-            "2. As the first step to control the device (e.g. turn up / down the volume of the "
-            "audio speaker, etc.)",
-            PropertyList(), [&board](const PropertyList& properties) -> ReturnValue {
-                return board.GetDeviceStatusJson();
-            });
+    AddTool(
+        "self.get_device_status",
+        "Provides the real-time information of the device, including the current status of the "
+        "audio speaker, screen, battery, network, etc.\n"
+        "For the device's local Wi-Fi IPv4 address, use network.ip from this result. "
+        "It is the active station interface address assigned by the local network, not a public "
+        "Internet address. If network.ip is null, report that no station IP is available; do not "
+        "guess. network.ap_ip, when present, belongs only to the configuration hotspot.\n"
+        "Use this tool for: \n"
+        "1. Answering questions about current condition (e.g. what is the current volume of "
+        "the audio speaker?)\n"
+        "2. As the first step to control the device (e.g. turn up / down the volume of the "
+        "audio speaker, etc.)",
+        PropertyList(), [&board](const PropertyList& properties) -> ReturnValue {
+            return board.GetDeviceStatusJson();
+        });
 
     AddTool("self.audio_speaker.set_volume",
             "Set the volume of the audio speaker. If the current volume is unknown, you must call "

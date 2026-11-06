@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <charconv>
+#include <cmath>
 #include <cstring>
 #include <memory>
 #include <new>
@@ -23,6 +24,7 @@
 #include "http.h"
 #include "uta_h264.h"
 #include "uta_helpers.h"
+#include "uta_media_policy.h"
 
 namespace uta {
 namespace {
@@ -39,8 +41,9 @@ public:
     }
 
     bool Seek(uint32_t position) {
-        if (http_ && position == position_)
+        if (open_ && http_ && position == position_ && position <= range_end_)
             return true;
+        open_ = false;
         if (http_)
             http_->Close();
         for (unsigned redirects = 0; redirects < 4 && IsHttpUrl(url_); ++redirects) {
@@ -63,38 +66,37 @@ public:
                 continue;
             }
             if (*code == 206) {
-                const auto range = http_->GetResponseHeader("content-range");
-                const auto prefix = "bytes " + std::to_string(position) + "-";
-                const auto slash = range.find('/');
-                if (!range.starts_with(prefix) || slash == std::string::npos)
+                HttpRange range;
+                if (!ParseMovieRange(http_->GetResponseHeader("content-range"), position, size_,
+                                     http_->GetBodyLength(), range))
                     return false;
-                uint32_t size = 0;
-                const auto parsed =
-                    std::from_chars(range.data() + slash + 1, range.data() + range.size(), size);
-                if (parsed.ec != std::errc{} || parsed.ptr != range.data() + range.size() ||
-                    size <= position || (size_ && size != size_))
-                    return false;
-                size_ = size;
+                size_ = range.total;
+                range_end_ = range.last;
             } else if (*code == 200 && position == 0) {
                 const auto size = http_->GetBodyLength();
                 if (!size || size > UINT32_MAX || (size_ && size_ != size))
                     return false;
                 size_ = size;
+                range_end_ = size_ - 1;
             } else
                 return false;
             position_ = position;
+            open_ = true;
             return true;
         }
         return false;
     }
     int Read(void* destination, uint32_t size) {
-        if (!http_ || callbacks_.cancelled() || position_ > size_)
+        if (!open_ || !http_ || callbacks_.cancelled() || position_ > size_)
             return -1;
         size = std::min(size, size_ - position_);
         if (!size)
             return 0;
+        if (position_ > range_end_ && !Seek(position_))
+            return -1;
+        size = std::min(size, range_end_ - position_ + 1);
         auto count = http_->Read(static_cast<char*>(destination), size);
-        if (!count || *count < 0 || static_cast<uint32_t>(*count) > size)
+        if (!count || *count <= 0 || static_cast<uint32_t>(*count) > size)
             return -1;
         position_ += *count;
         return *count;
@@ -106,6 +108,8 @@ private:
     const VideoCallbacks& callbacks_;
     std::unique_ptr<Http> http_;
     uint32_t position_ = 0, size_ = 0;
+    uint32_t range_end_ = 0;
+    bool open_ = false;
 };
 
 struct MovieSession {
@@ -169,7 +173,7 @@ bool ConvertVideo(MovieSession& session, const esp_video_dec_out_frame_t& output
 }
 
 bool DecodeAudio(MovieSession& session, const esp_extractor_frame_info_t& frame,
-                 const VideoCallbacks& callbacks) {
+                 const VideoCallbacks& callbacks, bool& emitted) {
     esp_audio_dec_in_raw_t input{};
     input.buffer = frame.frame_buffer;
     input.len = frame.frame_size;
@@ -230,12 +234,17 @@ bool DecodeAudio(MovieSession& session, const esp_extractor_frame_info_t& frame,
         }
         if (!callbacks.audio(pcm, samples))
             return false;
+        emitted = true;
     }
     return !callbacks.cancelled();
 }
 }  // namespace
 
 bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
+    if (!IsHttpUrl(url) || !callbacks.cancelled || !callbacks.paused || !callbacks.audio ||
+        !callbacks.video || !callbacks.error || callbacks.output_rate < 8000 ||
+        callbacks.output_rate > 48000)
+        return false;
     MovieInput input(url, callbacks);
     if (!input.Seek(0)) {
         callbacks.error(
@@ -289,7 +298,9 @@ bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
     const bool h264 = video.video_info.format == ESP_EXTRACTOR_VIDEO_FORMAT_H264;
     if ((!h264 && video.video_info.format != ESP_EXTRACTOR_VIDEO_FORMAT_MJPEG) ||
         !video.video_info.width || !video.video_info.height || video.video_info.width > 240 ||
-        video.video_info.height > 240 || video.video_info.fps > 15 ||
+        video.video_info.height > 240 ||
+        !std::isfinite(static_cast<double>(video.video_info.fps)) || video.video_info.fps <= 0 ||
+        video.video_info.fps > 15 ||
         (audio.audio_info.format != ESP_EXTRACTOR_AUDIO_FORMAT_AAC &&
          audio.audio_info.format != ESP_EXTRACTOR_AUDIO_FORMAT_MP3) ||
         audio.audio_info.channel < 1 || audio.audio_info.channel > 2 ||
@@ -324,10 +335,14 @@ bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
         audio_config.cfg = &aac;
         audio_config.cfg_sz = sizeof(aac);
     }
-    if (esp_audio_dec_open(&audio_config, &session->audio) != ESP_AUDIO_ERR_OK)
+    if (esp_audio_dec_open(&audio_config, &session->audio) != ESP_AUDIO_ERR_OK) {
+        callbacks.error("Không mở được bộ giải mã âm thanh MP4");
         return false;
+    }
     int64_t started = 0, paused_at = 0;
+    unsigned empty_frames = 0;
     bool audio_played = false, video_played = false;
+    bool audio_eos = false, video_eos = false;
     while (!callbacks.cancelled()) {
         if (callbacks.paused()) {
             if (!paused_at)
@@ -354,10 +369,21 @@ bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
         };
         std::unique_ptr<esp_extractor_frame_info_t, decltype(release)> guard(&frame, release);
         if (!frame.frame_buffer || !frame.frame_size) {
-            if (EXTRACTOR_IS_EOS(frame.frame_flag))
-                return audio_played && video_played;
+            if (++empty_frames > 16) {
+                callbacks.error("Bộ tách MP4 không trả dữ liệu khung hợp lệ");
+                return false;
+            }
+            if (EXTRACTOR_IS_EOS(frame.frame_flag) && frame.stream_idx == 0) {
+                audio_eos |= frame.stream_type == ESP_EXTRACTOR_STREAM_TYPE_AUDIO;
+                video_eos |= frame.stream_type == ESP_EXTRACTOR_STREAM_TYPE_VIDEO;
+                // Một track hết trước không được cắt phần còn lại của track kia.
+                if ((audio_eos && video_eos) || frame.stream_type == ESP_EXTRACTOR_STREAM_TYPE_NONE)
+                    return audio_played && video_played;
+            }
+            vTaskDelay(pdMS_TO_TICKS(1));
             continue;
         }
+        empty_frames = 0;
         if (frame.stream_idx != 0)
             continue;
         if (frame.pts > 3600000) {
@@ -386,12 +412,15 @@ bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
         if (callbacks.cancelled())
             return false;
         if (frame.stream_type == ESP_EXTRACTOR_STREAM_TYPE_AUDIO) {
-            if (!DecodeAudio(*session, frame, callbacks)) {
+            if (!DecodeAudio(*session, frame, callbacks, audio_played)) {
                 callbacks.error("Lỗi giải mã âm thanh MP4");
                 return false;
             }
-            audio_played = true;
         } else if (frame.stream_type == ESP_EXTRACTOR_STREAM_TYPE_VIDEO) {
+            if (frame.frame_size > 128 * 1024) {
+                callbacks.error("Khung video vượt giới hạn 128 KiB");
+                return false;
+            }
             esp_video_dec_in_frame_t encoded{};
             encoded.data = frame.frame_buffer;
             encoded.size = frame.frame_size;
@@ -434,7 +463,10 @@ bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
             if (h264 && !ConvertVideo(*session, decoded, true, info.res.width, info.res.height,
                                       info.res.width, info.res.height))
                 return false;
-            if (esp_timer_get_time() - (started + static_cast<int64_t>(frame.pts) * 1000) < 180000)
+            if (callbacks.cancelled())
+                return false;
+            if (!callbacks.paused() &&
+                esp_timer_get_time() - (started + static_cast<int64_t>(frame.pts) * 1000) < 180000)
                 callbacks.video(session->rgb.data(), info.res.width, info.res.height);
             video_played = true;
         }

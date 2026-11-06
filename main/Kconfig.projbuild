@@ -982,6 +982,7 @@ config USE_MULTILINE_CHAT_MESSAGE
 
 choice WAKE_WORD_TYPE
     prompt "Wake Word Implementation Type"
+    default USE_AFE_WAKE_WORD if BOARD_TYPE_UTA_ROBOT && SPIRAM
     default WAKE_WORD_DISABLED
     help
         Choose the type of wake word implementation to use.

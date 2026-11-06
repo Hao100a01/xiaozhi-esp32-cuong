@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <expected>
 #include <functional>
 #include <mutex>
 #include <optional>
@@ -14,22 +15,36 @@
 
 namespace uta {
 
+using MediaResult = std::expected<void, std::string>;
+
+struct MediaSnapshot {
+    std::string type;
+    std::string title;
+    std::string status;
+    bool playing = false;
+    bool preparing = false;
+    bool paused = false;
+    bool replay_available = false;
+};
+
 class MediaPlayer {
 public:
     explicit MediaPlayer(SettingsStore& settings);
     bool Start();
-    bool PlaySong(const std::string& song, const std::string& artist);
-    bool PlayRadio(const std::string& url, const std::string& name);
-    bool PlayVideo(const std::string& url);
+    MediaResult PlaySong(const std::string& song, const std::string& artist);
+    MediaResult PlayRadio(const std::string& url, const std::string& name);
+    MediaResult PlayVideo(const std::string& url);
+    MediaResult Replay();
     void SetVideoSink(std::function<void(const uint16_t*, int, int)> sink) {
         video_sink_ = std::move(sink);
     }
     bool IsVideo() const { return video_playing_.load(); }
     void Stop();
-    void Pause(bool paused);
+    MediaResult Pause(bool paused);
     bool IsPlaying() const { return playing_.load(); }
     bool IsPaused() const { return paused_.load(); }
     std::string Status();
+    MediaSnapshot Snapshot();
     Spectrum GetSpectrum();
 
 private:
@@ -43,23 +58,29 @@ private:
     SettingsStore& settings_;
     std::mutex mutex_;
     std::optional<Request> pending_;
+    std::optional<Request> last_request_;
     std::string status_ = "Đã dừng";
     std::atomic<uint32_t> request_id_{0};
     std::atomic<bool> playing_{false};
     std::atomic<bool> paused_{false};
-    std::atomic<bool> preparing_{false};
+    uint32_t preparing_id_ = 0;
     TaskHandle_t task_ = nullptr;
     Spectrum spectrum_{};
     int64_t spectrum_at_ = 0;
     std::atomic<bool> video_playing_{false};
     std::function<void(const uint16_t*, int, int)> video_sink_;
 
-    bool Submit(bool song, const std::string& value, const std::string& label, bool video = false);
+    MediaResult Submit(bool song, const std::string& value, const std::string& label,
+                       bool video = false);
     bool Cancelled(uint32_t id);
     void SetStatus(uint32_t id, const std::string& text);
     void Run();
-    std::string SearchSong(const Request& request, const Configuration& config);
-    bool Stream(const std::string& url, uint32_t id, bool radio);
+    std::expected<std::string, std::string> SearchSong(const Request& request,
+                                                       const Configuration& config);
+    bool Stream(const std::string& url, uint32_t id, bool radio, std::string& error,
+                bool& retryable);
+    bool PushPcm(const int16_t* pcm, size_t count, int rate, uint32_t id, uint32_t generation,
+                 bool pause_between_blocks);
 };
 
 }  // namespace uta

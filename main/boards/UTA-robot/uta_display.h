@@ -1,14 +1,25 @@
 #pragma once
 
 #include <esp_heap_caps.h>
+#include <src/misc/cache/instance/lv_image_cache.h>
 #include <cstring>
+#include "device_state.h"
 #include "display/lcd_display.h"
+#include "uta_emotions.h"
 #include "uta_spectrum.h"
 
 // Lớp hiển thị riêng của UTA: không đưa hành vi board vào màn hình dùng chung.
 class UtaDisplay : public SpiLcdDisplay {
 public:
     using SpiLcdDisplay::SpiLcdDisplay;
+    ~UtaDisplay() override;
+
+    void SetupUI() override;
+    void RestoreRotation();
+    bool SetRotation(int degrees);
+    int Rotation() const { return rotation_.load(); }
+    bool SetEmotion(const char* emotion) override;
+    void UpdateStandby(DeviceState state, bool media_active, bool wifi_connected);
 
     void UpdateVideo(const uint16_t* pixels, int width, int height) {
         if (!IsSetupUICalled() || !Lock(20))
@@ -84,6 +95,34 @@ public:
     }
 
 private:
+    std::atomic<int> rotation_{0};
+    void SetupEyesLocked();
+    bool UpdateEyesLocked(DeviceState state, bool visible, int64_t now);
+    void ReleaseEyesLocked();
+    lv_obj_t* eyes_screen_ = nullptr;
+    lv_obj_t* eyes_image_ = nullptr;
+    lv_obj_t* eyes_status_ = nullptr;
+    lv_obj_t* eyes_subtitle_ = nullptr;
+    std::unique_ptr<uint8_t, decltype(&heap_caps_free)> eyes_gif_data_{nullptr, heap_caps_free};
+    std::unique_ptr<LvglGif> eyes_controller_;
+    std::atomic<uta::EyeEmotion> requested_eye_{uta::EyeEmotion::Neutral};
+    std::atomic<bool> use_base_emotion_{false};
+    std::atomic<int64_t> expression_until_{0};
+    uta::EyeEmotion loaded_eye_ = uta::EyeEmotion::Count;
+    uta::EyeEmotion failed_eye_ = uta::EyeEmotion::Count;
+    int64_t eye_retry_at_ = 0;
+    lv_obj_t* boot_screen_ = nullptr;
+    lv_obj_t* idle_screen_ = nullptr;
+    lv_obj_t* clock_label_ = nullptr;
+    lv_obj_t* date_label_ = nullptr;
+    lv_obj_t* place_label_ = nullptr;
+    lv_obj_t* weather_label_ = nullptr;
+    lv_obj_t* temperature_label_ = nullptr;
+    lv_obj_t* wifi_image_ = nullptr;
+    lv_obj_t* wifi_text_ = nullptr;
+    lv_obj_t* weather_image_ = nullptr;
+    int64_t boot_until_ = 0;
+    int64_t content_at_ = 0;
     lv_obj_t* spectrum_ = nullptr;
     lv_obj_t* video_image_ = nullptr;
     uint16_t* video_pixels_ = nullptr;

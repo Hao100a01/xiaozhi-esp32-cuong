@@ -10,6 +10,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class UtaRobotTests(unittest.TestCase):
+    def test_location_portal(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("Cần Node.js để kiểm tra cài đặt vị trí")
+        result = subprocess.run(
+            [node, str(ROOT / "scripts/tests/uta_location_test.cjs")],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_embedded_web_actions(self):
         node = shutil.which("node")
         if not node:

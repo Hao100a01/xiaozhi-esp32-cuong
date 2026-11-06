@@ -72,6 +72,7 @@ public:
     virtual AudioCodec* GetAudioCodec() = 0;
     virtual bool GetTemperature(float& esp32temp);
     virtual Display* GetDisplay();
+    virtual void OnAssistantSentence(const std::string&) {}
     virtual Camera* GetCamera();
     virtual NetworkInterface* GetNetwork() = 0;
     virtual void StartNetwork() = 0;

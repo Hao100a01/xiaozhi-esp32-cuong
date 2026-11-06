@@ -988,6 +988,7 @@ def _collect_variants(
             variant["target"],
             sdkconfig_append,
         )
+        variant["default_wake_word"] = build.get("wake_word")
         variant["build_options"] = _build_option_definitions(
             variant["board"],
             variant["target"],
@@ -1612,7 +1613,10 @@ def build_board(
             ([option.split("=", 1)[0]], "--language")
         )
         wake_word_supported = _board_supports_wake_word(target, sdkconfig_append)
-        requested_wake_word = wake_word
+        # An explicit CLI choice wins over the variant's semantic default.
+        requested_wake_word = wake_word if wake_word is not None else build.get("wake_word")
+        if requested_wake_word is not None and not isinstance(requested_wake_word, str):
+            raise ValueError(f"{cfg_path}: build.wake_word must be a string")
         if requested_wake_word is None:
             requested_wake_word = "disabled"
             if wake_word_supported:

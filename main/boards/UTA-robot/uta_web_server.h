@@ -13,8 +13,15 @@ namespace uta {
 struct WebActions {
     std::function<bool(const std::string&, int)> robot;
     std::function<bool(int, int)> servo;
+    std::function<bool(int)> cob_available;
+    std::function<bool(int, int)> cob;
+    std::function<int()> tof_mm;
+    std::function<int()> ultrasonic_mm;
+    std::function<bool(int, int)> extra_servo;
     std::function<void(int)> volume;
     std::function<void(int)> brightness;
+    std::function<int()> rotation;
+    std::function<bool(int)> set_rotation;
     std::function<void()> restart;
     std::function<void()> wifi;
 };
@@ -33,7 +40,6 @@ private:
     httpd_handle_t server_ = nullptr;
 
     static esp_err_t Dispatch(httpd_req_t* request);
-    bool Authenticate(httpd_req_t* request);
     esp_err_t Handle(httpd_req_t* request);
     esp_err_t Status(httpd_req_t* request);
     esp_err_t Save(httpd_req_t* request, const cJSON* body);

@@ -5,8 +5,6 @@
 #include <cstring>
 #include <memory>
 
-#include <mbedtls/base64.h>
-
 #include "config.h"
 #include "uta_web_page.h"
 
@@ -104,46 +102,10 @@ esp_err_t WebServer::Dispatch(httpd_req_t* request) {
     return static_cast<WebServer*>(request->user_ctx)->Handle(request);
 }
 
-bool WebServer::Authenticate(httpd_req_t* request) {
-    const size_t length = httpd_req_get_hdr_value_len(request, "Authorization");
-    if (length == 0 || length >= 256) {
-        return false;
-    }
-    std::array<char, 256> header{};
-    if (httpd_req_get_hdr_value_str(request, "Authorization", header.data(), header.size()) !=
-        ESP_OK) {
-        return false;
-    }
-    const std::string credentials = "uta:" + settings_.Get().web_password;
-    std::array<unsigned char, 192> encoded{};
-    size_t encoded_size = 0;
-    if (mbedtls_base64_encode(encoded.data(), encoded.size(), &encoded_size,
-                              reinterpret_cast<const unsigned char*>(credentials.data()),
-                              credentials.size()) != 0) {
-        return false;
-    }
-    const std::string expected =
-        "Basic " + std::string(reinterpret_cast<const char*>(encoded.data()), encoded_size);
-    if (expected.size() != length) {
-        return false;
-    }
-    unsigned difference = 0;
-    for (size_t i = 0; i < expected.size(); ++i) {
-        difference |= static_cast<unsigned char>(expected[i] ^ header[i]);
-    }
-    return difference == 0;
-}
-
 esp_err_t WebServer::Handle(httpd_req_t* request) {
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     httpd_resp_set_hdr(request, "X-Content-Type-Options", "nosniff");
     httpd_resp_set_hdr(request, "Referrer-Policy", "same-origin");
-    if (!Authenticate(request)) {
-        httpd_resp_set_hdr(request, "WWW-Authenticate",
-                           "Basic realm=\"UTA-robot\", charset=\"UTF-8\"");
-        return Reply(request, "401 Unauthorized",
-                     "Hãy đăng nhập bằng tài khoản uta và mật khẩu trên màn hình");
-    }
     if (request->method == HTTP_GET) {
         if (std::strcmp(request->uri, "/api/trang-thai") == 0) {
             return Status(request);
@@ -200,6 +162,7 @@ esp_err_t WebServer::Status(httpd_req_t* request) {
         return ESP_ERR_NO_MEM;
     }
     cJSON_AddStringToObject(root.get(), "trang_thai_nhac", media_.Status().c_str());
+    cJSON_AddNumberToObject(root.get(), "goc_man_hinh", actions_.rotation());
     cJSON_AddStringToObject(root.get(), "may_chu_nhac", config.music_server.c_str());
     cJSON_AddStringToObject(root.get(), "url_radio", config.radio_url.c_str());
     cJSON_AddStringToObject(root.get(), "ten_radio", config.radio_name.c_str());
@@ -208,12 +171,16 @@ esp_err_t WebServer::Status(httpd_req_t* request) {
     cJSON_AddBoolToObject(root.get(), "robot_dang_bat",
                           active_.robot_enabled || active_.motor_driver);
     cJSON_AddBoolToObject(root.get(), "uart_dang_bat", active_.robot_enabled);
-    cJSON_AddBoolToObject(root.get(), "servo_dang_bat", active_.servos_enabled);
+    cJSON_AddBoolToObject(root.get(), "servo_dang_bat", active_.servos_enabled[0] || active_.servos_enabled[1]);
     cJSON_AddNumberToObject(root.get(), "driver_dc", config.motor_driver);
     cJSON_AddNumberToObject(root.get(), "toc_do_dc", config.motor_speed);
     cJSON_AddBoolToObject(root.get(), "dao_dc_trai", config.reverse_left);
     cJSON_AddBoolToObject(root.get(), "dao_dc_phai", config.reverse_right);
-    cJSON_AddBoolToObject(root.get(), "bat_servo", config.servos_enabled);
+    cJSON_AddBoolToObject(root.get(), "bat_servo", config.servos_enabled[0] || config.servos_enabled[1]);
+    cJSON_AddBoolToObject(root.get(), "bat_servo_dau", config.servos_enabled[0]);
+    cJSON_AddBoolToObject(root.get(), "bat_servo_co", config.servos_enabled[1]);
+    cJSON_AddBoolToObject(root.get(), "dang_servo_dau", active_.servos_enabled[0]);
+    cJSON_AddBoolToObject(root.get(), "dang_servo_co", active_.servos_enabled[1]);
     for (size_t i = 0; i < 2; ++i) {
         const auto suffix = std::to_string(i);
         cJSON_AddNumberToObject(root.get(), ("goc_min_" + suffix).c_str(), config.servo_min[i]);
@@ -223,9 +190,82 @@ esp_err_t WebServer::Status(httpd_req_t* request) {
         cJSON_AddNumberToObject(root.get(), ("dang_max_" + suffix).c_str(), active_.servo_max[i]);
         cJSON_AddNumberToObject(root.get(), ("dang_nha_" + suffix).c_str(), active_.servo_home[i]);
     }
+    auto* saved_servos = cJSON_CreateIntArray(config.extra_servo_pins.data(), kExtraServoCount);
+    auto* active_servos = cJSON_CreateIntArray(active_.extra_servo_pins.data(), kExtraServoCount);
+    if (!saved_servos || !active_servos) {
+        cJSON_Delete(saved_servos);
+        cJSON_Delete(active_servos);
+        return ESP_ERR_NO_MEM;
+    }
+    if (!cJSON_AddItemToObject(root.get(), "servo_mo_rong", saved_servos)) {
+        cJSON_Delete(saved_servos);
+        cJSON_Delete(active_servos);
+        return ESP_ERR_NO_MEM;
+    }
+    if (!cJSON_AddItemToObject(root.get(), "servo_mo_rong_dang_dung", active_servos)) {
+        cJSON_Delete(active_servos);
+        return ESP_ERR_NO_MEM;
+    }
+    auto* cob_pins = cJSON_CreateIntArray(config.cob_pins.data(), kCobPinCount);
+    if (!cob_pins)
+        return ESP_ERR_NO_MEM;
+    if (!cJSON_AddItemToObject(root.get(), "chan_den_cob", cob_pins)) {
+        cJSON_Delete(cob_pins);
+        return ESP_ERR_NO_MEM;
+    }
+    auto* cob_active = cJSON_AddArrayToObject(root.get(), "den_cob_dang_dung");
+    if (!cob_active)
+        return ESP_ERR_NO_MEM;
+    for (int light = 0; light < kCobLightCount; ++light) {
+        auto* item = cJSON_CreateBool(actions_.cob_available(light));
+        if (!item)
+            return ESP_ERR_NO_MEM;
+        if (!cJSON_AddItemToArray(cob_active, item)) {
+            cJSON_Delete(item);
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    cJSON_AddBoolToObject(root.get(), "rgb_anode", config.rgb_common_anode);
+    auto* range_pins = cJSON_CreateIntArray(config.range_pins.data(), kRangePinCount);
+    if (!range_pins)
+        return ESP_ERR_NO_MEM;
+    if (!cJSON_AddItemToObject(root.get(), "chan_cam_bien", range_pins)) {
+        cJSON_Delete(range_pins);
+        return ESP_ERR_NO_MEM;
+    }
+    cJSON_AddBoolToObject(root.get(), "tof_dang_dung", active_.range_pins[kTofSda] >= 0);
+    cJSON_AddBoolToObject(root.get(), "sieu_am_dang_dung", active_.range_pins[kUltrasonicTrig] >= 0);
+    cJSON_AddNumberToObject(root.get(), "tof_mm", actions_.tof_mm());
+    cJSON_AddNumberToObject(root.get(), "sieu_am_mm", actions_.ultrasonic_mm());
+    const auto add_lcd = [&](const char* key, const LcdSettings& lcd, bool secondary) {
+        auto* node = cJSON_AddObjectToObject(root.get(), key);
+        if (!node)
+            return false;
+        if (!cJSON_AddNumberToObject(node, "driver", static_cast<int>(lcd.driver)) ||
+            !cJSON_AddNumberToObject(node, "width", lcd.width) ||
+            !cJSON_AddNumberToObject(node, "height", lcd.height))
+            return false;
+        if (secondary) {
+            auto* pins = cJSON_CreateIntArray(lcd.pins.data(), lcd.pins.size());
+            if (!pins)
+                return false;
+            if (!cJSON_AddItemToObject(node, "pins", pins)) {
+                cJSON_Delete(pins);
+                return false;
+            }
+        }
+        return true;
+    };
+    if (!add_lcd("man_chinh", config.primary_lcd, false) ||
+        !add_lcd("man_phu", config.secondary_lcd, true))
+        return ESP_ERR_NO_MEM;
     cJSON_AddBoolToObject(
         root.get(), "can_khoi_dong_lai",
-        config.gpio.pins != active_.gpio.pins || config.touch_enabled != active_.touch_enabled ||
+        config.cob_pins != active_.cob_pins || config.rgb_common_anode != active_.rgb_common_anode ||
+            config.range_pins != active_.range_pins ||
+            config.extra_servo_pins != active_.extra_servo_pins ||
+            config.primary_lcd != active_.primary_lcd || config.secondary_lcd != active_.secondary_lcd ||
+            config.gpio.pins != active_.gpio.pins || config.touch_enabled != active_.touch_enabled ||
             config.robot_enabled != active_.robot_enabled ||
             config.motor_driver != active_.motor_driver ||
             config.motor_speed != active_.motor_speed ||
@@ -264,7 +304,6 @@ esp_err_t WebServer::Status(httpd_req_t* request) {
 
 esp_err_t WebServer::Save(httpd_req_t* request, const cJSON* body) {
     auto config = settings_.Get();
-    std::string password;
     std::string key;
     const auto* pins = cJSON_GetObjectItemCaseSensitive(body, "chan");
     const auto* robot = cJSON_GetObjectItemCaseSensitive(body, "robot_uart");
@@ -273,11 +312,10 @@ esp_err_t WebServer::Save(httpd_req_t* request, const cJSON* body) {
         (!config.music_server.empty() && !IsHttpUrl(config.music_server)) ||
         !Text(body, "url_radio", config.radio_url, 512) || !IsHttpUrl(config.radio_url) ||
         !Text(body, "ten_radio", config.radio_name, 120) || config.radio_name.empty() ||
-        !Text(body, "khoa_nhac", key, 128) || !Text(body, "mat_khau_moi", password, 64) ||
-        (!password.empty() && password.size() < 8) || !cJSON_IsBool(touch) ||
-        !cJSON_IsObject(pins) || !cJSON_IsBool(robot)) {
+        !Text(body, "khoa_nhac", key, 128) || !cJSON_IsBool(touch) || !cJSON_IsObject(pins) ||
+        !cJSON_IsBool(robot)) {
         return Reply(request, "400 Bad Request",
-                     "Cài đặt không hợp lệ; kiểm tra địa chỉ và mật khẩu tối thiểu 8 ký tự");
+                     "Cài đặt không hợp lệ; kiểm tra địa chỉ và các lựa chọn");
     }
     for (size_t i = 0; i < kPinCount; ++i) {
         if (!Integer(pins, kPinKeys[i], config.gpio.pins[i], -1, 48)) {
@@ -293,7 +331,13 @@ esp_err_t WebServer::Save(httpd_req_t* request, const cJSON* body) {
     }
     config.reverse_left = cJSON_IsTrue(cJSON_GetObjectItemCaseSensitive(body, "dao_dc_trai"));
     config.reverse_right = cJSON_IsTrue(cJSON_GetObjectItemCaseSensitive(body, "dao_dc_phai"));
-    config.servos_enabled = cJSON_IsTrue(cJSON_GetObjectItemCaseSensitive(body, "bat_servo"));
+    const auto* head = cJSON_GetObjectItemCaseSensitive(body, "bat_servo_dau");
+    const auto* neck = cJSON_GetObjectItemCaseSensitive(body, "bat_servo_co");
+    if ((head || neck) && (!cJSON_IsBool(head) || !cJSON_IsBool(neck)))
+        return Reply(request, "400 Bad Request", "Thiếu lựa chọn servo đầu hoặc cổ");
+    const bool legacy_servo = cJSON_IsTrue(cJSON_GetObjectItemCaseSensitive(body, "bat_servo"));
+    config.servos_enabled = {head ? cJSON_IsTrue(head) != 0 : legacy_servo,
+                             neck ? cJSON_IsTrue(neck) != 0 : legacy_servo};
     config.robot_enabled = cJSON_IsTrue(robot);
     for (size_t i = 0; i < 2; ++i) {
         const auto suffix = std::to_string(i);
@@ -311,19 +355,78 @@ esp_err_t WebServer::Save(httpd_req_t* request, const cJSON* body) {
     }
     config.touch_enabled = cJSON_IsTrue(touch);
     config.robot_enabled = cJSON_IsTrue(robot);
+    const auto read_lcd = [&](const char* key, LcdSettings& lcd, bool secondary) {
+        const auto* node = cJSON_GetObjectItemCaseSensitive(body, key);
+        if (!node)
+            return true;
+        int driver = 0;
+        if (!cJSON_IsObject(node) || !Integer(node, "driver", driver, 0, 6) ||
+            !Integer(node, "width", lcd.width, 1, 320) ||
+            !Integer(node, "height", lcd.height, 1, 320))
+            return false;
+        lcd.driver = static_cast<LcdDriver>(driver);
+        if (!secondary)
+            return true;
+        const auto* pins = cJSON_GetObjectItemCaseSensitive(node, "pins");
+        if (!cJSON_IsObject(pins))
+            return false;
+        constexpr const char* keys[] = {"data", "clock", "cs", "dc", "rst", "bl"};
+        for (size_t i = 0; i < lcd.pins.size(); ++i)
+            if (!Integer(pins, keys[i], lcd.pins[i], -1, 48))
+                return false;
+        return true;
+    };
+    if (!read_lcd("man_chinh", config.primary_lcd, false) ||
+        !read_lcd("man_phu", config.secondary_lcd, true))
+        return Reply(request, "400 Bad Request", "Cấu hình màn hình không hợp lệ");
+    if (const auto* extra = cJSON_GetObjectItemCaseSensitive(body, "servo_mo_rong")) {
+        constexpr const char* keys[] = {"banh_trai", "banh_phai", "tay_trai", "tay_phai"};
+        if (!cJSON_IsObject(extra))
+            return Reply(request, "400 Bad Request", "Cấu hình servo mở rộng không hợp lệ");
+        for (size_t i = 0; i < config.extra_servo_pins.size(); ++i) {
+            if (!Integer(extra, keys[i], config.extra_servo_pins[i], -1, 48))
+                return Reply(request, "400 Bad Request", "Chân PWM không hợp lệ");
+        }
+    }
+    if (const auto* range = cJSON_GetObjectItemCaseSensitive(body, "chan_cam_bien")) {
+        constexpr const char* keys[] = {"tof_sda", "tof_scl", "tof_xshut", "trig", "echo"};
+        if (!cJSON_IsObject(range))
+            return Reply(request, "400 Bad Request", "Cấu hình cảm biến không hợp lệ");
+        for (size_t i = 0; i < config.range_pins.size(); ++i) {
+            if (!Integer(range, keys[i], config.range_pins[i], -1, 48))
+                return Reply(request, "400 Bad Request", "Chân cảm biến không hợp lệ");
+        }
+    }
+    if (const auto* cob = cJSON_GetObjectItemCaseSensitive(body, "chan_den_cob")) {
+        constexpr const char* keys[] = {"r", "g", "b", "edison", "din"};
+        const auto* anode = cJSON_GetObjectItemCaseSensitive(cob, "rgb_anode");
+        if (!cJSON_IsObject(cob) || !cJSON_IsBool(anode))
+            return Reply(request, "400 Bad Request", "Cấu hình đèn COB không hợp lệ");
+        config.rgb_common_anode = cJSON_IsTrue(anode);
+        for (size_t i = 0; i < config.cob_pins.size(); ++i)
+            if (!Integer(cob, keys[i], config.cob_pins[i], -1, 48))
+                return Reply(request, "400 Bad Request", "Chân GPIO đèn COB không hợp lệ");
+    }
+    const auto cob_error = ValidateCobLights(config);
+    if (!cob_error.empty())
+        return Reply(request, "400 Bad Request", cob_error);
+    const auto range_error = ValidateRangeSensors(config);
+    if (!range_error.empty())
+        return Reply(request, "400 Bad Request", range_error);
+    const auto servo_error = ValidateExtraServos(config);
+    if (!servo_error.empty())
+        return Reply(request, "400 Bad Request", servo_error);
+    const auto display_error = ValidateDisplays(config);
+    if (!display_error.empty())
+        return Reply(request, "400 Bad Request", display_error);
     if (!key.empty()) {
         config.music_key = key;
-    }
-    if (!password.empty()) {
-        config.web_password = password;
     }
     if (!settings_.Save(config)) {
         return Reply(request, "500 Internal Server Error",
                      "Không lưu được cài đặt vào bộ nhớ thiết bị");
     }
-    return Reply(request, "200 OK",
-                 "Đã lưu. Chân GPIO và phụ kiện áp dụng sau khi khởi động lại; đổi mật khẩu cần "
-                 "đăng nhập lại");
+    return Reply(request, "200 OK", "Đã lưu. Chân GPIO và phụ kiện áp dụng sau khi khởi động lại");
 }
 
 esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
@@ -332,26 +435,33 @@ esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
         return Reply(request, "400 Bad Request", "Thiếu tên lệnh hợp lệ");
     }
     bool accepted = true;
+    std::string media_error;
+    const auto accept_media = [&](MediaResult result) {
+        if (!result)
+            media_error = std::move(result.error());
+        return result.has_value();
+    };
     if (command == "nhac") {
         std::string song;
         std::string artist;
         accepted = Text(body, "bai_hat", song, 160) && Text(body, "ca_si", artist, 160) &&
-                   media_.PlaySong(song, artist);
+                   accept_media(media_.PlaySong(song, artist));
     } else if (command == "video") {
         std::string url;
-        accepted = Text(body, "url", url, 512) && IsHttpUrl(url) && media_.PlayVideo(url);
+        accepted =
+            Text(body, "url", url, 2048) && IsHttpUrl(url) && accept_media(media_.PlayVideo(url));
     } else if (command == "radio") {
         std::string station_id;
         accepted = Text(body, "ma_dai", station_id, 40);
         bool found = false;
         if (accepted && station_id == "tuy_chinh") {
             const auto config = settings_.Get();
-            accepted = media_.PlayRadio(config.radio_url, config.radio_name);
+            accepted = accept_media(media_.PlayRadio(config.radio_url, config.radio_name));
             found = true;
         } else if (accepted) {
             for (const auto& station : kStations) {
                 if (station_id == station.id) {
-                    accepted = media_.PlayRadio(station.url, station.name);
+                    accepted = accept_media(media_.PlayRadio(station.url, station.name));
                     found = true;
                     break;
                 }
@@ -361,7 +471,7 @@ esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
     } else if (command == "dung_nhac") {
         media_.Stop();
     } else if (command == "tam_dung" || command == "tiep_tuc") {
-        media_.Pause(command == "tam_dung");
+        accepted = accept_media(media_.Pause(command == "tam_dung"));
     } else if (command == "robot") {
         std::string direction;
         int duration = 0;
@@ -372,6 +482,26 @@ esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
         int axis = 0, angle = 0;
         accepted = Integer(body, "truc", axis, 0, 1) && Integer(body, "goc", angle, 0, 180) &&
                    actions_.servo(axis, angle);
+    } else if (command == "den_cob") {
+        int light = 0, value = 0;
+        accepted = Integer(body, "loai", light, 0, kCobLightCount - 1) &&
+                   Integer(body, "gia_tri", value, 0, light == kEdisonLight ? 255 : 0xffffff) &&
+                   actions_.cob(light, value);
+    } else if (command == "servo_mo_rong") {
+        int axis = 0, value = 0;
+        accepted = Integer(body, "truc", axis, 0, kExtraServoCount - 1) &&
+                   (axis < kWheelServoCount ? Integer(body, "gia_tri", value, -100, 100)
+                                           : Integer(body, "gia_tri", value, 0, 180)) &&
+                   actions_.extra_servo(axis, value);
+    } else if (command == "xoay_man_hinh") {
+        int degrees = 0;
+        if (!Integer(body, "gia_tri", degrees, 0, 270) || degrees % 90 != 0) {
+            return Reply(request, "400 Bad Request", "Chọn góc 0°, 90°, 180° hoặc 270°");
+        }
+        if (!actions_.set_rotation(degrees)) {
+            return Reply(request, "409 Conflict", "Chưa lưu được góc xoay màn hình");
+        }
+        return Reply(request, "200 OK", "Đã xoay màn hình và lưu góc");
     } else if (command == "am_luong" || command == "do_sang") {
         int value = 0;
         accepted = Integer(body, "gia_tri", value, command == "do_sang" ? 5 : 0, 100);
@@ -390,7 +520,9 @@ esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
     }
     return Reply(request, accepted ? "202 Accepted" : "409 Conflict",
                  accepted ? "Đã nhận lệnh"
-                          : "Chưa thực hiện được; kiểm tra tham số và đợi hội thoại kết thúc");
+                 : !media_error.empty()
+                     ? media_error
+                     : "Chưa thực hiện được; kiểm tra tham số và trạng thái thiết bị");
 }
 
 }  // namespace uta

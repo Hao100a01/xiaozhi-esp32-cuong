@@ -1,4 +1,6 @@
 #include "uta_media_player.h"
+#include "uta_media_policy.h"
+#include "uta_media_response.h"
 #include "uta_video_player.h"
 
 #include <algorithm>
@@ -32,8 +34,6 @@ constexpr const char* kTag = "UTA_Nhac";
 constexpr size_t kInputCapacity = 16384;
 constexpr size_t kPcmSamples = 8192;
 
-using JsonPtr = std::unique_ptr<cJSON, decltype(&cJSON_Delete)>;
-
 void AddMusicHeaders(Http& http, const std::string& secret) {
     // Tương thích cách ký yêu cầu /stream_pcm của repo Việt Nam.
     std::string mac = SystemInfo::GetMacAddress();
@@ -60,8 +60,12 @@ void AddMusicHeaders(Http& http, const std::string& secret) {
     http.SetHeader("X-Dynamic-Key", key);
 }
 
-std::unique_ptr<Http> OpenHttp(std::string url, const Configuration& config, bool music) {
+std::unique_ptr<Http> OpenHttp(std::string url, const Configuration& config, bool music,
+                               const std::function<bool()>& cancelled, std::string& error,
+                               bool* retryable = nullptr) {
     for (unsigned redirects = 0; redirects <= 3 && IsHttpUrl(url); ++redirects) {
+        if (cancelled())
+            return nullptr;
         auto http = Board::GetInstance().GetNetwork()->CreateHttp(0);
         if (!http)
             return nullptr;
@@ -72,18 +76,28 @@ std::unique_ptr<Http> OpenHttp(std::string url, const Configuration& config, boo
         if (music && UrlOrigin(url) == UrlOrigin(config.music_server)) {
             AddMusicHeaders(*http, config.music_key);
         }
-        if (!http->Open("GET", url))
+        if (!http->Open("GET", url)) {
+            if (retryable)
+                *retryable = true;
+            error = "Không kết nối được nguồn phát; kiểm tra mạng và địa chỉ máy chủ";
             return nullptr;
+        }
         auto status = http->GetStatusCode();
-        if (status && *status >= 200 && *status < 300)
+        if (status && (*status == 200 || *status == 206))
             return http;
         const auto location = http->GetResponseHeader("location");
         http->Close();
         if (!status || (*status != 301 && *status != 302 && *status != 303 && *status != 307 &&
-                        *status != 308))
+                        *status != 308)) {
+            if (retryable && !status)
+                *retryable = true;
+            error = status ? "Nguồn phát trả HTTP " + std::to_string(*status)
+                           : "Không đọc được phản hồi HTTP của nguồn phát";
             return nullptr;
+        }
         url = ResolveRedirect(url, location);
     }
+    error = "Nguồn phát chuyển hướng quá nhiều hoặc trả địa chỉ không hợp lệ";
     return nullptr;
 }
 
@@ -121,18 +135,18 @@ bool MediaPlayer::Start() {
                        8192, this, 2, &task_) == pdPASS;
 }
 
-bool MediaPlayer::Submit(bool song, const std::string& value, const std::string& label,
-                         bool video) {
-    if (!task_ || value.empty() || value.size() > 512 || label.size() > 160) {
-        return false;
-    }
-    if (preparing_.exchange(true)) {
-        return false;
-    }
+MediaResult MediaPlayer::Submit(bool song, const std::string& value, const std::string& label,
+                                bool video) {
+    if (!task_)
+        return std::unexpected("Tác vụ phát media chưa sẵn sàng");
     Request request;
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        if (preparing_id_)
+            return std::unexpected("Đang chuẩn bị một nguồn phát; đợi hoàn tất hoặc dừng trước");
         request = Request{++request_id_, song, value, label, video};
+        preparing_id_ = request.id;
+        last_request_ = request;
         pending_.reset();
         status_ = "Đang chuẩn bị phát";
         playing_ = true;
@@ -140,9 +154,9 @@ bool MediaPlayer::Submit(bool song, const std::string& value, const std::string&
     }
     Application::GetInstance().PrepareLocalPlayback([this, request](bool ready) {
         std::lock_guard<std::mutex> lock(mutex_);
-        preparing_ = false;
         if (request.id != request_id_)
             return;
+        preparing_id_ = 0;
         if (!ready) {
             playing_ = false;
             status_ = "Chưa phát được khi đang khởi động hoặc cấu hình mạng";
@@ -152,19 +166,47 @@ bool MediaPlayer::Submit(bool song, const std::string& value, const std::string&
         pending_ = request;
         xTaskNotifyGive(task_);
     });
-    return true;
+    return {};
 }
 
-bool MediaPlayer::PlaySong(const std::string& song, const std::string& artist) {
-    return song.size() <= 160 && Submit(true, song, artist);
+MediaResult MediaPlayer::PlaySong(const std::string& song, const std::string& artist) {
+    if (!ValidMediaText(song) || !ValidMediaText(artist, true))
+        return std::unexpected(
+            "Tên bài hát phải có nội dung, tối đa 160 byte; ca sĩ tối đa 160 byte");
+    if (!ValidMusicServer(settings_.Get().music_server))
+        return std::unexpected("Chưa cài đúng URL máy chủ nhạc trên trang điều khiển :8080");
+    return Submit(true, TrimMediaText(song), TrimMediaText(artist));
 }
 
-bool MediaPlayer::PlayRadio(const std::string& url, const std::string& name) {
-    return IsHttpUrl(url) && Submit(false, url, name);
+MediaResult MediaPlayer::PlayRadio(const std::string& url, const std::string& name) {
+    if (!IsHttpUrl(url))
+        return std::unexpected(
+            "Radio cần URL luồng MP3/AAC trực tiếp qua HTTP/HTTPS, tối đa 2048 byte");
+    if (!ValidMediaText(name, true))
+        return std::unexpected("Tên đài không hợp lệ hoặc dài quá 160 byte");
+    const auto title = TrimMediaText(name);
+    return Submit(false, url, title.empty() ? "Radio Internet" : title);
 }
 
-bool MediaPlayer::PlayVideo(const std::string& url) {
-    return video_sink_ && IsHttpUrl(url) && Submit(false, url, "Video MP4", true);
+MediaResult MediaPlayer::PlayVideo(const std::string& url) {
+    if (!video_sink_)
+        return std::unexpected("Thiết bị chưa có đầu ra video");
+    if (!IsHttpUrl(url))
+        return std::unexpected("MP4 cần URL tệp trực tiếp qua HTTP/HTTPS, tối đa 2048 byte");
+    return Submit(false, url, "Video MP4", true);
+}
+
+MediaResult MediaPlayer::Replay() {
+    std::optional<Request> request;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        request = last_request_;
+    }
+    if (!request)
+        return std::unexpected("Chưa có nguồn media nào để phát lại");
+    if (request->song)
+        return PlaySong(request->value, request->label);
+    return request->video ? PlayVideo(request->value) : PlayRadio(request->value, request->label);
 }
 
 void MediaPlayer::Stop() {
@@ -173,6 +215,7 @@ void MediaPlayer::Stop() {
         std::lock_guard<std::mutex> lock(mutex_);
         id = ++request_id_;
         pending_.reset();
+        preparing_id_ = 0;
         status_ = "Đã dừng";
         playing_ = false;
         paused_ = false;
@@ -185,11 +228,40 @@ void MediaPlayer::Stop() {
     });
 }
 
-void MediaPlayer::Pause(bool paused) { paused_ = paused; }
+MediaResult MediaPlayer::Pause(bool paused) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (Application::GetInstance().GetDeviceState() != kDeviceStateIdle)
+        return std::unexpected(
+            "Hội thoại đã ngắt nguồn media. Có thể phát lại nguồn cũ từ đầu sau khi kết thúc lệnh");
+    if (!playing_ || preparing_id_)
+        return std::unexpected(
+            "Không có nguồn đang phát sẵn sàng. Nếu hội thoại đã dừng nguồn cũ, hãy phát lại từ "
+            "đầu");
+    paused_ = paused;
+    return {};
+}
 
 std::string MediaPlayer::Status() {
     std::lock_guard<std::mutex> lock(mutex_);
     return paused_ && playing_ ? "Đang tạm dừng" : status_;
+}
+
+MediaSnapshot MediaPlayer::Snapshot() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::string type = "none", title;
+    if (last_request_) {
+        type = last_request_->video ? "mp4" : last_request_->song ? "music" : "radio";
+        if (video_playing_)
+            type = "mp4";
+        title = last_request_->song ? last_request_->value : last_request_->label;
+    }
+    return {type,
+            title,
+            paused_ && playing_ ? "Đang tạm dừng" : status_,
+            playing_.load(),
+            preparing_id_ != 0,
+            paused_.load(),
+            last_request_.has_value()};
 }
 
 Spectrum MediaPlayer::GetSpectrum() {
@@ -211,56 +283,74 @@ void MediaPlayer::SetStatus(uint32_t id, const std::string& text) {
     }
 }
 
-std::string MediaPlayer::SearchSong(const Request& request, const Configuration& config) {
-    if (!IsHttpUrl(config.music_server)) {
-        SetStatus(request.id, "Chưa cài địa chỉ máy chủ nhạc trên trang điều khiển");
-        return {};
-    }
+std::expected<std::string, std::string> MediaPlayer::SearchSong(const Request& request,
+                                                                const Configuration& config) {
+    if (!ValidMusicServer(config.music_server))
+        return std::unexpected("Chưa cài đúng địa chỉ máy chủ nhạc trên trang điều khiển");
     std::string base = config.music_server;
     while (base.ends_with('/')) {
         base.pop_back();
     }
     const std::string url = base + "/stream_pcm?song=" + UrlEncode(request.value) +
                             "&artist=" + UrlEncode(request.label);
-    auto http = OpenHttp(url, config, true);
+    std::string error;
+    auto http =
+        OpenHttp(url, config, true, [this, id = request.id]() { return Cancelled(id); }, error);
     if (!http)
-        return {};
+        return std::unexpected(error.empty() ? "Không mở được dịch vụ tìm nhạc" : error);
     std::array<char, 1024> buffer{};
     std::string response;
-    while (!Cancelled(request.id)) {
+    const auto deadline = esp_timer_get_time() + 10000000;
+    bool complete = false;
+    while (!Cancelled(request.id) && esp_timer_get_time() < deadline) {
         auto size = http->Read(buffer.data(), buffer.size());
         if (!size || *size < 0 || static_cast<size_t>(*size) > buffer.size() ||
             response.size() + *size > 8192) {
             http->Close();
-            return {};
+            return std::unexpected("Phản hồi tìm nhạc bị lỗi hoặc vượt quá 8192 byte");
         }
         if (*size == 0) {
+            complete = true;
             break;
         }
         response.append(buffer.data(), *size);
     }
     http->Close();
     if (Cancelled(request.id)) {
-        return {};
+        return std::unexpected("Đã hủy tìm nhạc để ưu tiên hội thoại hoặc lệnh mới");
     }
-    JsonPtr root(cJSON_Parse(response.c_str()), cJSON_Delete);
-    const auto* audio = cJSON_GetObjectItemCaseSensitive(root.get(), "audio_url");
-    if (!cJSON_IsString(audio) || !audio->valuestring) {
-        return {};
-    }
-    return ResolveUrl(base, audio->valuestring);
+    if (!complete)
+        return std::unexpected("Máy chủ tìm nhạc phản hồi quá chậm");
+    return ParseSongResponse(base, response);
 }
 
-bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio) {
+bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::string& error,
+                         bool& retryable) {
+    retryable = false;
     auto& audio = Application::GetInstance().GetAudioService();
     const uint32_t generation = audio.GetPlaybackGeneration();
     const int output_rate = Board::GetInstance().GetAudioCodec()->output_sample_rate();
-    auto http = OpenHttp(url, settings_.Get(), !radio);
+    auto http = OpenHttp(
+        url, settings_.Get(), !radio, [this, id]() { return Cancelled(id); }, error, &retryable);
     if (!http)
         return false;
+    const auto content_type = http->GetResponseHeader("content-type");
+    if (content_type.find("text/html") != std::string::npos ||
+        content_type.find("mpegurl") != std::string::npos ||
+        content_type.find("scpls") != std::string::npos) {
+        http->Close();
+        error = "Nguồn là trang web hoặc playlist; cần luồng MP3/AAC trực tiếp";
+        return false;
+    }
+    if (output_rate < 8000 || output_rate > 48000) {
+        http->Close();
+        error = "Tần số đầu ra âm thanh không được hỗ trợ";
+        return false;
+    }
     void* memory = heap_caps_malloc(sizeof(DecoderSession), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     if (!memory) {
         http->Close();
+        error = "Không đủ bộ nhớ để giải mã nhạc/radio";
         return false;
     }
     const auto destroy = [](DecoderSession* value) {
@@ -274,7 +364,7 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio) {
     bool need_input = true;
     bool played = false;
     unsigned no_progress = 0;
-    while (!Cancelled(id)) {
+    while (!Cancelled(id) && audio.GetPlaybackGeneration() == generation) {
         if (paused_) {
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;
@@ -288,6 +378,8 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio) {
             if (!count || *count < 0 ||
                 static_cast<size_t>(*count) >
                     std::min<size_t>(4096, session->input.size() - used)) {
+                error = "Luồng nhạc/radio mất kết nối hoặc lỗi đọc dữ liệu";
+                retryable = true;
                 break;
             }
             eof = *count == 0;
@@ -415,6 +507,8 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio) {
             }
             pcm = session->converted.data();
         }
+        if (!samples)
+            continue;
         // Giới hạn cập nhật phổ ở 10 lần/giây; không lấy dữ liệu từ mic.
         const int64_t now = esp_timer_get_time();
         if (now - spectrum_at_ >= 100000) {
@@ -425,23 +519,46 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio) {
                 spectrum_at_ = now;
             }
         }
-        size_t offset = 0;
-        while (offset < samples && !Cancelled(id)) {
-            const size_t chunk = std::min<size_t>(output_rate / 50, samples - offset);
-            std::vector<int16_t> block(pcm + offset, pcm + offset + chunk);
-            if (!audio.PushPcmToPlaybackQueue(std::move(block), generation)) {
-                if (audio.GetPlaybackGeneration() != generation) {
-                    http->Close();
-                    return false;
-                }
-                continue;
-            }
-            offset += chunk;
-            played = true;
+        if (!PushPcm(pcm, samples, output_rate, id, generation, true)) {
+            error = "Đầu ra âm thanh bị hủy hoặc không nhận thêm dữ liệu";
+            break;
         }
+        played = true;
     }
     http->Close();
+    if (error.empty())
+        error = "Không giải mã được nguồn MP3/AAC; kiểm tra định dạng và luồng trực tiếp";
     return false;
+}
+
+bool MediaPlayer::PushPcm(const int16_t* pcm, size_t count, int rate, uint32_t id,
+                          uint32_t generation, bool pause_between_blocks) {
+    if (!pcm || rate < 8000 || rate > 48000)
+        return false;
+    auto& audio = Application::GetInstance().GetAudioService();
+    size_t offset = 0;
+    while (offset < count && !Cancelled(id)) {
+        const size_t chunk = std::min<size_t>(rate / 50, count - offset);
+        std::vector<int16_t> block(pcm + offset, pcm + offset + chunk);
+        int64_t deadline = esp_timer_get_time() + 2000000;
+        for (;;) {
+            if (Cancelled(id) || audio.GetPlaybackGeneration() != generation)
+                return false;
+            if (pause_between_blocks && paused_) {
+                vTaskDelay(pdMS_TO_TICKS(20));
+                deadline = esp_timer_get_time() + 2000000;
+                continue;
+            }
+            // Push chỉ move dữ liệu khi thành công; giữ cùng buffer khi queue đầy.
+            if (audio.PushPcmToPlaybackQueue(std::move(block), generation))
+                break;
+            if (esp_timer_get_time() >= deadline)
+                return false;
+            vTaskDelay(pdMS_TO_TICKS(5));
+        }
+        offset += chunk;
+    }
+    return offset == count && !Cancelled(id);
 }
 
 void MediaPlayer::Run() {
@@ -468,44 +585,75 @@ void MediaPlayer::Run() {
             continue;
         }
         const auto config = settings_.Get();
-        std::string url = request->song ? SearchSong(*request, config) : request->value;
+        std::string url = request->value;
         bool ok = false;
         std::string movie_error;
+        if (request->song) {
+            auto found = SearchSong(*request, config);
+            if (found)
+                url = std::move(*found);
+            else {
+                url.clear();
+                movie_error = found.error();
+            }
+        }
         if (!url.empty() && !Cancelled(request->id)) {
             SetStatus(request->id,
                       "Đang phát: " + (request->song ? request->value : request->label));
             if (request->video || IsMp4Url(url)) {
-                auto& audio = Application::GetInstance().GetAudioService();
-                const auto generation = audio.GetPlaybackGeneration();
-                VideoCallbacks callbacks;
-                callbacks.output_rate = Board::GetInstance().GetAudioCodec()->output_sample_rate();
-                callbacks.cancelled = [this, id = request->id, generation, &audio]() {
-                    return Cancelled(id) || audio.GetPlaybackGeneration() != generation;
-                };
-                callbacks.paused = [this]() { return paused_.load(); };
-                callbacks.video = video_sink_;
-                callbacks.error = [&movie_error](const std::string& text) { movie_error = text; };
-                callbacks.audio = [this, id = request->id, generation, &audio,
-                                   rate = callbacks.output_rate](const int16_t* pcm, size_t count) {
-                    size_t offset = 0;
-                    while (offset < count && !Cancelled(id)) {
-                        // Hoàn tất khung hiện tại; bộ phát video xử lý tạm dừng và dời mốc PTS.
-                        const size_t chunk = std::min<size_t>(rate / 50, count - offset);
-                        std::vector<int16_t> block(pcm + offset, pcm + offset + chunk);
-                        if (audio.PushPcmToPlaybackQueue(std::move(block), generation))
-                            offset += chunk;
-                        else if (audio.GetPlaybackGeneration() != generation)
-                            return false;
-                    }
-                    return !Cancelled(id);
-                };
-                video_playing_ = true;
-                ok = PlayMp4(url, callbacks);
-                video_playing_ = false;
-                video_sink_(nullptr, 0, 0);
+                if (!video_sink_) {
+                    movie_error = "Nguồn nhạc trả MP4 nhưng thiết bị chưa có đầu ra video";
+                } else {
+                    auto& audio = Application::GetInstance().GetAudioService();
+                    const auto generation = audio.GetPlaybackGeneration();
+                    VideoCallbacks callbacks;
+                    callbacks.output_rate =
+                        Board::GetInstance().GetAudioCodec()->output_sample_rate();
+                    callbacks.cancelled = [this, id = request->id, generation, &audio]() {
+                        return Cancelled(id) || audio.GetPlaybackGeneration() != generation;
+                    };
+                    callbacks.paused = [this]() { return paused_.load(); };
+                    callbacks.video = [this, id = request->id](const uint16_t* pixels, int width,
+                                                               int height) {
+                        if (!Cancelled(id))
+                            video_sink_(pixels, width, height);
+                    };
+                    callbacks.error = [&movie_error](const std::string& text) {
+                        movie_error = text;
+                    };
+                    callbacks.audio = [this, id = request->id, generation,
+                                       rate = callbacks.output_rate](const int16_t* pcm,
+                                                                     size_t count) {
+                        // Hoàn tất khung hiện tại; bộ phát MP4 dời PTS khi tạm dừng.
+                        return PushPcm(pcm, count, rate, id, generation, false);
+                    };
+                    video_playing_ = true;
+                    ok = PlayMp4(url, callbacks);
+                    video_playing_ = false;
+                    video_sink_(nullptr, 0, 0);
+                }
             } else {
-                ok = Stream(url, request->id, !request->song);
+                bool retryable = false;
+                ok = Stream(url, request->id, !request->song, movie_error, retryable);
+                // Đài trực tiếp: thử lại tối đa hai lần khi lỗi đường truyền, không
+                // lặp lại lỗi codec/HTTP 4xx hoặc tự phát lại tệp nhạc đã kết thúc.
+                for (unsigned retry = 0;
+                     !request->song && !ok && retryable && retry < 2 && !Cancelled(request->id);
+                     ++retry) {
+                    SetStatus(request->id, "Đang kết nối lại đài Internet");
+                    vTaskDelay(pdMS_TO_TICKS(250 * (retry + 1)));
+                    movie_error.clear();
+                    ok = Stream(url, request->id, true, movie_error, retryable);
+                }
             }
+        }
+        // Đợi đuôi PCM đã xếp hàng, không báo phát xong trước khi loa nhận hết.
+        if (ok) {
+            auto& audio = Application::GetInstance().GetAudioService();
+            const auto deadline = esp_timer_get_time() + 2000000;
+            while (!Cancelled(request->id) && !audio.IsPlaybackIdle() &&
+                   esp_timer_get_time() < deadline)
+                vTaskDelay(pdMS_TO_TICKS(10));
         }
         {
             std::lock_guard<std::mutex> lock(mutex_);

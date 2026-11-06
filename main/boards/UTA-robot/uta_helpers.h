@@ -29,8 +29,6 @@ enum PinIndex {
     kMotorL2,
     kMotorR1,
     kMotorR2,
-    kMotorLEn,
-    kMotorREn,
     kServoHead,
     kServoNeck,
     kPinCount
@@ -40,20 +38,23 @@ inline constexpr std::array<const char*, kPinCount> kPinKeys{
     "d_mosi",     "d_clk",       "d_dc",      "d_cs",      "d_blk",     "d_rst",     "cam_ung_miso",
     "cam_ung_cs", "cam_ung_irq", "robot_tx",  "robot_rx",  "mic_ws",    "mic_sck",   "mic_din",
     "spk_dout",   "spk_bclk",    "spk_lrck",  "dc_trai_1", "dc_trai_2", "dc_phai_1", "dc_phai_2",
-    "dc_trai_en", "dc_phai_en",  "servo_dau", "servo_co"};
+    "servo_dau", "servo_co"};
 inline constexpr std::array<const char*, kPinCount> kPinLabels{
     "Dữ liệu màn hình", "Xung màn hình",       "Lệnh màn hình",    "Chọn màn hình",
     "Đèn nền",          "Đặt lại màn hình",    "Dữ liệu cảm ứng",  "Chọn cảm ứng",
     "Ngắt cảm ứng",     "Truyền tới đế robot", "Nhận từ đế robot", "Chọn kênh mic",
     "Xung mic",         "Dữ liệu mic",         "Dữ liệu loa",      "Xung loa",
     "Chọn kênh loa",    "Động cơ trái IN1",    "Động cơ trái IN2", "Động cơ phải IN1",
-    "Động cơ phải IN2", "L298N ENA",           "L298N ENB",        "Servo đầu",
-    "Servo cổ"};
+    "Động cơ phải IN2", "Servo đầu",          "Servo cổ"};
 
 struct PinSettings {
     std::array<int, kPinCount> pins{40, 39, 42, 2,  1, 41, 11, 12, 13, 38, 48, 4, 5,
-                                    6,  7,  15, 16, 8, 9,  10, 14, 17, 18, 21, 43};
+                                    6,  7,  15, 16, 8, 9,  10, 14, 21, 43};
 };
+
+inline constexpr bool AllowedGpio(int pin) {
+    return (pin >= 0 && pin <= 21) || (pin >= 38 && pin <= 48);
+}
 
 inline constexpr std::string ValidatePins(const PinSettings& config) {
     for (size_t i = 0; i < config.pins.size(); ++i) {
@@ -62,9 +63,7 @@ inline constexpr std::string ValidatePins(const PinSettings& config) {
             continue;
         }
         // Giữ chân khởi động, USB và bộ nhớ Flash/PSRAM của N16R8.
-        const bool allowed = (pin >= 1 && pin <= 21 && pin != 3 && pin != 19 && pin != 20) ||
-                             (pin >= 38 && pin <= 48 && pin != 45 && pin != 46);
-        if (!allowed) {
+        if (!AllowedGpio(pin)) {
             return std::string(kPinLabels[i]) + ": chân bị giữ lại cho phần cứng khác";
         }
         for (size_t j = 0; j < i; ++j) {

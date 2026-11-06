@@ -1449,6 +1449,21 @@ class BuildOptionTests(unittest.TestCase):
 
 
 class LanguageBuildTests(unittest.TestCase):
+    def test_uta_wake_word_default_and_explicit_override(self):
+        with self.mock_idf() as (_, configure, _):
+            for requested, expected in ((None, "WN9_HILILI_TTS"), ("hiesp", "WN9_HIESP")):
+                with self.subTest(requested=requested):
+                    build.build_board(
+                        "UTA-robot", name_filter="uta-robot", language="vi-VN",
+                        wake_word=requested, idf_version=(6, 1, 0),
+                    )
+                    fragment = configure.call_args.args[1]
+                    self.assertEqual(
+                        [item for item in fragment if item.startswith("CONFIG_SR_WN_")],
+                        [f"CONFIG_SR_WN_{expected}=y"],
+                    )
+                    self.assertIn("CONFIG_USE_AFE_WAKE_WORD=y", fragment)
+
     @contextlib.contextmanager
     def mock_idf(self):
         # Resolve real board presets and build options; replace only SDK execution.
@@ -1506,6 +1521,8 @@ class LanguageBuildTests(unittest.TestCase):
                                 model = "WN9S_NIHAOXIAOZHI" if chinese else "WN9S_HIESP"
                             else:
                                 model = "WN9_NIHAOXIAOZHI_TTS" if chinese else "WN9_HIESP"
+                            if variant.get("default_wake_word"):
+                                model = variant["default_wake_word"].upper()
                             self.assertEqual(models, [f"CONFIG_SR_WN_{model}=y"])
                             validate.assert_any_call(
                                 ["CONFIG_USE_AFE_WAKE_WORD" if target in {"esp32s3", "esp32s31", "esp32p4"}

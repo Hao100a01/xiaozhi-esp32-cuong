@@ -8,6 +8,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include "uta_pwm_bank.h"
 #include "uta_settings.h"
 
 namespace uta {
@@ -19,29 +20,22 @@ public:
     void Start() {
         if (config_.motor_driver) {
             Timer(LEDC_TIMER_1, 20000, LEDC_TIMER_10_BIT);
-            if (config_.motor_driver == 1) {
-                for (auto index : {kMotorL1, kMotorL2, kMotorR1, kMotorR2}) {
-                    const auto pin = Pin(index);
-                    ESP_ERROR_CHECK(gpio_set_level(pin, 0));
-                    ESP_ERROR_CHECK(gpio_set_direction(pin, GPIO_MODE_OUTPUT));
-                }
-                Channel(kMotorLEn, LEDC_CHANNEL_1, LEDC_TIMER_1);
-                Channel(kMotorREn, LEDC_CHANNEL_2, LEDC_TIMER_1);
-            } else {
-                Channel(kMotorL1, LEDC_CHANNEL_1, LEDC_TIMER_1);
-                Channel(kMotorL2, LEDC_CHANNEL_2, LEDC_TIMER_1);
-                Channel(kMotorR1, LEDC_CHANNEL_3, LEDC_TIMER_1);
-                Channel(kMotorR2, LEDC_CHANNEL_4, LEDC_TIMER_1);
-            }
+            Channel(kMotorL1, LEDC_CHANNEL_1, LEDC_TIMER_1);
+            Channel(kMotorL2, LEDC_CHANNEL_2, LEDC_TIMER_1);
+            Channel(kMotorR1, LEDC_CHANNEL_3, LEDC_TIMER_1);
+            Channel(kMotorR2, LEDC_CHANNEL_4, LEDC_TIMER_1);
             Stop();
         }
-        if (config_.servos_enabled) {
+        if (config_.servos_enabled[0] || config_.servos_enabled[1]) {
             Timer(LEDC_TIMER_2, 50, LEDC_TIMER_14_BIT);
-            Channel(kServoHead, LEDC_CHANNEL_5, LEDC_TIMER_2);
-            Channel(kServoNeck, LEDC_CHANNEL_6, LEDC_TIMER_2);
+            if (config_.servos_enabled[0])
+                Channel(kServoHead, LEDC_CHANNEL_5, LEDC_TIMER_2);
+            if (config_.servos_enabled[1])
+                Channel(kServoNeck, LEDC_CHANNEL_6, LEDC_TIMER_2);
             Servo(0, config_.servo_home[0]);
             Servo(1, config_.servo_home[1]);
         }
+        extra_pwm_.Start(config_.extra_servo_pins, 0, 20000, {1500, 1500, 1500, 1500});
     }
 
     void Stop() {
@@ -49,13 +43,8 @@ public:
             return;
         Duty(LEDC_CHANNEL_1, 0);
         Duty(LEDC_CHANNEL_2, 0);
-        if (config_.motor_driver == 2) {
-            Duty(LEDC_CHANNEL_3, 0);
-            Duty(LEDC_CHANNEL_4, 0);
-        } else {
-            for (auto index : {kMotorL1, kMotorL2, kMotorR1, kMotorR2})
-                gpio_set_level(Pin(index), 0);
-        }
+        Duty(LEDC_CHANNEL_3, 0);
+        Duty(LEDC_CHANNEL_4, 0);
     }
 
     void Drive(int left, int right) {
@@ -73,7 +62,7 @@ public:
     }
 
     void Servo(size_t axis, int angle) {
-        if (!config_.servos_enabled || axis >= 2)
+        if (axis >= 2 || !config_.servos_enabled[axis])
             return;
         angle = std::clamp(angle, config_.servo_min[axis], config_.servo_max[axis]);
         // Servo 180 độ, 50 Hz, xung 500–2500 µs; giới hạn góc tránh chạm cơ khí.
@@ -81,11 +70,19 @@ public:
         Duty(axis == 0 ? LEDC_CHANNEL_5 : LEDC_CHANNEL_6, pulse * 16383 / 20000);
     }
 
+    void ExtraServo(size_t axis, int value) {
+        const int pulse = axis < kWheelServoCount ? 1500 + 2 * value : 1000 + value * 1000 / 180;
+        extra_pwm_.SetPulse(axis, pulse);
+    }
+
 private:
     const Configuration& config_;
+    PwmBank extra_pwm_;
+
     gpio_num_t Pin(PinIndex index) const {
         return static_cast<gpio_num_t>(config_.gpio.pins[index]);
     }
+
     static void Timer(ledc_timer_t timer, unsigned frequency, ledc_timer_bit_t bits) {
         ledc_timer_config_t config{};
         config.speed_mode = LEDC_LOW_SPEED_MODE;
@@ -109,14 +106,8 @@ private:
     }
     void Motor(bool left, int speed) {
         const unsigned duty = std::abs(speed) * 1023 / 100;
-        if (config_.motor_driver == 1) {
-            gpio_set_level(Pin(left ? kMotorL1 : kMotorR1), speed > 0);
-            gpio_set_level(Pin(left ? kMotorL2 : kMotorR2), speed < 0);
-            Duty(left ? LEDC_CHANNEL_1 : LEDC_CHANNEL_2, duty);
-        } else {
-            Duty(left ? LEDC_CHANNEL_1 : LEDC_CHANNEL_3, speed > 0 ? duty : 0);
-            Duty(left ? LEDC_CHANNEL_2 : LEDC_CHANNEL_4, speed < 0 ? duty : 0);
-        }
+        Duty(left ? LEDC_CHANNEL_1 : LEDC_CHANNEL_3, speed > 0 ? duty : 0);
+        Duty(left ? LEDC_CHANNEL_2 : LEDC_CHANNEL_4, speed < 0 ? duty : 0);
     }
 };
 }  // namespace uta

@@ -674,6 +674,7 @@ void Application::InitializeProtocol() {
                               glyphs = std::move(glyphs), bpp]() {
                         display->AddTextGlyphs(glyphs, bpp);
                         display->SetChatMessage("assistant", message.c_str());
+                        Board::GetInstance().OnAssistantSentence(message);
                     });
                 }
             }

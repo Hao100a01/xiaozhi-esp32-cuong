@@ -1172,8 +1172,30 @@ if(CONFIG_IDF_TARGET_ESP32S3)
 endif()
 
 set(MAIN_PRIV_REQUIRES_EXTRA "")
+if(IDF_TARGET STREQUAL "esp32s3")
+    # The UTA board's MCPWM headers must be available during early dependency expansion.
+    list(APPEND MAIN_PRIV_REQUIRES_EXTRA esp_driver_mcpwm)
+endif()
+set(UTA_UI_EMBED_FILES "")
 if(CONFIG_BOARD_TYPE_UTA_ROBOT)
-    list(APPEND MAIN_PRIV_REQUIRES_EXTRA esp_http_server esp_extractor esp_video_codec)
+    list(APPEND MAIN_PRIV_REQUIRES_EXTRA esp_http_server esp_extractor esp_video_codec esp_driver_rmt)
+    list(APPEND UTA_UI_EMBED_FILES
+        "boards/UTA-robot/assets/uta_boot.rgb565"
+        "boards/UTA-robot/assets/uta_neon.rgb565"
+        "boards/UTA-robot/assets/uta_icons.argb8888"
+    )
+    include("${CMAKE_CURRENT_SOURCE_DIR}/boards/UTA-robot/assets/emotions/emotions.cmake")
+    if(NOT CMAKE_BUILD_EARLY_EXPANSION)
+        set(DEFAULT_ASSETS_EXTRA_FILES "${CMAKE_CURRENT_BINARY_DIR}/uta_eye_assets")
+        file(MAKE_DIRECTORY "${DEFAULT_ASSETS_EXTRA_FILES}")
+        foreach(gif IN LISTS UTA_EYE_GIFS)
+            get_filename_component(gif_name "${gif}" NAME)
+            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${gif}"
+                "${DEFAULT_ASSETS_EXTRA_FILES}/uta_eye_${gif_name}" COPYONLY)
+            list(APPEND UTA_EYE_ASSET_DEPENDENCIES
+                "${DEFAULT_ASSETS_EXTRA_FILES}/uta_eye_${gif_name}")
+        endforeach()
+    endif()
 endif()
 if(CONFIG_XIAOZHI_NETWORK_ETHERNET AND CONFIG_XIAOZHI_ETH_PHY_IP101)
     list(APPEND MAIN_PRIV_REQUIRES_EXTRA espressif__ip101)
@@ -1201,7 +1223,7 @@ if(CONFIG_BOARD_TYPE_ESP32_P4_FUNCTION_EV_BOARD)
     )
 endif()
 idf_component_register(SRCS ${SOURCES}
-                    EMBED_FILES ${LANG_SOUNDS} ${COMMON_SOUNDS}
+                    EMBED_FILES ${LANG_SOUNDS} ${COMMON_SOUNDS} ${UTA_UI_EMBED_FILES}
                     INCLUDE_DIRS ${INCLUDE_DIRS}
                     WHOLE_ARCHIVE
                     PRIV_REQUIRES
@@ -1229,6 +1251,11 @@ idf_component_register(SRCS ${SOURCES}
                         xiaozhi-fonts
                         ${MAIN_PRIV_REQUIRES_EXTRA}
                     )
+
+# Chỉ UTA mở rộng portal của esp-wifi-connect, không thay đổi component vendor.
+if(CONFIG_BOARD_TYPE_UTA_ROBOT AND NOT CMAKE_BUILD_EARLY_EXPANSION)
+    target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=httpd_register_uri_handler")
+endif()
 
 # Keep project-owned C++ on GNU C++23. ESP-IDF 6 may default to a newer
 # dialect; pin the baseline so main/ does not depend on it.
@@ -1429,6 +1456,7 @@ function(build_default_assets_bin)
     # Add default assets extra files if defined
     if(DEFAULT_ASSETS_EXTRA_FILES)
         list(APPEND BUILD_ARGS "--extra_files" "${DEFAULT_ASSETS_EXTRA_FILES}")
+        list(APPEND DEFAULT_ASSETS_DEPENDENCIES ${UTA_EYE_ASSET_DEPENDENCIES})
     endif()
 
     list(APPEND BUILD_ARGS "--esp_sr_model_path" "${ESP_SR_MODEL_PATH}")

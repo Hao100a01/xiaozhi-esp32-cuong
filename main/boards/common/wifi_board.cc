@@ -1,40 +1,41 @@
 #include "wifi_board.h"
 
-#include "display.h"
 #include "application.h"
-#include "system_info.h"
-#include "settings.h"
 #include "assets/lang_config.h"
+#include "display.h"
+#include "settings.h"
+#include "system_info.h"
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <esp_network.h>
 #include <esp_log.h>
 #include <esp_mac.h>
+#include <esp_netif.h>
+#include <esp_network.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <cstdint>
+#include <cstdio>
 #include <utility>
 
 #include <material_symbols.h>
+#include <ssid_manager.h>
 #include <wifi_manager.h>
 #include <wifi_station.h>
-#include <ssid_manager.h>
 #ifdef CONFIG_USE_ESP_BLUFI_WIFI_PROVISIONING
 #include "blufi.h"
 #endif
 
-static const char *TAG = "WifiBoard";
+static const char* TAG = "WifiBoard";
 
 // Connection timeout in seconds
 static constexpr int CONNECT_TIMEOUT_SEC = 60;
 
 WifiBoard::WifiBoard() {
     // Create connection timeout timer
-    esp_timer_create_args_t timer_args = {
-        .callback = OnWifiConnectTimeout,
-        .arg = this,
-        .dispatch_method = ESP_TIMER_TASK,
-        .name = "wifi_connect_timer",
-        .skip_unhandled_events = true
-    };
+    esp_timer_create_args_t timer_args = {.callback = OnWifiConnectTimeout,
+                                          .arg = this,
+                                          .dispatch_method = ESP_TIMER_TASK,
+                                          .name = "wifi_connect_timer",
+                                          .skip_unhandled_events = true};
     esp_timer_create(&timer_args, &connect_timer_);
 }
 
@@ -45,9 +46,7 @@ WifiBoard::~WifiBoard() {
     }
 }
 
-std::string WifiBoard::GetBoardType() {
-    return "wifi";
-}
+std::string WifiBoard::GetBoardType() { return "wifi"; }
 
 void WifiBoard::StartNetwork() {
     auto& wifi_manager = WifiManager::GetInstance();
@@ -64,7 +63,8 @@ void WifiBoard::StartNetwork() {
     uint8_t mac[6];
     if (esp_read_mac(mac, ESP_MAC_WIFI_STA) == ESP_OK) {
         char hostname[32];
-        snprintf(hostname, sizeof(hostname), "%s-%02X%02X", config.ssid_prefix.c_str(), mac[4], mac[5]);
+        snprintf(hostname, sizeof(hostname), "%s-%02X%02X", config.ssid_prefix.c_str(), mac[4],
+                 mac[5]);
         config.station_hostname = hostname;
     }
     wifi_manager.Initialize(config);
@@ -183,10 +183,11 @@ void WifiBoard::StartWifiConfigMode() {
         hint += Lang::Strings::ACCESS_VIA_BROWSER;
         hint += wifi_manager.GetApWebUrl();
 
-        Application::GetInstance().Alert(Lang::Strings::WIFI_CONFIG_MODE, hint.c_str(), "gear", Lang::Sounds::OGG_WIFICONFIG);
+        Application::GetInstance().Alert(Lang::Strings::WIFI_CONFIG_MODE, hint.c_str(), "gear",
+                                         Lang::Sounds::OGG_WIFICONFIG);
     });
 #elif CONFIG_USE_ESP_BLUFI_WIFI_PROVISIONING
-    auto &blufi = Blufi::GetInstance();
+    auto& blufi = Blufi::GetInstance();
     // initialize esp-blufi protocol
     blufi.init();
 #endif
@@ -204,26 +205,31 @@ void WifiBoard::EnterWifiConfigMode() {
         // Reset protocol (close audio channel, reset protocol)
         Application::GetInstance().ResetProtocol();
 
-        xTaskCreate([](void* arg) {
-            auto* board = static_cast<WifiBoard*>(arg);
+        xTaskCreate(
+            [](void* arg) {
+                auto* board = static_cast<WifiBoard*>(arg);
 
-            // Wait for 1 second to allow speaking to finish gracefully
-            vTaskDelay(pdMS_TO_TICKS(1000));
+                // Wait for 1 second to allow speaking to finish gracefully
+                vTaskDelay(pdMS_TO_TICKS(1000));
 
-            // Stop any ongoing connection attempt
-            esp_timer_stop(board->connect_timer_);
-            WifiManager::GetInstance().StopStation();
+                // Stop any ongoing connection attempt
+                esp_timer_stop(board->connect_timer_);
+                WifiManager::GetInstance().StopStation();
 
-            // Enter config mode
-            board->StartWifiConfigMode();
+                // Enter config mode
+                board->StartWifiConfigMode();
 
-            vTaskDelete(NULL);
-        }, "wifi_cfg_delay", 4096, this, 2, NULL);
+                vTaskDelete(NULL);
+            },
+            "wifi_cfg_delay", 4096, this, 2, NULL);
         return;
     }
 
     if (state != kDeviceStateStarting) {
-        ESP_LOGE(TAG, "EnterWifiConfigMode called but device state is not starting or speaking, device state: %d", state);
+        ESP_LOGE(TAG,
+                 "EnterWifiConfigMode called but device state is not starting or speaking, device "
+                 "state: %d",
+                 state);
         return;
     }
 
@@ -234,9 +240,7 @@ void WifiBoard::EnterWifiConfigMode() {
     StartWifiConfigMode();
 }
 
-bool WifiBoard::IsInWifiConfigMode() const {
-    return WifiManager::GetInstance().IsConfigMode();
-}
+bool WifiBoard::IsInWifiConfigMode() const { return WifiManager::GetInstance().IsConfigMode(); }
 
 NetworkInterface* WifiBoard::GetNetwork() {
     static EspNetwork network;
@@ -262,20 +266,60 @@ const char* WifiBoard::GetNetworkStateIcon() {
     return MATERIAL_SYMBOLS_WIFI_1_BAR;
 }
 
+WifiBoard::WifiNetworkInfo WifiBoard::GetWifiNetworkInfo() const {
+    auto& wifi = WifiManager::GetInstance();
+    WifiNetworkInfo info;
+    info.config_mode = wifi.IsConfigMode();
+    info.connected = !info.config_mode && wifi.IsConnected();
+    const auto read_ip = [](const char* interface_key) -> std::string {
+        auto* netif = esp_netif_get_handle_from_ifkey(interface_key);
+        esp_netif_ip_info_t address{};
+        if (!netif || !esp_netif_is_netif_up(netif) ||
+            esp_netif_get_ip_info(netif, &address) != ESP_OK || address.ip.addr == 0 ||
+            address.ip.addr == UINT32_MAX)
+            return {};
+        char text[16]{};
+        std::snprintf(text, sizeof(text), IPSTR, IP2STR(&address.ip));
+        return text;
+    };
+    if (info.connected)
+        info.ip = read_ip("WIFI_STA_DEF");
+    if (info.config_mode)
+        info.ap_ip = read_ip("WIFI_AP_DEF");
+    // Không công bố IP vừa đọc nếu kết nối đã mất/chuyển sang AP giữa hai lần đọc.
+    if (info.connected && (!wifi.IsConnected() || wifi.IsConfigMode())) {
+        info.connected = false;
+        info.ip.clear();
+    }
+    if (info.config_mode && !wifi.IsConfigMode()) {
+        info.config_mode = false;
+        info.ap_ip.clear();
+    }
+    return info;
+}
+
 std::string WifiBoard::GetBoardJson() {
     auto& wifi = WifiManager::GetInstance();
-    std::string json = R"({"type":")" + std::string(BOARD_TYPE) + R"(",)";
-    json += R"("name":")" + std::string(BOARD_NAME) + R"(",)";
-    json += R"("manufacturer":")" + std::string(BOARD_MANUFACTURER) + R"(",)";
+    const auto network = GetWifiNetworkInfo();
+    auto* root = cJSON_CreateObject();
+    if (!root)
+        return "{}";
+    cJSON_AddStringToObject(root, "type", BOARD_TYPE);
+    cJSON_AddStringToObject(root, "name", BOARD_NAME);
+    cJSON_AddStringToObject(root, "manufacturer", BOARD_MANUFACTURER);
 
-    if (!wifi.IsConfigMode()) {
-        json += R"("ssid":")" + wifi.GetSsid() + R"(",)";
-        json += R"("rssi":)" + std::to_string(wifi.GetRssi()) + R"(,)";
-        json += R"("channel":)" + std::to_string(wifi.GetChannel()) + R"(,)";
-        json += R"("ip":")" + wifi.GetIpAddress() + R"(",)";
+    if (network.connected) {
+        cJSON_AddStringToObject(root, "ssid", wifi.GetSsid().c_str());
+        cJSON_AddNumberToObject(root, "rssi", wifi.GetRssi());
+        cJSON_AddNumberToObject(root, "channel", wifi.GetChannel());
+        cJSON_AddStringToObject(root, "ip", network.ip.c_str());
     }
 
-    json += R"("mac":")" + SystemInfo::GetMacAddress() + R"("})";
+    cJSON_AddStringToObject(root, "mac", SystemInfo::GetMacAddress().c_str());
+    char* encoded = cJSON_PrintUnformatted(root);
+    std::string json = encoded ? encoded : "{}";
+    cJSON_free(encoded);
+    cJSON_Delete(root);
     return json;
 }
 
@@ -331,11 +375,28 @@ std::string WifiBoard::GetDeviceStatusJson() {
 
     // Network
     auto& wifi = WifiManager::GetInstance();
+    const auto info = GetWifiNetworkInfo();
     auto network = cJSON_CreateObject();
     cJSON_AddStringToObject(network, "type", "wifi");
-    cJSON_AddStringToObject(network, "ssid", wifi.GetSsid().c_str());
+    cJSON_AddBoolToObject(network, "connected", info.connected);
+    cJSON_AddBoolToObject(network, "config_mode", info.config_mode);
+    cJSON_AddStringToObject(network, "mode", info.config_mode ? "ap" : "station");
+    cJSON_AddStringToObject(network, "status",
+                            info.config_mode  ? "configuring"
+                            : !info.connected ? "disconnected"
+                            : info.ip.empty() ? "waiting_for_ip"
+                                              : "connected");
+    if (info.ip.empty())
+        cJSON_AddNullToObject(network, "ip");
+    else
+        cJSON_AddStringToObject(network, "ip", info.ip.c_str());
+    if (!info.ap_ip.empty())
+        cJSON_AddStringToObject(network, "ap_ip", info.ap_ip.c_str());
+    cJSON_AddStringToObject(network, "ssid", info.connected ? wifi.GetSsid().c_str() : "");
     int rssi = wifi.GetRssi();
-    const char* signal = rssi >= -60 ? "strong" : (rssi >= -70 ? "medium" : "weak");
+    const char* signal = !info.connected ? "disconnected"
+                         : rssi >= -60   ? "strong"
+                                         : (rssi >= -70 ? "medium" : "weak");
     cJSON_AddStringToObject(network, "signal", signal);
     cJSON_AddItemToObject(root, "network", network);
 
