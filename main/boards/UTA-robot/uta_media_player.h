@@ -25,6 +25,9 @@ struct MediaSnapshot {
     bool preparing = false;
     bool paused = false;
     bool replay_available = false;
+    std::string artist;
+    int elapsed_seconds = 0;
+    int duration_seconds = 0;
 };
 
 class MediaPlayer {
@@ -67,6 +70,9 @@ private:
     TaskHandle_t task_ = nullptr;
     Spectrum spectrum_{};
     int64_t spectrum_at_ = 0;
+    int64_t queued_pcm_us_ = 0;
+    int duration_seconds_ = 0;
+    std::string song_title_;
     std::atomic<bool> video_playing_{false};
     std::function<void(const uint16_t*, int, int)> video_sink_;
 
@@ -76,9 +82,10 @@ private:
     void SetStatus(uint32_t id, const std::string& text);
     void Run();
     std::expected<std::string, std::string> SearchSong(const Request& request,
-                                                       const Configuration& config);
+                                                       const Configuration& config,
+                                                       int& duration_seconds, std::string& title);
     bool Stream(const std::string& url, uint32_t id, bool radio, std::string& error,
-                bool& retryable);
+                bool& retryable, bool* delivered = nullptr);
     bool PushPcm(const int16_t* pcm, size_t count, int rate, uint32_t id, uint32_t generation,
                  bool pause_between_blocks);
 };

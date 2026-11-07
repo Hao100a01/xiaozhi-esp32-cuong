@@ -36,6 +36,15 @@ inline bool ValidMusicServer(std::string_view url) {
     return IsHttpUrl(url) && url.find_first_of("?#") == std::string_view::npos;
 }
 
+inline std::string LegacyMusicProxy(std::string_view url, std::string_view server) {
+    if (!IsHttpUrl(url) || UrlOrigin(url) != UrlOrigin(server))
+        return {};
+    const auto origin = UrlOrigin(url);
+    if (!url.substr(origin.size()).starts_with("/mp3/proxy/stream?"))
+        return {};
+    return std::string(origin) + std::string(url.substr(origin.size() + 4));
+}
+
 struct HttpRange {
     uint32_t first = 0;
     uint32_t last = 0;

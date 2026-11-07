@@ -41,7 +41,8 @@ class UtaRobotTests(unittest.TestCase):
             self.skipTest("Cần trình biên dịch C++23 để kiểm tra GPIO và địa chỉ mạng")
         result = subprocess.run(
             [compiler, "-std=c++23", "-fsyntax-only", "-I", str(ROOT),
-             str(ROOT / "scripts/tests/cpp/uta_helpers_test.cc")],
+             str(ROOT / "scripts/tests/cpp/uta_helpers_test.cc"),
+             str(ROOT / "scripts/tests/cpp/uta_hls_test.cc")],
             capture_output=True, text=True, encoding="utf-8", errors="replace",
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

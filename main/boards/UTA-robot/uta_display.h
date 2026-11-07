@@ -8,6 +8,10 @@
 #include "uta_emotions.h"
 #include "uta_spectrum.h"
 
+namespace uta {
+struct MediaSnapshot;
+}
+
 // Lớp hiển thị riêng của UTA: không đưa hành vi board vào màn hình dùng chung.
 class UtaDisplay : public SpiLcdDisplay {
 public:
@@ -15,7 +19,7 @@ public:
     ~UtaDisplay() override;
 
     void SetupUI() override;
-    void RestoreRotation();
+    void RestoreRotation(bool st7789);
     bool SetRotation(int degrees);
     int Rotation() const { return rotation_.load(); }
     bool SetEmotion(const char* emotion) override;
@@ -42,7 +46,7 @@ public:
             return;
         }
         if (!video_image_)
-            video_image_ = lv_image_create(lv_layer_top());
+            video_image_ = lv_image_create(lv_display_get_layer_top(display_));
         lv_image_cache_drop(&video_descriptor_);
         std::memcpy(video_pixels_, pixels, width * height * sizeof(uint16_t));
         video_descriptor_.header.magic = LV_IMAGE_HEADER_MAGIC;
@@ -59,43 +63,12 @@ public:
         Unlock();
     }
 
-    void UpdateSpectrum(const uta::Spectrum& values, bool visible) {
-        // Không để việc vẽ chặn tác vụ điều khiển khi LVGL đang bận.
-        if (!IsSetupUICalled() || !Lock(10))
-            return;
-        if (!spectrum_ && visible) {
-            spectrum_ = lv_obj_create(lv_layer_top());
-            lv_obj_set_size(spectrum_, 224, 72);
-            lv_obj_align(spectrum_, LV_ALIGN_BOTTOM_MID, 0, -4);
-            lv_obj_remove_flag(spectrum_, LV_OBJ_FLAG_SCROLLABLE);
-            lv_obj_set_style_pad_all(spectrum_, 4, 0);
-            lv_obj_set_style_border_width(spectrum_, 0, 0);
-            lv_obj_set_style_bg_color(spectrum_, lv_color_hex(0x102030), 0);
-            for (size_t i = 0; i < bars_.size(); ++i) {
-                bars_[i] = lv_obj_create(spectrum_);
-                lv_obj_remove_flag(bars_[i], LV_OBJ_FLAG_SCROLLABLE);
-                lv_obj_set_style_border_width(bars_[i], 0, 0);
-                lv_obj_set_style_radius(bars_[i], 2, 0);
-                lv_obj_set_style_bg_color(bars_[i], lv_color_hex(0x35d6a0), 0);
-            }
-        }
-        if (spectrum_) {
-            if (visible)
-                lv_obj_remove_flag(spectrum_, LV_OBJ_FLAG_HIDDEN);
-            else
-                lv_obj_add_flag(spectrum_, LV_OBJ_FLAG_HIDDEN);
-            if (visible) {
-                for (size_t i = 0; i < bars_.size(); ++i) {
-                    lv_obj_set_size(bars_[i], 10, std::max(2, values[i] * 60 / 100));
-                    lv_obj_align(bars_[i], LV_ALIGN_BOTTOM_LEFT, i * 13, 0);
-                }
-            }
-        }
-        Unlock();
-    }
+    void UpdateSpectrum(const uta::Spectrum& values, const uta::MediaSnapshot* media);
 
 private:
     std::atomic<int> rotation_{0};
+    bool st7789_square_ = false;
+    void ApplyRotationLocked(int degrees);
     void SetupEyesLocked();
     bool UpdateEyesLocked(DeviceState state, bool visible, int64_t now);
     void ReleaseEyesLocked();
@@ -124,8 +97,18 @@ private:
     int64_t boot_until_ = 0;
     int64_t content_at_ = 0;
     lv_obj_t* spectrum_ = nullptr;
+    lv_obj_t* record_highlight_ = nullptr;
+    lv_obj_t* media_kind_ = nullptr;
+    lv_obj_t* media_title_ = nullptr;
+    lv_obj_t* media_artist_ = nullptr;
+    lv_obj_t* media_progress_ = nullptr;
+    lv_obj_t* media_progress_dot_ = nullptr;
+    lv_obj_t* media_elapsed_ = nullptr;
+    lv_obj_t* media_duration_ = nullptr;
+    unsigned record_angle_ = 0;
     lv_obj_t* video_image_ = nullptr;
     uint16_t* video_pixels_ = nullptr;
     lv_image_dsc_t video_descriptor_{};
     std::array<lv_obj_t*, uta::kSpectrumBands> bars_{};
+    std::array<int, uta::kSpectrumBands> bar_heights_{};
 };

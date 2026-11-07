@@ -5226,9 +5226,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1793794683.3303158,
-    "seen": 1793794743.9430904,
-    "ast_hash": "ee1d81633847947e0e5fe011cda395a1",
+    "mtime": 1794016249.095125,
+    "seen": 1794018944.7078557,
+    "ast_hash": "ee767b29dc58ce05f0dbca32c58d3ef7",
     "semantic_hash": ""
   },
   "CMakeLists.txt": {
@@ -10092,27 +10092,27 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_helpers.h": {
-    "mtime": 1793948725.7839808,
-    "seen": 1793948843.9363062,
-    "ast_hash": "d6652e76d56ede0dec5a813bf760b4d2",
+    "mtime": 1794032228.0179641,
+    "seen": 1794032286.171105,
+    "ast_hash": "f2fa9beeed08f021f601323b7adde46e",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_player.cc": {
-    "mtime": 1793868970.1801777,
-    "seen": 1793869188.5436902,
-    "ast_hash": "717768ee6c21bf59d7235a55795c2648",
+    "mtime": 1794032664.6896234,
+    "seen": 1794032718.488814,
+    "ast_hash": "108f3f1d2096591e8bcf33f0b65ccf0b",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_player.h": {
-    "mtime": 1793868970.157987,
-    "seen": 1793869188.5436902,
-    "ast_hash": "83648ecd3c0863180acf132c3c06f87e",
+    "mtime": 1794032664.2023838,
+    "seen": 1794032718.488814,
+    "ast_hash": "26cd6fdd7f789bb1849d285035502577",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_robot.cc": {
-    "mtime": 1793952133.4382584,
-    "seen": 1793952310.3565423,
-    "ast_hash": "deb32c1c0df3cc7079455057a7c519cf",
+    "mtime": 1794033240.4193456,
+    "seen": 1794033290.0094414,
+    "ast_hash": "4e253b6bc65e74db3ef3ed8acf3da617",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_settings.cc": {
@@ -10152,9 +10152,9 @@
     "semantic_hash": ""
   },
   "scripts/tests/test_uta_robot.py": {
-    "mtime": 1793865106.9745133,
-    "seen": 1793865396.666095,
-    "ast_hash": "10ea1e23997357f9c26ca03b3e860a21",
+    "mtime": 1794021537.0484786,
+    "seen": 1794021632.8415368,
+    "ast_hash": "a8edc9c8a2633f17cc9fb33320c684d4",
     "semantic_hash": ""
   },
   "scripts/tests/uta_web_test.cjs": {
@@ -10164,15 +10164,15 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/README.md": {
-    "mtime": 1793948277.2119014,
-    "seen": 1793948346.6513531,
-    "ast_hash": "524a999e915b3234fbd4f2a17d97450b",
+    "mtime": 1794022513.3185837,
+    "seen": 1794022572.2204611,
+    "ast_hash": "476cf5e663b0f2adee172af45720d85c",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_display.h": {
-    "mtime": 1793951240.4048922,
-    "seen": 1793951812.2335975,
-    "ast_hash": "d6e29a16fe4b9aecc3d6db8ca4f64050",
+    "mtime": 1794023219.6168745,
+    "seen": 1794023271.2539601,
+    "ast_hash": "8dd56b8105bb03b7f56c126567d58b28",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_h264.h": {
@@ -10194,9 +10194,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_video_player.cc": {
-    "mtime": 1793869317.7336416,
-    "seen": 1793869347.694416,
-    "ast_hash": "fea5ed8c0ffa86061a126b6e715145ab",
+    "mtime": 1793955618.879215,
+    "seen": 1793956153.4741366,
+    "ast_hash": "bdfbfcfc924287d94dde0507cb23fefe",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_video_player.h": {
@@ -10878,9 +10878,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_location_portal.h": {
-    "mtime": 1793950549.9963403,
-    "seen": 1793950624.4951015,
-    "ast_hash": "6f6a5ae249c5534dc20bdddb3f45cf53",
+    "mtime": 1793958344.5482821,
+    "seen": 1794018944.7062893,
+    "ast_hash": "08d17dc91e17e81ecd754a44b7323b05",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_provinces.h": {
@@ -10920,9 +10920,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_display.cc": {
-    "mtime": 1793946094.7042854,
-    "seen": 1793946243.2174406,
-    "ast_hash": "a283dfbda41bdf5a9c7a09a01e3156e9",
+    "mtime": 1794032722.637333,
+    "seen": 1794032768.2734225,
+    "ast_hash": "7849dda9d9509437d5f4d92e5a878c1b",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_ui_assets.cc": {
@@ -11118,9 +11118,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_display_emotions.cc": {
-    "mtime": 1793951445.9417691,
-    "seen": 1793951812.2335975,
-    "ast_hash": "7779b858908ce34981c304efaec5cdc1",
+    "mtime": 1794023220.5164976,
+    "seen": 1794023271.2539601,
+    "ast_hash": "e2380c33f3a234c868a8a3b949dce568",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_emotion_assets.cc": {
@@ -11310,9 +11310,9 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_mcp.cc": {
-    "mtime": 1793868970.1972065,
-    "seen": 1793869188.5436902,
-    "ast_hash": "125576698a02bc0278e84484ccbe70fa",
+    "mtime": 1794032213.1363878,
+    "seen": 1794032286.171105,
+    "ast_hash": "c841e56010c494d9d21a88b119843b6a",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_mcp.h": {
@@ -11322,21 +11322,21 @@
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_policy.h": {
-    "mtime": 1793868405.8751132,
-    "seen": 1793869188.5436902,
-    "ast_hash": "8a6031b69f91d202822229030a8cb6b3",
+    "mtime": 1793955652.8168333,
+    "seen": 1793956153.4741366,
+    "ast_hash": "7886d5dc299c268682f91fa6582c17eb",
     "semantic_hash": ""
   },
   "main/boards/UTA-robot/uta_media_response.h": {
-    "mtime": 1793868970.2118483,
-    "seen": 1793869188.5436902,
-    "ast_hash": "b06970dce685255e5ac6a0dccdf2bfb8",
+    "mtime": 1794032663.622817,
+    "seen": 1794032718.488814,
+    "ast_hash": "75fee6d48b7101c55556ee341e2e4166",
     "semantic_hash": ""
   },
   "scripts/tests/cpp/uta_media_test.cc": {
-    "mtime": 1793869157.529318,
-    "seen": 1793869188.5447435,
-    "ast_hash": "1c79f03444739c905d84d9e507ec692f",
+    "mtime": 1794032675.5479867,
+    "seen": 1794032718.4917693,
+    "ast_hash": "5ff29d943b94e6188a218d30431a2162",
     "semantic_hash": ""
   },
   "scripts/tests/test_uta_media.py": {
@@ -11379,6 +11379,30 @@
     "mtime": 1793947653.9144719,
     "seen": 1793947702.9929671,
     "ast_hash": "c2a46d7e15ab944496906a4f08426de0",
+    "semantic_hash": ""
+  },
+  "LEAN-CTX.md": {
+    "mtime": 1794016249.0862532,
+    "seen": 1794018944.7078557,
+    "ast_hash": "bbe3962fb481e1cc3b17ca34150e7aec",
+    "semantic_hash": ""
+  },
+  "docs/uta-robot-handoff.md": {
+    "mtime": 1793974383.6663618,
+    "seen": 1794018944.7078557,
+    "ast_hash": "26fe68b25c5c236b0b4b5c272ad33fdb",
+    "semantic_hash": ""
+  },
+  "main/boards/UTA-robot/uta_hls.h": {
+    "mtime": 1794021684.4297192,
+    "seen": 1794021737.845905,
+    "ast_hash": "881ea2c83130c89bcb792ed1cd6dbfac",
+    "semantic_hash": ""
+  },
+  "scripts/tests/cpp/uta_hls_test.cc": {
+    "mtime": 1794021359.4420586,
+    "seen": 1794021632.8415368,
+    "ast_hash": "4350eacff6408856de7cdf2c3fabf092",
     "semantic_hash": ""
   }
 }

@@ -175,15 +175,59 @@ struct RadioStation {
     const char* url;
 };
 
-// Giữ danh sách đài từ repo Việt Nam; địa chỉ có thể đổi ngoài firmware.
-inline constexpr std::array<RadioStation, 7> kStations{{
-    {"vov1", "VOV 1 — Thời sự", "https://stream.vovmedia.vn/vov-1"},
-    {"vov2", "VOV 2 — Văn hóa và giáo dục", "https://stream.vovmedia.vn/vov-2"},
-    {"vov3", "VOV 3 — Âm nhạc và giải trí", "https://stream.vovmedia.vn/vov-3"},
-    {"vov5", "VOV 5 — Đối ngoại", "https://stream.vovmedia.vn/vov5"},
-    {"vov_gt_hn", "VOV Giao thông Hà Nội", "https://stream.vovmedia.vn/vovgt-hn"},
-    {"vov_gt_hcm", "VOV Giao thông TP. Hồ Chí Minh", "https://stream.vovmedia.vn/vovgt-hcm"},
-    {"vov_tieng_anh", "VOV — Kênh tiếng Anh", "https://stream.vovmedia.vn/vov247"},
+inline constexpr char kVov1HlsUrl[] = "https://audio-lss.vov.vn/live/vov1.m3u8";
+inline constexpr std::array<RadioStation, 9> kStations{{
+    {"vov1", "VOV 1 — Thời sự", kVov1HlsUrl},
+    {"vov2", "VOV 2 — Văn hóa và giáo dục", "https://audio-lss.vov.vn/live/vov2.m3u8"},
+    {"vov3", "VOV 3 — Âm nhạc và giải trí", "https://audio-lss.vov.vn/live/vov3.m3u8"},
+    {"vov4", "VOV4", "https://audio-lss.vov.vn/live/vov4.m3u8"},
+    {"vov4_dbscl", "VOV4 ĐBSCL",
+     "https://str.vov.gov.vn/vovlive/vov4.DBCuuLong.sdp_aac/playlist.m3u8"},
+    {"vov5", "VOV 5 tiếng Việt",
+     "https://str.vov.gov.vn/vovlive/vov1vov5Vietnamese.sdp_aac/playlist.m3u8"},
+    {"vov_mekong", "VOV Giao thông Mê Kông",
+     "https://str.vov.gov.vn/vovlive/vovgtMeKong.sdp_aac/playlist.m3u8"},
+    {"vov_gt_hcm", "VOV Giao thông TP.HCM",
+     "https://play.vovgiaothong.vn/live/gthcm3/playlist.m3u8"},
+    {"vov_sonata", "VOV Sonata", "https://audio-lss.vov.vn/live/sonata.m3u8"},
 }};
+
+inline const RadioStation* FindRadioStation(std::string_view query) {
+    const auto lower_ascii = [](std::string_view text) {
+        std::string result(text);
+        for (char& c : result) {
+            if (c >= 'A' && c <= 'Z') {
+                c += 'a' - 'A';
+            }
+        }
+        return result;
+    };
+    const auto key = lower_ascii(query);
+    std::string_view id = key;
+    if (key == "vov 1" || key == "vov" || key == "vov mộc" || key == "vov mốc" ||
+        key == "vov mốt" || key == "vov mậu" || key == "vov máu" || key == "vov một" ||
+        key == "vov mút" || key == "vov mót" || key == "vov mục") {
+        id = "vov1";
+    } else if (key == "mê kông" || key == "mekong" || key == "vov mekong" ||
+               key == "vov mekong fm" || key == "giao thông mê kông") {
+        id = "vov_mekong";
+    } else if (key == "vov giao thông tphcm" || key == "vov giao thông tp. hồ chí minh" ||
+               key == "giao thông tphcm") {
+        id = "vov_gt_hcm";
+    } else if (key == "vov 4") {
+        id = "vov4";
+    } else if (key == "vov 5" || key == "vov5 tiếng việt") {
+        id = "vov5";
+    } else if (key == "sonata" || key == "sanata" || key == "vov sanata") {
+        id = "vov_sonata";
+    }
+    for (const auto& station : kStations) {
+        const auto name = lower_ascii(station.name);
+        if (id == station.id || key == name || key == name.substr(0, name.find(" — "))) {
+            return &station;
+        }
+    }
+    return nullptr;
+}
 
 }  // namespace uta

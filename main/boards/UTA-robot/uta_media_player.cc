@@ -1,6 +1,7 @@
 #include "uta_media_player.h"
 #include "uta_media_policy.h"
 #include "uta_media_response.h"
+#include "uta_hls.h"
 #include "uta_video_player.h"
 
 #include <algorithm>
@@ -62,19 +63,21 @@ void AddMusicHeaders(Http& http, const std::string& secret) {
 
 std::unique_ptr<Http> OpenHttp(std::string url, const Configuration& config, bool music,
                                const std::function<bool()>& cancelled, std::string& error,
-                               bool* retryable = nullptr) {
+                                bool* retryable = nullptr, std::string* final_url = nullptr) {
     for (unsigned redirects = 0; redirects <= 3 && IsHttpUrl(url); ++redirects) {
         if (cancelled())
             return nullptr;
         auto http = Board::GetInstance().GetNetwork()->CreateHttp(0);
         if (!http)
             return nullptr;
-        http->SetTimeout(4000);
+        http->SetTimeout(music ? 12000 : 8000);
+        http->SetHeader("User-Agent", "ESP32-Music-Player/1.0");
         http->SetHeader("Accept-Encoding", "identity");
         http->SetHeader("Icy-MetaData", "0");
         // Không chuyển thông tin ký yêu cầu sang máy chủ nhạc/đài khác nguồn.
         if (music && UrlOrigin(url) == UrlOrigin(config.music_server)) {
             AddMusicHeaders(*http, config.music_key);
+            http->SetHeader("Cache-Control", "no-cache");
         }
         if (!http->Open("GET", url)) {
             if (retryable)
@@ -83,8 +86,11 @@ std::unique_ptr<Http> OpenHttp(std::string url, const Configuration& config, boo
             return nullptr;
         }
         auto status = http->GetStatusCode();
-        if (status && (*status == 200 || *status == 206))
+        if (status && (*status == 200 || *status == 206)) {
+            if (final_url)
+                *final_url = url;
             return http;
+        }
         const auto location = http->GetResponseHeader("location");
         http->Close();
         if (!status || (*status != 301 && *status != 302 && *status != 303 && *status != 307 &&
@@ -100,6 +106,216 @@ std::unique_ptr<Http> OpenHttp(std::string url, const Configuration& config, boo
     error = "Nguồn phát chuyển hướng quá nhiều hoặc trả địa chỉ không hợp lệ";
     return nullptr;
 }
+
+class HlsReader {
+public:
+    HlsReader(const Configuration& config, std::function<bool()> cancelled,
+              const std::atomic<bool>& paused, std::string& error, bool& retryable)
+        : config_(config), cancelled_(std::move(cancelled)), paused_(paused),
+          error_(error), retryable_(retryable) {}
+
+    ~HlsReader() {
+        if (segment_)
+            segment_->Close();
+    }
+
+    bool Open(std::unique_ptr<Http> http, std::string url) {
+        // Master VOV trả URL CDN có chữ ký phiên, cần đọc lại khi reconnect.
+        for (unsigned depth = 0; depth < 4; ++depth) {
+            if (!Load(std::move(http), url))
+                return false;
+            if (playlist_.variant.empty()) {
+                playlist_url_ = url;
+                return true;
+            }
+            url = playlist_.variant;
+            http = OpenHttp(url, config_, false, cancelled_, error_, &retryable_, &url);
+            if (!http)
+                return false;
+        }
+        error_ = "Playlist radio HLS lồng quá nhiều tầng";
+        return false;
+    }
+
+    int Read(char* output, size_t capacity) {
+        size_t written = 0;
+        auto deadline = esp_timer_get_time() + 30000000;
+        while (written < capacity && !cancelled_()) {
+            if (paused_) {
+                if (written)
+                    break;
+                vTaskDelay(pdMS_TO_TICKS(20));
+                deadline = esp_timer_get_time() + 30000000;
+                continue;
+            }
+            if (esp_timer_get_time() > deadline) {
+                error_ = "Radio HLS không gửi âm thanh AAC trong 30 giây";
+                retryable_ = true;
+                return -1;
+            }
+            if (!payload_.empty()) {
+                const auto bytes = std::min(capacity - written, payload_.size());
+                std::memcpy(output + written, payload_.data(), bytes);
+                payload_ = payload_.subspan(bytes);
+                written += bytes;
+                continue;
+            }
+            if (!segment_) {
+                if (written)
+                    break;
+                const int next = NextSegment();
+                if (next <= 0)
+                    return next;
+                if (next == 2) {
+                    deadline = esp_timer_get_time() + 30000000;
+                    continue;
+                }
+            }
+            auto count = segment_->Read(reinterpret_cast<char*>(packet_.data() + packet_used_),
+                                        packet_.size() - packet_used_);
+            if (!count || *count < 0 || static_cast<size_t>(*count) > packet_.size() - packet_used_) {
+                error_ = "Không đọc được đoạn radio HLS";
+                retryable_ = true;
+                return -1;
+            }
+            if (*count == 0) {
+                segment_->Close();
+                segment_.reset();
+                if (packet_used_ || segment_bytes_ == 0) {
+                    error_ = "Đoạn radio MPEG-TS kết thúc thiếu dữ liệu";
+                    retryable_ = true;
+                    return -1;
+                }
+                continue;
+            }
+            packet_used_ += *count;
+            segment_bytes_ += *count;
+            if (segment_bytes_ > 512 * 1024) {
+                error_ = "Đoạn radio HLS vượt giới hạn 512 KiB";
+                return -1;
+            }
+            if (packet_used_ == packet_.size()) {
+                auto payload = demux_.Packet(packet_);
+                if (!payload) {
+                    error_ = payload.error();
+                    retryable_ = true;
+                    return -1;
+                }
+                payload_ = *payload;
+                packet_used_ = 0;
+            }
+        }
+        return cancelled_() ? -1 : static_cast<int>(written);
+    }
+
+private:
+    const Configuration& config_;
+    std::function<bool()> cancelled_;
+    const std::atomic<bool>& paused_;
+    std::string& error_;
+    bool& retryable_;
+    std::string playlist_url_;
+    HlsPlaylist playlist_;
+    std::unique_ptr<Http> segment_;
+    HlsTsAudio demux_;
+    std::array<uint8_t, 188> packet_{};
+    std::span<const uint8_t> payload_;
+    size_t packet_used_ = 0, segment_bytes_ = 0;
+    uint64_t next_sequence_ = 0;
+    bool started_ = false;
+    int64_t last_progress_ = esp_timer_get_time();
+
+    bool Load(std::unique_ptr<Http> http, const std::string& url) {
+        std::string body;
+        std::array<char, 1024> buffer{};
+        const auto deadline = esp_timer_get_time() + 15000000;
+        while (!cancelled_() && esp_timer_get_time() < deadline) {
+            auto count = http->Read(buffer.data(), buffer.size());
+            if (!count || *count < 0) {
+                http->Close();
+                error_ = "Kết nối bị ngắt khi đọc playlist HLS";
+                retryable_ = true;
+                return false;
+            }
+            if (static_cast<size_t>(*count) > buffer.size() || body.size() + *count > 65536) {
+                http->Close();
+                error_ = "Playlist HLS vượt giới hạn dữ liệu";
+                return false;
+            }
+            if (*count == 0) {
+                http->Close();
+                auto parsed = ParseHlsPlaylist(url, body);
+                if (!parsed) {
+                    error_ = parsed.error();
+                    return false;
+                }
+                playlist_ = std::move(*parsed);
+                return true;
+            }
+            body.append(buffer.data(), *count);
+        }
+        http->Close();
+        error_ = "Playlist radio HLS phản hồi quá chậm hoặc đã hủy";
+        retryable_ = true;
+        return false;
+    }
+
+    int NextSegment() {
+        // Thời hạn tính theo tiến triển, có nhường task và kiểm tra hủy.
+        while (!cancelled_()) {
+            if (paused_) {
+                last_progress_ = esp_timer_get_time();
+                return 2;
+            }
+            for (const auto& item : playlist_.segments) {
+                if (started_ && item.sequence < next_sequence_)
+                    continue;
+                if (started_ && (item.discontinuity || item.sequence != next_sequence_)) {
+                    error_ = "Đài HLS đổi mốc âm thanh, cần kết nối lại";
+                    retryable_ = true;
+                    return -1;
+                }
+                segment_ = OpenHttp(item.url, config_, false, cancelled_, error_, &retryable_);
+                if (!segment_) {
+                    // URL phiên/đoạn có thể hết hạn. Run() sẽ mở lại từ master,
+                    // vẫn giữ giới hạn hai lần reconnect của radio.
+                    retryable_ = true;
+                    return -1;
+                }
+                next_sequence_ = item.sequence + 1;
+                started_ = true;
+                segment_bytes_ = 0;
+                last_progress_ = esp_timer_get_time();
+                return 1;
+            }
+            if (playlist_.ended)
+                return 0;
+            const auto wait_ms = std::min(playlist_.target_seconds * 500U, 2000U);
+            for (unsigned waited = 0; waited < wait_ms && !cancelled_(); waited += 20)
+                vTaskDelay(pdMS_TO_TICKS(20));
+            std::string url = playlist_url_;
+            auto http = OpenHttp(url, config_, false, cancelled_, error_, &retryable_, &url);
+            if (!http) {
+                // Playlist CDN cũng có thể hết phiên; thử lấy phiên mới từ URL gốc.
+                retryable_ = true;
+                return -1;
+            }
+            if (!Load(std::move(http), url))
+                return -1;
+            playlist_url_ = url;
+            if (!playlist_.variant.empty()) {
+                error_ = "Playlist radio đổi sang master khi đang phát";
+                return -1;
+            }
+            if (esp_timer_get_time() - last_progress_ > 30000000) {
+                error_ = "Đài HLS không có đoạn âm thanh mới trong 30 giây";
+                retryable_ = true;
+                return -1;
+            }
+        }
+        return -1;
+    }
+};
 
 struct DecoderSession {
     std::array<uint8_t, kInputCapacity> input{};
@@ -147,6 +363,11 @@ MediaResult MediaPlayer::Submit(bool song, const std::string& value, const std::
         request = Request{++request_id_, song, value, label, video};
         preparing_id_ = request.id;
         last_request_ = request;
+        queued_pcm_us_ = 0;
+        duration_seconds_ = 0;
+        song_title_.clear();
+        spectrum_ = {};
+        spectrum_at_ = 0;
         pending_.reset();
         status_ = "Đang chuẩn bị phát";
         playing_ = true;
@@ -181,10 +402,13 @@ MediaResult MediaPlayer::PlaySong(const std::string& song, const std::string& ar
 MediaResult MediaPlayer::PlayRadio(const std::string& url, const std::string& name) {
     if (!IsHttpUrl(url))
         return std::unexpected(
-            "Radio cần URL luồng MP3/AAC trực tiếp qua HTTP/HTTPS, tối đa 2048 byte");
+            "Radio cần URL MP3/AAC hoặc HLS MPEG-TS/AAC qua HTTP/HTTPS, tối đa 2048 byte");
     if (!ValidMediaText(name, true))
         return std::unexpected("Tên đài không hợp lệ hoặc dài quá 160 byte");
     const auto title = TrimMediaText(name);
+    if (url == "https://stream.vovmedia.vn/vov-1" ||
+        url == "http://stream.vovmedia.vn/vov-1")
+        return Submit(false, kVov1HlsUrl, title.empty() ? "VOV 1" : title);
     return Submit(false, url, title.empty() ? "Radio Internet" : title);
 }
 
@@ -254,6 +478,8 @@ MediaSnapshot MediaPlayer::Snapshot() {
         if (video_playing_)
             type = "mp4";
         title = last_request_->song ? last_request_->value : last_request_->label;
+        if (last_request_->song && !song_title_.empty())
+            title = song_title_;
     }
     return {type,
             title,
@@ -261,7 +487,10 @@ MediaSnapshot MediaPlayer::Snapshot() {
             playing_.load(),
             preparing_id_ != 0,
             paused_.load(),
-            last_request_.has_value()};
+            last_request_.has_value(),
+            last_request_ && last_request_->song ? last_request_->label : "",
+            static_cast<int>(queued_pcm_us_ / 1000000),
+            duration_seconds_};
 }
 
 Spectrum MediaPlayer::GetSpectrum() {
@@ -284,7 +513,9 @@ void MediaPlayer::SetStatus(uint32_t id, const std::string& text) {
 }
 
 std::expected<std::string, std::string> MediaPlayer::SearchSong(const Request& request,
-                                                                const Configuration& config) {
+                                                                const Configuration& config,
+                                                                int& duration_seconds,
+                                                                std::string& title) {
     if (!ValidMusicServer(config.music_server))
         return std::unexpected("Chưa cài đúng địa chỉ máy chủ nhạc trên trang điều khiển");
     std::string base = config.music_server;
@@ -300,7 +531,7 @@ std::expected<std::string, std::string> MediaPlayer::SearchSong(const Request& r
         return std::unexpected(error.empty() ? "Không mở được dịch vụ tìm nhạc" : error);
     std::array<char, 1024> buffer{};
     std::string response;
-    const auto deadline = esp_timer_get_time() + 10000000;
+    const auto deadline = esp_timer_get_time() + 15000000;
     bool complete = false;
     while (!Cancelled(request.id) && esp_timer_get_time() < deadline) {
         auto size = http->Read(buffer.data(), buffer.size());
@@ -321,22 +552,30 @@ std::expected<std::string, std::string> MediaPlayer::SearchSong(const Request& r
     }
     if (!complete)
         return std::unexpected("Máy chủ tìm nhạc phản hồi quá chậm");
-    return ParseSongResponse(base, response);
+    return ParseSongResponse(base, response, &duration_seconds, &title);
 }
 
 bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::string& error,
-                         bool& retryable) {
+                         bool& retryable, bool* delivered) {
     retryable = false;
     auto& audio = Application::GetInstance().GetAudioService();
     const uint32_t generation = audio.GetPlaybackGeneration();
     const int output_rate = Board::GetInstance().GetAudioCodec()->output_sample_rate();
+    const auto config = settings_.Get();
+    std::string final_url;
     auto http = OpenHttp(
-        url, settings_.Get(), !radio, [this, id]() { return Cancelled(id); }, error, &retryable);
+        url, config, !radio, [this, id]() { return Cancelled(id); }, error, &retryable, &final_url);
     if (!http)
         return false;
-    const auto content_type = http->GetResponseHeader("content-type");
+    auto content_type = http->GetResponseHeader("content-type");
+    std::transform(content_type.begin(), content_type.end(), content_type.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    const auto path = final_url.substr(0, final_url.find_first_of("?#"));
+    const bool hls_source = radio &&
+                            (content_type.find("mpegurl") != std::string::npos ||
+                             path.ends_with(".m3u8"));
     if (content_type.find("text/html") != std::string::npos ||
-        content_type.find("mpegurl") != std::string::npos ||
+        (!hls_source && content_type.find("mpegurl") != std::string::npos) ||
         content_type.find("scpls") != std::string::npos) {
         http->Close();
         error = "Nguồn là trang web hoặc playlist; cần luồng MP3/AAC trực tiếp";
@@ -359,6 +598,14 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
     };
     std::unique_ptr<DecoderSession, decltype(destroy)> session(new (memory) DecoderSession,
                                                                destroy);
+    std::unique_ptr<HlsReader> hls;
+    if (hls_source) {
+        hls = std::make_unique<HlsReader>(
+            config, [this, id]() { return Cancelled(id); }, paused_, error, retryable);
+        if (!hls->Open(std::move(http), final_url))
+            return false;
+        ESP_LOGI(kTag, "Radio HLS: đọc playlist và tách AAC từ MPEG-TS");
+    }
     size_t used = 0;
     bool eof = false;
     bool need_input = true;
@@ -373,22 +620,35 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
             if (used == session->input.size()) {
                 break;
             }
-            auto count = http->Read(reinterpret_cast<char*>(session->input.data() + used),
-                                    std::min<size_t>(4096, session->input.size() - used));
-            if (!count || *count < 0 ||
-                static_cast<size_t>(*count) >
-                    std::min<size_t>(4096, session->input.size() - used)) {
-                error = "Luồng nhạc/radio mất kết nối hoặc lỗi đọc dữ liệu";
-                retryable = true;
+            auto* buffer = reinterpret_cast<char*>(session->input.data() + used);
+            const auto capacity = std::min<size_t>(4096, session->input.size() - used);
+            int count;
+            if (hls) {
+                count = hls->Read(buffer, capacity);
+            } else {
+                auto received = http->Read(buffer, capacity);
+                count = received ? *received : -1;
+            }
+            if (count < 0 || static_cast<size_t>(count) > capacity) {
+                if (!hls) {
+                    error = used || played ? "Luồng âm thanh bị ngắt khi đang đọc dữ liệu"
+                                          : "Nguồn phát không gửi dữ liệu âm thanh trong thời gian chờ";
+                    retryable = true;
+                }
                 break;
             }
-            eof = *count == 0;
-            used += *count;
+            eof = count == 0;
+            if (eof && radio && !hls) {
+                error = "Luồng radio trực tiếp đã đóng kết nối";
+                retryable = true;
+            }
+            used += count;
             need_input = false;
         }
         if (used == 0 && eof) {
-            http->Close();
-            return played;
+            if (http)
+                http->Close();
+            return played && (!radio || hls);
         }
         // Nạp trước dữ liệu có giới hạn để tránh hụt tiếng ngay sau khung đầu tiên.
         if (!session->decoder && !eof && used < 8192) {
@@ -524,8 +784,11 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
             break;
         }
         played = true;
+        if (delivered)
+            *delivered = true;
     }
-    http->Close();
+    if (http)
+        http->Close();
     if (error.empty())
         error = "Không giải mã được nguồn MP3/AAC; kiểm tra định dạng và luồng trực tiếp";
     return false;
@@ -558,6 +821,11 @@ bool MediaPlayer::PushPcm(const int16_t* pcm, size_t count, int rate, uint32_t i
         }
         offset += chunk;
     }
+    if (pause_between_blocks && offset > 0) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (id == request_id_)
+            queued_pcm_us_ += static_cast<int64_t>(offset) * 1000000 / rate;
+    }
     return offset == count && !Cancelled(id);
 }
 
@@ -589,10 +857,17 @@ void MediaPlayer::Run() {
         bool ok = false;
         std::string movie_error;
         if (request->song) {
-            auto found = SearchSong(*request, config);
-            if (found)
+            int duration = 0;
+            std::string title;
+            auto found = SearchSong(*request, config, duration, title);
+            if (found) {
                 url = std::move(*found);
-            else {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (request->id == request_id_) {
+                    duration_seconds_ = duration;
+                    song_title_ = std::move(title);
+                }
+            } else {
                 url.clear();
                 movie_error = found.error();
             }
@@ -634,9 +909,16 @@ void MediaPlayer::Run() {
                 }
             } else {
                 bool retryable = false;
-                ok = Stream(url, request->id, !request->song, movie_error, retryable);
-                // Đài trực tiếp: thử lại tối đa hai lần khi lỗi đường truyền, không
-                // lặp lại lỗi codec/HTTP 4xx hoặc tự phát lại tệp nhạc đã kết thúc.
+                bool delivered = false;
+                ok = Stream(url, request->id, !request->song, movie_error, retryable, &delivered);
+                if (request->song && !ok && !delivered && !Cancelled(request->id)) {
+                    const auto legacy = LegacyMusicProxy(url, config.music_server);
+                    if (!legacy.empty()) {
+                        ESP_LOGI(kTag, "Thử đường dẫn proxy nhạc tương thích bản cũ");
+                        ok = Stream(legacy, request->id, false, movie_error, retryable);
+                    }
+                }
+                // Radio thử lại tối đa hai lần khi mất kết nối hoặc cần phiên HLS mới.
                 for (unsigned retry = 0;
                      !request->song && !ok && retryable && retry < 2 && !Cancelled(request->id);
                      ++retry) {
@@ -666,6 +948,8 @@ void MediaPlayer::Run() {
                                                  : movie_error;
             }
         }
+        if (!ok && !Cancelled(request->id) && !movie_error.empty())
+            ESP_LOGW(kTag, "%s", movie_error.c_str());
         ESP_LOGI(kTag, "Đã kết thúc lượt phát");
     }
 }

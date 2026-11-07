@@ -64,10 +64,10 @@ bool UtaDisplay::SetEmotion(const char* emotion) {
 }
 
 void UtaDisplay::SetupEyesLocked() {
-    eyes_screen_ = lv_obj_create(lv_layer_top());
+    eyes_screen_ = lv_obj_create(lv_display_get_layer_top(display_));
     lv_obj_remove_style_all(eyes_screen_);
     lv_obj_set_size(eyes_screen_, 240, 240);
-    lv_obj_set_pos(eyes_screen_, 0, 0);
+    lv_obj_center(eyes_screen_);
     lv_obj_remove_flag(eyes_screen_, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_remove_flag(eyes_screen_, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_bg_color(eyes_screen_, lv_color_black(), 0);

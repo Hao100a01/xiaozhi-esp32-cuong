@@ -47,6 +47,7 @@ struct RobotCommand {
     int duration_ms = 0;
     bool dance = false;
 };
+enum class HeadCommand { None, Left, Right, Up, Down, Shake, Dance, Stop };
 
 class UtaBootButton : public Button {
 public:
@@ -206,6 +207,7 @@ private:
     std::array<std::atomic<int>, uta::kExtraServoCount> extra_servo_pending_{
         kNoExtraServoCommand, kNoExtraServoCommand, kNoExtraServoCommand, kNoExtraServoCommand};
     std::atomic<uta::ReplyGesture> pending_gesture_{uta::ReplyGesture::None};
+    std::atomic<HeadCommand> head_pending_{HeadCommand::None};
     uta::MediaPlayer media_;
     UtaBootButton boot_;
     std::unique_ptr<UtaDisplay> display_;
@@ -370,7 +372,7 @@ private:
                 display_ = std::make_unique<UtaDisplay>(
                     io, panel, lcd.width, lcd.height, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y,
                     DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
-                display_->RestoreRotation();
+                display_->RestoreRotation(lcd.driver == uta::LcdDriver::St7789);
             }
         }
         if (active_.secondary_lcd.driver != uta::LcdDriver::Off)
@@ -806,6 +808,16 @@ private:
         size_t gesture_step = 0;
         std::array<int, 2> servo_target = active_.servo_home;
         constexpr std::array gesture_offsets{15, -15, 0};
+        std::array<bool, 2> hold_pose{};
+        HeadCommand head_mode = HeadCommand::None;
+        int64_t head_at = 0;
+        int64_t head_end = 0;
+        size_t head_step = 0;
+        const auto move_head = [&](size_t axis, int offset) {
+            servo_target[axis] = std::clamp(active_.servo_home[axis] + offset,
+                                           active_.servo_min[axis], active_.servo_max[axis]);
+            motion_.Servo(axis, servo_target[axis]);
+        };
         std::array<uint8_t, 64> responses{};
         for (;;) {
             if (start_web_.exchange(false)) {
@@ -820,6 +832,9 @@ private:
                 WriteRobot("x0.0 y0.0");
                 stop_at = 0;
                 dancing_.store(false);
+                head_pending_.exchange(HeadCommand::None);
+                head_mode = HeadCommand::None;
+                gesture_at = 0;
                 for (size_t axis = 0; axis < wheel_stop_at.size(); ++axis) {
                     extra_servo_pending_[axis].store(kNoExtraServoCommand);
                     motion_.ExtraServo(axis, 0);
@@ -846,6 +861,8 @@ private:
                 const int angle = servo_pending_[axis].exchange(-1);
                 if (angle >= 0) {
                     manual_servo = true;
+                    head_mode = HeadCommand::None;
+                    hold_pose[axis] = false;
                     if (gesture_at && axis == gesture_axis)
                         gesture_at = 0;
                     servo_target[axis] = angle;
@@ -861,9 +878,58 @@ private:
                 }
             }
             const int64_t now = esp_timer_get_time();
+            const auto head_command = head_pending_.exchange(HeadCommand::None);
+            if (head_command != HeadCommand::None) {
+                head_mode = HeadCommand::None;
+                gesture_at = 0;
+                manual_servo = true;
+                switch (head_command) {
+                case HeadCommand::Left:
+                case HeadCommand::Right:
+                    hold_pose[1] = true;
+                    move_head(1, head_command == HeadCommand::Left ? -25 : 25);
+                    break;
+                case HeadCommand::Up:
+                case HeadCommand::Down:
+                    hold_pose[0] = true;
+                    move_head(0, head_command == HeadCommand::Up ? -20 : 20);
+                    break;
+                case HeadCommand::Shake:
+                case HeadCommand::Dance:
+                    head_mode = head_command;
+                    hold_pose[1] = true;
+                    if (head_mode == HeadCommand::Dance)
+                        hold_pose[0] = true;
+                    head_at = now;
+                    head_end = now + 6000000;
+                    head_step = 0;
+                    break;
+                case HeadCommand::Stop:
+                    hold_pose.fill(true);
+                    break;
+                case HeadCommand::None:
+                    break;
+                }
+            }
+            if (head_mode == HeadCommand::Dance && now >= head_end)
+                head_mode = HeadCommand::None;
+            if (head_mode != HeadCommand::None && now >= head_at) {
+                if (head_mode == HeadCommand::Shake) {
+                    move_head(1, head_step % 2 == 0 ? -25 : 25);
+                } else {
+                    constexpr std::array yaw{-20, 0, 20, 0};
+                    constexpr std::array pitch{0, -15, 0, 15};
+                    move_head(1, yaw[head_step % yaw.size()]);
+                    move_head(0, pitch[head_step % pitch.size()]);
+                }
+                ++head_step;
+                head_at = now + 350000;
+            }
             const auto gesture = pending_gesture_.exchange(uta::ReplyGesture::None);
-            if (gesture != uta::ReplyGesture::None && !gesture_at && !manual_servo) {
-                gesture_axis = gesture == uta::ReplyGesture::Nod ? 0 : 1;
+            const size_t requested_axis = gesture == uta::ReplyGesture::Nod ? 0 : 1;
+            if (gesture != uta::ReplyGesture::None && !gesture_at && !manual_servo &&
+                head_mode == HeadCommand::None && !hold_pose[requested_axis]) {
+                gesture_axis = requested_axis;
                 gesture_step = 0;
                 gesture_at = now;
             }
@@ -880,7 +946,13 @@ private:
                     const bool visible =
                         media_.IsPlaying() && !media_.IsVideo() &&
                         Application::GetInstance().GetDeviceState() == kDeviceStateIdle;
-                    display_->UpdateSpectrum(media_.GetSpectrum(), visible);
+                    if (visible) {
+                        const auto playback = media_.Snapshot();
+                        display_->UpdateSpectrum(media_.GetSpectrum(),
+                                                 playback.playing ? &playback : nullptr);
+                    } else {
+                        display_->UpdateSpectrum({}, nullptr);
+                    }
                     if (!media_.IsVideo() ||
                         Application::GetInstance().GetDeviceState() != kDeviceStateIdle)
                         display_->UpdateVideo(nullptr, 0, 0);
@@ -953,6 +1025,38 @@ private:
             }
         }
         if (active_.servos_enabled[0] || active_.servos_enabled[1]) {
+            const struct {
+                const char* name;
+                const char* description;
+                HeadCommand command;
+                bool available;
+            } head_tools[] = {
+                {"self.robot.look_left", "Xoay đầu sang trái và giữ góc", HeadCommand::Left,
+                 active_.servos_enabled[1]},
+                {"self.robot.look_right", "Xoay đầu sang phải và giữ góc", HeadCommand::Right,
+                 active_.servos_enabled[1]},
+                {"self.robot.look_up", "Ngửa đầu lên và giữ góc", HeadCommand::Up,
+                 active_.servos_enabled[0]},
+                {"self.robot.look_down", "Cúi đầu xuống và giữ góc", HeadCommand::Down,
+                 active_.servos_enabled[0]},
+                {"self.robot.shake_head", "Lắc đầu qua lại liên tục đến khi có lệnh dừng",
+                 HeadCommand::Shake, active_.servos_enabled[1]},
+                {"self.robot.dance", "Quẩy bằng cách phối hợp cử động đầu và cổ trong 6 giây",
+                 HeadCommand::Dance, active_.servos_enabled[0] && active_.servos_enabled[1]},
+                {"self.robot.stop_head", "Dừng lắc đầu hoặc quẩy và giữ góc hiện tại",
+                 HeadCommand::Stop, true},
+            };
+            for (const auto& tool : head_tools) {
+                if (tool.available) {
+                    mcp.AddTool(tool.name, tool.description, PropertyList(),
+                                [this, command = tool.command](const PropertyList&) -> ReturnValue {
+                                    if (!control_task_)
+                                        return false;
+                                    head_pending_.store(command);
+                                    return true;
+                                });
+                }
+            }
             mcp.AddTool("self.robot.set_head", "Đặt góc đầu và cổ, trong giới hạn đã lưu trên web",
                         PropertyList({Property("dau", kPropertyTypeInteger, 90, 0, 180),
                                       Property("co", kPropertyTypeInteger, 90, 0, 180)}),

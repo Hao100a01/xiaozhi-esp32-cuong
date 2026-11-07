@@ -104,6 +104,19 @@ thời tiết đổi địa phương và dung lượng phân vùng firmware.
 
 ## Nhạc và đài Internet
 
+VOV1 dùng URL gốc `https://audio-lss.vov.vn/live/vov1.m3u8`. Firmware đọc master
+playlist để nhận URL CDN theo phiên, đọc media playlist theo số thứ tự và tách
+AAC ADTS từ MPEG-TS 188 byte. URL VOV1 cũ `stream.vovmedia.vn/vov-1` được
+chuyển sang nguồn mới khi phát, kể cả cài đặt đã lưu trước đây. Các preset đài
+khác cần kiểm chứng nguồn riêng. URL CDN có chữ ký được giữ trong RAM.
+
+Phạm vi HLS hiện tại là radio MPEG-TS/AAC không mã hóa. Playlist tối đa 64 KiB,
+128 đoạn, mỗi đoạn tối đa 512 KiB, thời gian chờ có giới hạn. Không hỗ trợ HLS
+fMP4, AES/DRM, byte-range hoặc delta playlist. Khi hết phiên, mất đoạn hay đổi
+mốc âm thanh, luồng radio kết nối lại từ URL gốc trong giới hạn thử lại hiện có.
+Thử nghiệm parser và tách ADTS từ đoạn VOV1 thật đã qua trên máy tính. Phát loa,
+TLS trên ESP32, chuyển đoạn liên tục và pause/reconnect cần kiểm tra trên mạch.
+
 Các MCP media của UTA được đăng ký tại `uta_media_mcp.cc`, chỉ dùng cho board
 này; giữ nguyên các tên lệnh cũ. Kết quả lệnh phát là **đã nhận yêu cầu**, không
 đồng nghĩa đã giải mã/phát thành công. Xem `self.media.get_status` để biết tên
@@ -114,7 +127,7 @@ trả khóa máy chủ hoặc URL đã ký.
 |---|---|
 | `self.music.play_song` | `bai_hat`, `ca_si` tùy chọn; mỗi trường tối đa 160 byte |
 | `self.radio.list_stations` | Liệt kê mã/tên đài có sẵn và đài tùy chỉnh đã lưu |
-| `self.radio.play_station` | `ma_dai`, gồm `tuy_chinh` |
+| `self.radio.play_station` | `ma_dai` nhận mã hoặc tên đài, ví dụ `VOV 3`, `Tây Nguyên`, `VOV Mekong`; `tuy_chinh` phát đài đã lưu |
 | `self.radio.play_url` | `url` luồng MP3/AAC trực tiếp, `ten` tùy chọn |
 | `self.video.play_mp4` | `url` tệp MP4 trực tiếp; URL tối đa 2048 byte |
 | `self.media.get_status` | Xem kết quả phát và lỗi bất đồng bộ |

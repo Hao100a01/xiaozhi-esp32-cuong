@@ -52,9 +52,12 @@ public:
             http_ = Board::GetInstance().GetNetwork()->CreateHttp(0);
             if (!http_)
                 return false;
-            http_->SetTimeout(4000);
+            http_->SetTimeout(10000);
             http_->SetHeader("Accept-Encoding", "identity");
-            http_->SetHeader("Range", "bytes=" + std::to_string(position) + "-");
+            const auto last = std::min<uint64_t>(uint64_t{position} + 32767,
+                                                 size_ ? size_ - 1 : UINT32_MAX);
+            http_->SetHeader("Range", "bytes=" + std::to_string(position) + "-" +
+                                          std::to_string(last));
             if (!http_->Open("GET", url_))
                 return false;
             const auto code = http_->GetStatusCode();
@@ -92,14 +95,18 @@ public:
         size = std::min(size, size_ - position_);
         if (!size)
             return 0;
-        if (position_ > range_end_ && !Seek(position_))
-            return -1;
-        size = std::min(size, range_end_ - position_ + 1);
-        auto count = http_->Read(static_cast<char*>(destination), size);
-        if (!count || *count <= 0 || static_cast<uint32_t>(*count) > size)
-            return -1;
-        position_ += *count;
-        return *count;
+        uint32_t filled = 0;
+        while (filled < size && !callbacks_.cancelled()) {
+            if (position_ > range_end_ && !Seek(position_))
+                return -1;
+            const auto chunk = std::min(size - filled, range_end_ - position_ + 1);
+            const auto count = http_->Read(static_cast<char*>(destination) + filled, chunk);
+            if (!count || *count <= 0 || static_cast<uint32_t>(*count) > chunk)
+                return -1;
+            filled += *count;
+            position_ += *count;
+        }
+        return filled == size ? static_cast<int>(filled) : -1;
     }
     uint32_t Size() const { return size_; }
 
@@ -284,7 +291,7 @@ bool PlayMp4(const std::string& url, const VideoCallbacks& callbacks) {
     extract.in_size_cb = [](void* ctx) { return static_cast<MovieInput*>(ctx)->Size(); };
     if (esp_extractor_open(&extract, &session->extractor) != ESP_EXTRACTOR_ERR_OK ||
         esp_extractor_parse_stream(session->extractor) != ESP_EXTRACTOR_ERR_OK) {
-        callbacks.error("Không đọc được cấu trúc MP4 hoặc máy chủ không hỗ trợ tìm vị trí tệp");
+        callbacks.error("Không đọc được MP4. Kiểm tra HTTP Range và dùng H.264 Baseline/MJPEG, không dùng AV1");
         return false;
     }
     esp_extractor_stream_info_t audio{}, video{};

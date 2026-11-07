@@ -32,7 +32,7 @@ ToolResult Status(MediaPlayer& media) {
     return root.release();
 }
 
-ToolResult Stations(SettingsStore& settings) {
+ToolResult Stations() {
     JsonPtr root(cJSON_CreateArray(), cJSON_Delete);
     if (!root)
         return std::unexpected("Không đủ bộ nhớ đọc danh sách đài");
@@ -49,9 +49,6 @@ ToolResult Stations(SettingsStore& settings) {
         if (!add(station.id, station.name))
             return std::unexpected("Không đủ bộ nhớ đọc danh sách đài");
     }
-    const auto config = settings.Get();
-    if (IsHttpUrl(config.radio_url) && !add("tuy_chinh", config.radio_name.c_str()))
-        return std::unexpected("Không đủ bộ nhớ đọc danh sách đài");
     return root.release();
 }
 }  // namespace
@@ -71,11 +68,14 @@ void RegisterMediaTools(MediaPlayer& media, SettingsStore& settings) {
                 "Đã nhận yêu cầu tìm và phát bài hát; chưa xác nhận nguồn phát thành công");
         });
     mcp.AddTool("self.radio.list_stations",
-                "Xem mã và tên các đài radio có sẵn, gồm đài tùy chỉnh đã lưu", PropertyList(),
-                [&settings](const PropertyList&) { return Stations(settings); });
+                "Xem mã và tên các đài radio có sẵn", PropertyList(),
+                [](const PropertyList&) { return Stations(); });
     mcp.AddTool("self.radio.play_station",
-                "Phát đài theo mã từ self.radio.list_stations; tuy_chinh dùng đài đã lưu",
-                PropertyList({Property("ma_dai", kPropertyTypeString).SetMaxLength(40)}),
+                "Phát đài VOV theo mã hoặc tên, ví dụ VOV1, VOV4 ĐBSCL, VOV Giao thông Mê Kông. "
+                "VOV một/mộc/mốt là VOV1. Dùng self.radio.list_stations để xem mã đài; "
+                "tuy_chinh dùng đài đã lưu",
+                PropertyList(
+                    {Property("ma_dai", kPropertyTypeString).SetMaxLength(kMediaTitleLimit)}),
                 [&media, &settings](const PropertyList& values) -> ToolResult {
                     const auto id = TrimMediaText(values["ma_dai"].value<std::string>());
                     if (id == "tuy_chinh") {
@@ -83,15 +83,14 @@ void RegisterMediaTools(MediaPlayer& media, SettingsStore& settings) {
                         return Accepted(media.PlayRadio(config.radio_url, config.radio_name),
                                         "Đã nhận yêu cầu phát đài tùy chỉnh");
                     }
-                    for (const auto& station : kStations) {
-                        if (id == station.id)
-                            return Accepted(media.PlayRadio(station.url, station.name),
-                                            "Đã nhận yêu cầu phát đài");
+                    if (const auto* station = FindRadioStation(id)) {
+                        return Accepted(media.PlayRadio(station->url, station->name),
+                                        "Đã nhận yêu cầu phát đài");
                     }
-                    return std::unexpected("Mã đài không hợp lệ; hãy xem danh sách đài có sẵn");
+                    return std::unexpected("Không tìm thấy đài; hãy xem danh sách đài có sẵn");
                 });
     mcp.AddTool("self.radio.play_url",
-                "Phát URL luồng MP3/AAC radio trực tiếp; không nhận trang web, HLS hoặc playlist",
+        "Phát radio MP3/AAC trực tiếp hoặc HLS MPEG-TS/AAC (.m3u8); không nhận trang web",
                 PropertyList({Property("url", kPropertyTypeString).SetMaxLength(kMediaUrlLimit),
                               Property("ten", kPropertyTypeString, "Radio Internet")
                                   .SetMaxLength(kMediaTitleLimit)}),

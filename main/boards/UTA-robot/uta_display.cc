@@ -8,7 +8,10 @@
 #include <nvs.h>
 
 #include "uta_ui_assets.h"
+#include "uta_media_player.h"
 #include "uta_weather.h"
+
+
 
 namespace {
 constexpr char kRotationNamespace[] = "uta_robot";
@@ -29,8 +32,34 @@ void Visible(lv_obj_t* object, bool visible) {
         lv_obj_add_flag(object, LV_OBJ_FLAG_HIDDEN);
 }
 
-lv_obj_t* Panel(const lv_image_dsc_t* background) {
-    auto* panel = lv_obj_create(lv_layer_top());
+lv_obj_t* MediaShape(lv_obj_t* parent, int x, int y, int width, int height, int radius,
+                     uint32_t color) {
+    auto* shape = lv_obj_create(parent);
+    lv_obj_remove_style_all(shape);
+    lv_obj_remove_flag(shape, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(shape, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_pos(shape, x, y);
+    lv_obj_set_size(shape, width, height);
+    lv_obj_set_style_radius(shape, radius, 0);
+    lv_obj_set_style_bg_color(shape, lv_color_hex(color), 0);
+    lv_obj_set_style_bg_opa(shape, LV_OPA_COVER, 0);
+    return shape;
+}
+
+void SetMediaText(lv_obj_t* label, const char* value) {
+    if (std::strcmp(lv_label_get_text(label), value) != 0)
+        lv_label_set_text(label, value);
+}
+
+void FormatMediaTime(char* text, size_t size, int seconds) {
+    if (seconds >= 3600)
+        std::snprintf(text, size, "%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60);
+    else
+        std::snprintf(text, size, "%d:%02d", seconds / 60, seconds % 60);
+}
+
+lv_obj_t* Panel(lv_obj_t* layer, const lv_image_dsc_t* background) {
+    auto* panel = lv_obj_create(layer);
     lv_obj_remove_style_all(panel);
     lv_obj_set_size(panel, 240, 240);
     lv_obj_center(panel);
@@ -67,7 +96,111 @@ lv_obj_t* Icon(lv_obj_t* panel, unsigned index, int x, int y, int size) {
 bool IsVisible(lv_obj_t* object) { return object && !lv_obj_has_flag(object, LV_OBJ_FLAG_HIDDEN); }
 }  // namespace
 
-void UtaDisplay::RestoreRotation() {
+void UtaDisplay::UpdateSpectrum(const uta::Spectrum& values, const uta::MediaSnapshot* media) {
+    if (!IsSetupUICalled() || !Lock(10))
+        return;
+
+    if (!media) {
+        if (spectrum_)
+            lv_obj_add_flag(spectrum_, LV_OBJ_FLAG_HIDDEN);
+        bar_heights_.fill(0);
+        record_angle_ = 0;
+        Unlock();
+        return;
+    }
+
+    if (!spectrum_) {
+        spectrum_ = MediaShape(lv_display_get_layer_top(display_), 0, 0, 224, 160, 14, 0x10171b);
+        lv_obj_center(spectrum_);
+        lv_obj_set_style_border_width(spectrum_, 1, 0);
+        lv_obj_set_style_border_color(spectrum_, lv_color_hex(0x30313c), 0);
+
+        MediaShape(spectrum_, 10, 17, 70, 70, LV_RADIUS_CIRCLE, 0xf46bb2);
+        MediaShape(spectrum_, 13, 20, 64, 64, LV_RADIUS_CIRCLE, 0x14151d);
+        auto* record = MediaShape(spectrum_, 15, 22, 60, 60, LV_RADIUS_CIRCLE, 0xef9cb5);
+        lv_obj_set_style_bg_grad_color(record, lv_color_hex(0x899bd7), 0);
+        lv_obj_set_style_bg_grad_dir(record, LV_GRAD_DIR_VER, 0);
+        MediaShape(spectrum_, 42, 49, 6, 6, LV_RADIUS_CIRCLE, 0x272735);
+        record_highlight_ = MediaShape(spectrum_, 24, 31, 12, 12, LV_RADIUS_CIRCLE, 0xffe1cf);
+
+        media_kind_ = Label(spectrum_, "", 90, 16, 123, 0xf68dbe);
+        media_title_ = Label(spectrum_, "", 90, 36, 123, 0xf5f3f8);
+        lv_label_set_long_mode(media_title_, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
+        media_artist_ = Label(spectrum_, "", 90, 56, 123, 0xb7bfca);
+        for (size_t i = 0; i < bars_.size(); ++i) {
+            bars_[i] = MediaShape(spectrum_, 12 + i * 13, 110, 8, 2, 2, 0xf16db8);
+            lv_obj_set_style_bg_grad_color(bars_[i], lv_color_hex(0x6eaeff), 0);
+            lv_obj_set_style_bg_grad_dir(bars_[i], LV_GRAD_DIR_VER, 0);
+        }
+
+        media_progress_ = lv_bar_create(spectrum_);
+        lv_obj_remove_style_all(media_progress_);
+        lv_obj_set_pos(media_progress_, 12, 123);
+        lv_obj_set_size(media_progress_, 198, 5);
+        lv_bar_set_range(media_progress_, 0, 1000);
+        lv_obj_set_style_radius(media_progress_, 3, LV_PART_MAIN);
+        lv_obj_set_style_radius(media_progress_, 3, LV_PART_INDICATOR);
+        lv_obj_set_style_bg_color(media_progress_, lv_color_hex(0x323945), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(media_progress_, LV_OPA_COVER, LV_PART_MAIN);
+        lv_obj_set_style_bg_color(media_progress_, lv_color_hex(0xf46bb2), LV_PART_INDICATOR);
+        lv_obj_set_style_bg_opa(media_progress_, LV_OPA_COVER, LV_PART_INDICATOR);
+        media_progress_dot_ = MediaShape(spectrum_, 8, 121, 9, 9, LV_RADIUS_CIRCLE, 0xffe4f3);
+        media_elapsed_ = Label(spectrum_, "", 12, 134, 95, 0xb7bfca);
+        media_duration_ = Label(spectrum_, "", 115, 134, 95, 0xb7bfca);
+        lv_obj_set_style_text_align(media_duration_, LV_TEXT_ALIGN_RIGHT, 0);
+    }
+
+    lv_obj_remove_flag(spectrum_, LV_OBJ_FLAG_HIDDEN);
+    SetMediaText(media_kind_, media->type == "radio" ? "RADIO" : "NHẠC");
+    SetMediaText(media_title_, media->title.empty() ? "Đang phát" : media->title.c_str());
+    SetMediaText(media_artist_, media->artist.empty() ? "—" : media->artist.c_str());
+    if (!media->paused)
+        record_angle_ = (record_angle_ + 15) % 360;
+    const float angle = record_angle_ * (3.14159265f / 180.0f);
+    lv_obj_set_pos(record_highlight_, 39 + static_cast<int>(20 * std::cos(angle)),
+                   46 + static_cast<int>(20 * std::sin(angle)));
+
+    for (size_t i = 0; i < bars_.size(); ++i) {
+        const int target = 2 + static_cast<int>(34 * std::sqrt(values[i] / 100.0f));
+        auto& height = bar_heights_[i];
+        height = std::max(target, height - 5);
+        lv_obj_set_y(bars_[i], 112 - height);
+        lv_obj_set_height(bars_[i], height);
+    }
+
+    char elapsed[20], duration[20];
+    FormatMediaTime(elapsed, sizeof(elapsed), media->elapsed_seconds);
+    Visible(media_progress_dot_, media->duration_seconds > 0);
+    if (media->duration_seconds > 0) {
+        FormatMediaTime(duration, sizeof(duration), media->duration_seconds);
+        const int position = std::min(media->elapsed_seconds, media->duration_seconds);
+        lv_bar_set_value(media_progress_, position * 1000 / media->duration_seconds, LV_ANIM_OFF);
+        lv_obj_set_x(media_progress_dot_, 8 + position * 198 / media->duration_seconds);
+    } else {
+        std::snprintf(duration, sizeof(duration), "--:--");
+        lv_bar_set_value(media_progress_, 0, LV_ANIM_OFF);
+    }
+    SetMediaText(media_elapsed_, elapsed);
+    SetMediaText(media_duration_, duration);
+    Unlock();
+}
+
+void UtaDisplay::ApplyRotationLocked(int degrees) {
+    lv_display_set_rotation(display_, kRotations[degrees / 90]);
+    if (st7789_square_) {
+        // UTA's 240x240 panel starts at (0, 0) in the ST7789's 240x320 RAM.
+        // LVGL's hardware rotation moves that window when MADCTL reverses the row axis.
+        constexpr int kUnusedRows = 320 - 240;
+        esp_lcd_panel_set_gap(panel_, degrees == 90 ? kUnusedRows : 0,
+                             degrees == 180 ? kUnusedRows : 0);
+    }
+    // Redraw the entire visible area after changing both orientation and address window.
+    lv_obj_invalidate(lv_display_get_screen_active(display_));
+    rotation_.store(degrees);
+}
+
+void UtaDisplay::RestoreRotation(bool st7789) {
+    st7789_square_ = st7789 && width_ == 240 && height_ == 240;
     nvs_handle_t handle;
     if (nvs_open(kRotationNamespace, NVS_READONLY, &handle) != ESP_OK)
         return;
@@ -75,8 +208,7 @@ void UtaDisplay::RestoreRotation() {
     const auto result = nvs_get_i32(handle, kRotationKey, &degrees);
     nvs_close(handle);
     if (result == ESP_OK && ValidRotation(degrees) && display_ && Lock()) {
-        lv_display_set_rotation(display_, kRotations[degrees / 90]);
-        rotation_.store(degrees);
+        ApplyRotationLocked(degrees);
         Unlock();
     }
 }
@@ -93,10 +225,8 @@ bool UtaDisplay::SetRotation(int degrees) {
                     nvs_commit(handle) == ESP_OK;
             nvs_close(handle);
         }
-        if (saved) {
-            lv_display_set_rotation(display_, kRotations[degrees / 90]);
-            rotation_.store(degrees);
-        }
+        if (saved)
+            ApplyRotationLocked(degrees);
     }
     Unlock();
     return saved;
@@ -109,7 +239,8 @@ void UtaDisplay::SetupUI() {
     SpiLcdDisplay::SetupUI();
     DisplayLockGuard lock(this);
     SetupEyesLocked();
-    idle_screen_ = Panel(uta::NeonImage());
+    auto* layer = lv_display_get_layer_top(display_);
+    idle_screen_ = Panel(layer, uta::NeonImage());
     Label(idle_screen_, "ATFUTA", 16, 16, 90, 0x98b3c8);
     wifi_image_ = Icon(idle_screen_, uta::kWifiOfflineIcon, 171, 14, 18);
     wifi_text_ = Label(idle_screen_, "Offline", 191, 16, 48, 0x8b9baa);
@@ -130,7 +261,7 @@ void UtaDisplay::SetupUI() {
     lv_obj_set_style_text_align(temperature_label_, LV_TEXT_ALIGN_RIGHT, 0);
     Visible(idle_screen_, false);
 
-    boot_screen_ = Panel(uta::BootImage());
+    boot_screen_ = Panel(layer, uta::BootImage());
     auto* text = Label(boot_screen_, "ĐANG KHỞI ĐỘNG", 16, 184, 208, 0x30383c);
     lv_obj_set_style_text_align(text, LV_TEXT_ALIGN_CENTER, 0);
     auto* line = lv_obj_create(boot_screen_);

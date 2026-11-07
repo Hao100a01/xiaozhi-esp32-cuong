@@ -16,6 +16,9 @@ int main() {
     assert(uta::ValidMusicServer("https://server/api"));
     assert(!uta::ValidMusicServer("https://server/api?key=secret"));
     assert(!uta::ValidMusicServer("https://server/api#fragment"));
+    assert(uta::LegacyMusicProxy("https://server/mp3/proxy/stream?url=a%2Fb", "https://server") ==
+           "https://server/proxy/stream?url=a%2Fb");
+    assert(uta::LegacyMusicProxy("https://other/mp3/proxy/stream?url=x", "https://server").empty());
 
     uta::HttpRange range;
     assert(uta::ParseMovieRange("bytes 0-99/1000", 0, 0, 100, range));
@@ -34,6 +37,17 @@ int main() {
 
     auto song = uta::ParseSongResponse("https://server/api", R"({"audio_url":"/a.mp3"})");
     assert(song && *song == "https://server/a.mp3");
+    int duration = 0;
+    std::string title;
+    song = uta::ParseSongResponse(
+        "https://server",
+        R"({"audio_url":"/a.mp3","duration":351,"title":"SÓNG GIÓ | ICM x JACK | OFFICIAL MUSIC VIDEO"})",
+        &duration, &title);
+    assert(song && duration == 351 && title == "SÓNG GIÓ | ICM x JACK | OFFICIAL MUSIC VIDEO");
+    song = uta::ParseSongResponse(
+        "https://server", R"({"audio_url":"/a.mp3","duration":-1,"duration_seconds":180})",
+        &duration, &title);
+    assert(song && duration == 180 && title.empty());
     song = uta::ParseSongResponse("https://server/api", R"({"audio_url":"a.mp4?token=123"})");
     assert(song && *song == "https://server/api/a.mp4?token=123");
     song = uta::ParseSongResponse("https://server", R"({"audio_url":"https://cdn/a.mp3"})");

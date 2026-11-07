@@ -4,6 +4,16 @@ namespace uta {
 
 // Chèn trước </body> của trang AP gốc. Form độc lập với form Wi-Fi/OTA.
 inline constexpr char kLocationPortal[] = R"UTA(
+<style>
+#advanced-tab #ota_url_row { display: block !important; }
+#advanced-tab #ota_url {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 12px;
+    font: inherit;
+}
+</style>
 <script>
 (() => {
     const tab = document.getElementById('advanced-tab');
@@ -12,7 +22,7 @@ inline constexpr char kLocationPortal[] = R"UTA(
     const otaUrl = document.getElementById('ota_url');
     const otaRow = document.getElementById('ota_url_row');
     if (otaUrl && otaRow) {
-        otaUrl.type = 'url';
+        otaUrl.inputMode = 'url';
         otaUrl.maxLength = 255;
         otaUrl.pattern = 'https?://.+';
         otaUrl.setAttribute('aria-describedby', 'uta-ota-hint');
