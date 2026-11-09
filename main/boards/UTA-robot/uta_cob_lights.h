@@ -3,6 +3,8 @@
 #include <esp_log.h>
 #include <led_strip.h>
 
+#include <array>
+
 #include "uta_pwm_bank.h"
 #include "uta_settings.h"
 
@@ -69,6 +71,18 @@ public:
             led_strip_set_pixel(strip_, pixel, r, g, b);
         if (const auto result = led_strip_refresh(strip_); result != ESP_OK)
             ESP_LOGW(kTag, "Không cập nhật được WS2812B: %s", esp_err_to_name(result));
+    }
+
+    void ApplyStripFrame(const std::array<unsigned, 8>& colors) {
+        if (!strip_)
+            return;
+        for (size_t pixel = 0; pixel < colors.size(); ++pixel) {
+            const unsigned color = colors[pixel];
+            led_strip_set_pixel(strip_, pixel, (color >> 16) & 255, (color >> 8) & 255,
+                                color & 255);
+        }
+        if (const auto result = led_strip_refresh(strip_); result != ESP_OK)
+            ESP_LOGW(kTag, "Không cập nhật được hiệu ứng WS2812B: %s", esp_err_to_name(result));
     }
 
 private:

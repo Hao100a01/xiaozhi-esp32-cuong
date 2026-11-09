@@ -17,6 +17,8 @@
 #include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_timer.h>
+#include <freertos/semphr.h>
+#include <freertos/stream_buffer.h>
 #include <cJSON.h>
 #include <impl/esp_aac_dec.h>
 #include <psa/crypto.h>
@@ -317,6 +319,78 @@ private:
     }
 };
 
+// Tải trước dữ liệu nén trong PSRAM để TLS/HTTP không chặn bộ giải mã.
+class MediaReadAhead {
+public:
+    ~MediaReadAhead() { Stop(); }
+
+    bool Start(std::function<int(char*, size_t)> read) {
+        storage_.reset(static_cast<uint8_t*>(
+            heap_caps_malloc(kCapacity + 1 + kReadSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)));
+        if (!storage_)
+            return false;
+        buffer_ = xStreamBufferCreateStatic(kCapacity + 1, 1, storage_.get(), &buffer_state_);
+        done_ = xSemaphoreCreateBinaryStatic(&done_state_);
+        if (!buffer_ || !done_)
+            return false;
+        read_ = std::move(read);
+        started_ = xTaskCreate([](void* context) {
+            auto* self = static_cast<MediaReadAhead*>(context);
+            self->Run();
+            xSemaphoreGive(self->done_);
+            vTaskDelete(nullptr);
+        }, "uta_media_net", 8192, this, 2, nullptr) == pdPASS;
+        return started_;
+    }
+
+    bool Stopping() const { return stopping_.load(); }
+    bool Failed() const { return failed_.load(); }
+    bool Finished() const { return finished_.load(); }
+    size_t Available() const { return xStreamBufferBytesAvailable(buffer_); }
+
+    size_t Read(char* output, size_t size) {
+        return xStreamBufferReceive(buffer_, output, size, pdMS_TO_TICKS(20));
+    }
+
+    void Stop() {
+        if (started_) {
+            stopping_.store(true);
+            xSemaphoreTake(done_, portMAX_DELAY);
+            started_ = false;
+        }
+    }
+
+private:
+    static constexpr size_t kCapacity = 64 * 1024;
+    static constexpr size_t kReadSize = 4096;
+    std::unique_ptr<uint8_t, decltype(&heap_caps_free)> storage_{nullptr, heap_caps_free};
+    StaticStreamBuffer_t buffer_state_{};
+    StaticSemaphore_t done_state_{};
+    StreamBufferHandle_t buffer_ = nullptr;
+    SemaphoreHandle_t done_ = nullptr;
+    std::function<int(char*, size_t)> read_;
+    std::atomic<bool> stopping_{false};
+    std::atomic<bool> finished_{false};
+    std::atomic<bool> failed_{false};
+    bool started_ = false;
+
+    void Run() {
+        auto* bytes = storage_.get() + kCapacity + 1;
+        while (!Stopping()) {
+            const int count = read_(reinterpret_cast<char*>(bytes), kReadSize);
+            if (count <= 0 || static_cast<size_t>(count) > kReadSize) {
+                failed_.store(count != 0);
+                break;
+            }
+            size_t sent = 0;
+            while (sent < static_cast<size_t>(count) && !Stopping()) {
+                sent += xStreamBufferSend(buffer_, bytes + sent, count - sent, pdMS_TO_TICKS(20));
+            }
+        }
+        finished_.store(true);
+    }
+};
+
 struct DecoderSession {
     std::array<uint8_t, kInputCapacity> input{};
     std::array<int16_t, kPcmSamples> decoded{};
@@ -598,19 +672,46 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
     };
     std::unique_ptr<DecoderSession, decltype(destroy)> session(new (memory) DecoderSession,
                                                                destroy);
+    std::string read_error;
+    bool read_retryable = false;
     std::unique_ptr<HlsReader> hls;
+    MediaReadAhead read_ahead;
+    const auto cancelled = [&]() {
+        return read_ahead.Stopping() || Cancelled(id) ||
+               audio.GetPlaybackGeneration() != generation;
+    };
     if (hls_source) {
         hls = std::make_unique<HlsReader>(
-            config, [this, id]() { return Cancelled(id); }, paused_, error, retryable);
-        if (!hls->Open(std::move(http), final_url))
+            config, cancelled, paused_, read_error, read_retryable);
+        if (!hls->Open(std::move(http), final_url)) {
+            error = std::move(read_error);
+            retryable = read_retryable;
             return false;
+        }
         ESP_LOGI(kTag, "Radio HLS: đọc playlist và tách AAC từ MPEG-TS");
     }
+    if (!read_ahead.Start([&](char* buffer, size_t capacity) {
+            if (hls)
+                return hls->Read(buffer, capacity);
+            auto received = http->Read(buffer, capacity);
+            return received ? *received : -1;
+        })) {
+        if (http)
+            http->Close();
+        error = "Không tạo được bộ đệm phát nhạc/radio";
+        return false;
+    }
+    // Đợi dữ liệu đủ để chịu được một lần mở TLS và chuyển đoạn HLS.
+    const size_t prebuffer = hls ? 24 * 1024 : 16 * 1024;
+    while (!cancelled() && !read_ahead.Finished() && read_ahead.Available() < prebuffer)
+        vTaskDelay(pdMS_TO_TICKS(20));
     size_t used = 0;
     bool eof = false;
     bool need_input = true;
     bool played = false;
+    bool drained = false;
     unsigned no_progress = 0;
+    int64_t last_spectrum_at = 0;
     while (!Cancelled(id) && audio.GetPlaybackGeneration() == generation) {
         if (paused_) {
             vTaskDelay(pdMS_TO_TICKS(20));
@@ -622,33 +723,23 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
             }
             auto* buffer = reinterpret_cast<char*>(session->input.data() + used);
             const auto capacity = std::min<size_t>(4096, session->input.size() - used);
-            int count;
-            if (hls) {
-                count = hls->Read(buffer, capacity);
-            } else {
-                auto received = http->Read(buffer, capacity);
-                count = received ? *received : -1;
-            }
-            if (count < 0 || static_cast<size_t>(count) > capacity) {
-                if (!hls) {
-                    error = used || played ? "Luồng âm thanh bị ngắt khi đang đọc dữ liệu"
-                                          : "Nguồn phát không gửi dữ liệu âm thanh trong thời gian chờ";
-                    retryable = true;
+            const auto count = read_ahead.Read(buffer, capacity);
+            eof = read_ahead.Finished() && read_ahead.Available() == 0;
+            if (count == 0 && !eof && (need_input || used == 0 || !session->decoder)) {
+                if (played) {
+                    ESP_LOGW(kTag, "Bộ đệm media đã cạn, đợi nạp lại");
+                    while (!cancelled() && !paused_ && !read_ahead.Finished() &&
+                           read_ahead.Available() < prebuffer / 2)
+                        vTaskDelay(pdMS_TO_TICKS(20));
                 }
-                break;
-            }
-            eof = count == 0;
-            if (eof && radio && !hls) {
-                error = "Luồng radio trực tiếp đã đóng kết nối";
-                retryable = true;
+                continue;
             }
             used += count;
             need_input = false;
         }
         if (used == 0 && eof) {
-            if (http)
-                http->Close();
-            return played && (!radio || hls);
+            drained = true;
+            break;
         }
         // Nạp trước dữ liệu có giới hạn để tránh hụt tiếng ngay sau khung đầu tiên.
         if (!session->decoder && !eof && used < 8192) {
@@ -733,7 +824,7 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
                                                     session->decoded[2 * i + 1]) /
                                                        2;
         }
-        const int16_t* pcm = session->mono.data();
+        int16_t* pcm = session->mono.data();
         uint32_t samples = frames;
         if (info.sample_rate != output_rate) {
             if (session->source_rate != info.sample_rate) {
@@ -769,9 +860,24 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
         }
         if (!samples)
             continue;
+        if (radio) {
+            // +6 dB cho radio, nén mềm các đỉnh để tránh cắt ngọn PCM.
+            constexpr int kKnee = 24576;
+            constexpr int kHeadroom = 32767 - kKnee;
+            for (uint32_t i = 0; i < samples; ++i) {
+                const int boosted = static_cast<int>(pcm[i]) * 2;
+                int magnitude = boosted < 0 ? -boosted : boosted;
+                if (magnitude > kKnee) {
+                    const int excess = magnitude - kKnee;
+                    magnitude = kKnee + excess * kHeadroom / (excess + kHeadroom);
+                }
+                pcm[i] = static_cast<int16_t>(boosted < 0 ? -magnitude : magnitude);
+            }
+        }
         // Giới hạn cập nhật phổ ở 10 lần/giây; không lấy dữ liệu từ mic.
         const int64_t now = esp_timer_get_time();
-        if (now - spectrum_at_ >= 100000) {
+        if (now - last_spectrum_at >= 100000) {
+            last_spectrum_at = now;
             const auto values = AnalyzeSpectrum(pcm, samples, output_rate);
             std::lock_guard<std::mutex> lock(mutex_);
             if (id == request_id_) {
@@ -787,8 +893,22 @@ bool MediaPlayer::Stream(const std::string& url, uint32_t id, bool radio, std::s
         if (delivered)
             *delivered = true;
     }
+    const bool source_finished = read_ahead.Finished();
+    read_ahead.Stop();
     if (http)
         http->Close();
+    if (source_finished && read_ahead.Failed()) {
+        error = read_error.empty() ? "Luồng âm thanh bị ngắt khi đang đọc dữ liệu" : read_error;
+        retryable = !hls || read_retryable;
+        return false;
+    }
+    if (eof && radio && !hls) {
+        error = "Luồng radio trực tiếp đã đóng kết nối";
+        retryable = true;
+        return false;
+    }
+    if (drained && played)
+        return true;
     if (error.empty())
         error = "Không giải mã được nguồn MP3/AAC; kiểm tra định dạng và luồng trực tiếp";
     return false;

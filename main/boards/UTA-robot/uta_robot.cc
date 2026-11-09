@@ -112,6 +112,23 @@ public:
         };
         actions.cob_available = [this](int light) { return cob_task_ && cob_.Available(light); };
         actions.cob = [this](int light, int value) { return QueueCob(light, value); };
+        actions.cob_effect = [this](const std::string& effect) {
+            if (!cob_task_ || !cob_.Available(uta::kStripLight))
+                return false;
+            int mode = -1;
+            if (effect == "rainbow") mode = 0;
+            else if (effect == "cycle") mode = 1;
+            else if (effect == "chase") mode = 2;
+            else if (effect == "strobe") mode = 3;
+            else if (effect == "pulse") mode = 4;
+            else if (effect == "off") mode = 0;
+            if (mode < 0)
+                return false;
+            cob_effect_mode_.store(mode);
+            cob_effect_requested_.store(effect != "off");
+            xTaskNotifyGive(cob_task_);
+            return true;
+        };
         actions.tof_mm = [this]() { return range_.TofMillimeters(); };
         actions.ultrasonic_mm = [this]() { return range_.UltrasonicMillimeters(); };
         actions.servo = [this](int axis, int angle) { return QueueServo(axis, angle); };
@@ -199,6 +216,10 @@ private:
     static constexpr int kCobNoCommand = -1;
     static constexpr int kCobTurnOn = -2;
     std::atomic<bool> dancing_{false};
+    // 0=rainbow, 1=cycle, 2=chase, 3=strobe, 4=pulse.
+    std::atomic<int> cob_effect_mode_{0};
+    std::atomic<bool> cob_effect_requested_{false};
+    std::atomic<bool> dance_lights_{false};
     std::array<std::atomic<int>, uta::kCobLightCount> cob_pending_{-1, -1, -1};
     TaskHandle_t cob_task_ = nullptr;
     std::array<i2c_master_bus_handle_t, 2> oled_buses_{};
@@ -706,6 +727,27 @@ private:
         return (rise << 16) | fall;
     }
 
+    static unsigned CobHue(unsigned hue, unsigned brightness = 255) {
+        hue %= 360;
+        const unsigned sector = hue / 60;
+        const unsigned offset = hue % 60;
+        const unsigned up = offset * 255 / 60;
+        const unsigned down = 255 - up;
+        unsigned r = 0, g = 0, b = 0;
+        switch (sector) {
+        case 0: r = 255; g = up; break;
+        case 1: r = down; g = 255; break;
+        case 2: g = 255; b = up; break;
+        case 3: g = down; b = 255; break;
+        case 4: r = up; b = 255; break;
+        default: r = 255; b = down; break;
+        }
+        r = r * brightness / 255;
+        g = g * brightness / 255;
+        b = b * brightness / 255;
+        return (r << 16) | (g << 8) | b;
+    }
+
     void RunCobLights() {
         std::array<int, uta::kCobLightCount> last_on{0x404040, 64, 0x404040};
         std::array<int, uta::kCobLightCount> manual{};
@@ -716,13 +758,14 @@ private:
         bool previous_effect = false;
         for (;;) {
             ulTaskNotifyTake(pdTRUE, color_available ? pdMS_TO_TICKS(60) : portMAX_DELAY);
-            const bool effect = color_available && (dancing_.load() ||
+            const bool effect = color_available && (cob_effect_requested_.load() || dance_lights_.load() || dancing_.load() ||
                 (media_.IsPlaying() && !media_.IsPaused() && !media_.IsVideo()));
             if (effect != previous_effect) {
                 override_effect.fill(false);
                 previous_effect = effect;
             }
             const int rainbow = effect ? CobRainbow(esp_timer_get_time()) : 0;
+            const int effect_mode = cob_effect_mode_.load();
             for (size_t light = 0; light < cob_pending_.size(); ++light) {
                 const int value = cob_pending_[light].exchange(kCobNoCommand);
                 if (value != kCobNoCommand) {
@@ -734,7 +777,42 @@ private:
                 }
                 const bool animate = effect && light != uta::kEdisonLight &&
                                      !disabled[light] && !override_effect[light];
-                const int target = animate ? rainbow : manual[light];
+                int target = manual[light];
+                if (animate && light == uta::kStripLight) {
+                    std::array<unsigned, 8> frame{};
+                    const auto now_ms = static_cast<unsigned>(esp_timer_get_time() / 1000);
+                    for (size_t pixel = 0; pixel < frame.size(); ++pixel) {
+                        switch (effect_mode) {
+                        case 1:
+                            frame[pixel] = CobHue((now_ms / 8) % 360);
+                            break;
+                        case 2:
+                            frame[pixel] = (pixel == (now_ms / 90) % frame.size())
+                                                ? CobHue((now_ms / 5) % 360)
+                                                : CobHue((now_ms / 5 + 180) % 360, 24);
+                            break;
+                        case 3:
+                            frame[pixel] = ((now_ms / 140) % 2) ? 0xffffff : 0;
+                            break;
+                        case 4: {
+                            const unsigned phase = (now_ms / 12) % 512;
+                            const unsigned brightness = phase < 256 ? phase : 512 - phase;
+                            frame[pixel] = CobHue((now_ms / 7) % 360, 32 + brightness * 223 / 255);
+                            break;
+                        }
+                        default:
+                            frame[pixel] = CobHue((now_ms / 8 + pixel * 360 / frame.size()) % 360);
+                            break;
+                        }
+                    }
+                    cob_.ApplyStripFrame(frame);
+                    output[light] = -2;
+                    continue;
+                }
+                if (animate)
+                    target = effect_mode == 3 && ((esp_timer_get_time() / 1000 / 140) % 2)
+                                 ? 0xffffff
+                                 : rainbow;
                 if (cob_.Available(light) && target != output[light]) {
                     cob_.Apply(light, target);
                     output[light] = target;
@@ -788,6 +866,28 @@ private:
                                             (args["brightness"].value<int>() * 255 + 50) / 100);
                         });
         }
+        if (cob_.Available(uta::kStripLight)) {
+            mcp.AddTool(
+                "self.cob.ws2812b.set_effect",
+                "Chọn hiệu ứng WS2812B: rainbow, cycle, chase, strobe, pulse hoặc off",
+                PropertyList({Property("effect", kPropertyTypeString)}),
+                [this](const PropertyList& args) -> ReturnValue {
+                    const auto effect = args["effect"].value<std::string>();
+                    int mode = -1;
+                    if (effect == "rainbow") mode = 0;
+                    else if (effect == "cycle") mode = 1;
+                    else if (effect == "chase") mode = 2;
+                    else if (effect == "strobe") mode = 3;
+                    else if (effect == "pulse") mode = 4;
+                    else if (effect == "off") mode = 0;
+                    if (mode < 0)
+                        return false;
+                    cob_effect_mode_.store(mode);
+                    cob_effect_requested_.store(effect != "off");
+                    xTaskNotifyGive(cob_task_);
+                    return true;
+                });
+        }
         mcp.AddTool("self.cob.set_all_power", "Bật hoặc tắt tất cả đèn COB đã cấu hình",
                     PropertyList({Property("on", kPropertyTypeBoolean)}),
                     [this](const PropertyList& args) -> ReturnValue {
@@ -832,6 +932,7 @@ private:
                 WriteRobot("x0.0 y0.0");
                 stop_at = 0;
                 dancing_.store(false);
+                dance_lights_.store(false);
                 head_pending_.exchange(HeadCommand::None);
                 head_mode = HeadCommand::None;
                 gesture_at = 0;
@@ -875,6 +976,9 @@ private:
                 if (command.duration_ms > 0) {
                     stop_at = esp_timer_get_time() + command.duration_ms * 1000LL;
                     dancing_.store(command.dance);
+                    dance_lights_.store(command.dance);
+                    if (command.dance)
+                        head_pending_.store(HeadCommand::Dance);
                 }
             }
             const int64_t now = esp_timer_get_time();
@@ -971,6 +1075,8 @@ private:
                 WriteRobot("x0.0 y0.0");
                 stop_at = 0;
                 dancing_.store(false);
+                dance_lights_.store(false);
+                head_pending_.store(HeadCommand::Stop);
             }
             if (restart_at_.load() && now >= restart_at_) {
                 restart_at_ = 0;
@@ -1052,6 +1158,7 @@ private:
                                 [this, command = tool.command](const PropertyList&) -> ReturnValue {
                                     if (!control_task_)
                                         return false;
+                                    dance_lights_.store(command == HeadCommand::Dance);
                                     head_pending_.store(command);
                                     return true;
                                 });

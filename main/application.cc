@@ -22,6 +22,20 @@
 
 #define TAG "Application"
 
+namespace {
+const char* InferVisualScene(const std::string& text) {
+    if (text.find("mưa") != std::string::npos || text.find("mưa rào") != std::string::npos)
+        return "weather/rain";
+    if (text.find("dông") != std::string::npos || text.find("sấm") != std::string::npos)
+        return "weather/storm";
+    if (text.find("nắng") != std::string::npos || text.find("trời quang") != std::string::npos)
+        return "weather/sunny";
+    if (text.find("nhiều mây") != std::string::npos || text.find("mây") != std::string::npos)
+        return "weather/cloudy";
+    return nullptr;
+}
+}  // namespace
+
 Application::Application() : notify_player_(audio_service_) {
     event_group_ = xEventGroupCreate();
 
@@ -674,6 +688,8 @@ void Application::InitializeProtocol() {
                               glyphs = std::move(glyphs), bpp]() {
                         display->AddTextGlyphs(glyphs, bpp);
                         display->SetChatMessage("assistant", message.c_str());
+                        if (const auto* scene = InferVisualScene(message))
+                            display->ShowVisualScene(scene, message.c_str());
                         Board::GetInstance().OnAssistantSentence(message);
                     });
                 }
@@ -695,10 +711,27 @@ void Application::InitializeProtocol() {
             }
         } else if (strcmp(type->valuestring, "llm") == 0) {
             auto emotion = cJSON_GetObjectItem(root, "emotion");
+            auto visual = cJSON_GetObjectItem(root, "visual");
             if (cJSON_IsString(emotion)) {
                 Schedule([display, emotion_str = std::string(emotion->valuestring)]() {
                     display->SetEmotion(emotion_str.c_str());
                 });
+            }
+            if (cJSON_IsObject(visual)) {
+                auto scene = cJSON_GetObjectItem(visual, "scene");
+                auto visual_text = cJSON_GetObjectItem(visual, "text");
+                auto duration = cJSON_GetObjectItem(visual, "duration_ms");
+                if (cJSON_IsString(scene) && scene->valuestring[0] != '\0') {
+                    const std::string scene_name(scene->valuestring);
+                    const std::string scene_text =
+                        cJSON_IsString(visual_text) ? visual_text->valuestring : "";
+                    const int duration_ms = cJSON_IsNumber(duration) && duration->valueint > 0
+                                                ? duration->valueint
+                                                : 6000;
+                    Schedule([display, scene_name, scene_text, duration_ms]() {
+                        display->ShowVisualScene(scene_name.c_str(), scene_text.c_str(), duration_ms);
+                    });
+                }
             }
         } else if (strcmp(type->valuestring, "mcp") == 0) {
             auto payload = cJSON_GetObjectItem(root, "payload");
@@ -833,6 +866,13 @@ void Application::PrepareLocalPlayback(std::function<void(bool)> ready) {
                 break;
         }
         audio_service_.ResetDecoder();
+        // Media can start while already idle, so there may be no state-change
+        // event to arm wake word detection.
+        if (!audio_service_.IsWakeWordRunning()) {
+            audio_service_.EnableWakeWordDetection(true);
+        }
+        ESP_LOGI(TAG, "Local playback wake word: %s",
+                 audio_service_.IsWakeWordRunning() ? "active" : "unavailable");
         ready(true);
     });
 }
@@ -1005,6 +1045,9 @@ void Application::BeginWakeWordInvoke(const std::string& wake_word) {
         return;
     }
 
+    // Clear queued local audio before waiting for the server. The generation
+    // change also rejects PCM from the interrupted media producer.
+    audio_service_.ResetDecoder();
     if (!protocol_->IsAudioChannelOpened()) {
         // Schedule to let the state change be processed first (UI update),
         // then continue with OpenAudioChannel which may block for ~1 second

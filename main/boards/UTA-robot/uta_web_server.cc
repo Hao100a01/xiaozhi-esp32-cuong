@@ -487,6 +487,10 @@ esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
         accepted = Integer(body, "loai", light, 0, kCobLightCount - 1) &&
                    Integer(body, "gia_tri", value, 0, light == kEdisonLight ? 255 : 0xffffff) &&
                    actions_.cob(light, value);
+    } else if (command == "den_cob_hieu_ung") {
+        std::string effect;
+        accepted = Text(body, "hieu_ung", effect, 16) && actions_.cob_effect &&
+                   actions_.cob_effect(effect);
     } else if (command == "servo_mo_rong") {
         int axis = 0, value = 0;
         accepted = Integer(body, "truc", axis, 0, kExtraServoCount - 1) &&

@@ -51,6 +51,18 @@ void SetMediaText(lv_obj_t* label, const char* value) {
         lv_label_set_text(label, value);
 }
 
+const char* SceneTitle(const char* scene) {
+    if (std::strcmp(scene, "weather/rain") == 0 || std::strcmp(scene, "weather") == 0)
+        return "THỜI TIẾT · MƯA";
+    if (std::strcmp(scene, "weather/sunny") == 0)
+        return "THỜI TIẾT · NẮNG";
+    if (std::strcmp(scene, "weather/cloudy") == 0)
+        return "THỜI TIẾT · NHIỀU MÂY";
+    if (std::strcmp(scene, "weather/storm") == 0)
+        return "THỜI TIẾT · DÔNG";
+    return "TRẠNG THÁI";
+}
+
 void FormatMediaTime(char* text, size_t size, int seconds) {
     if (seconds >= 3600)
         std::snprintf(text, size, "%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60);
@@ -95,6 +107,58 @@ lv_obj_t* Icon(lv_obj_t* panel, unsigned index, int x, int y, int size) {
 
 bool IsVisible(lv_obj_t* object) { return object && !lv_obj_has_flag(object, LV_OBJ_FLAG_HIDDEN); }
 }  // namespace
+
+void UtaDisplay::ShowVisualScene(const char* scene, const char* text, int duration_ms) {
+    if (!scene || !text || !IsSetupUICalled() || !Lock(20))
+        return;
+    const bool weather = std::strncmp(scene, "weather", 7) == 0;
+    const auto snapshot = weather ? uta::WeatherService::GetInstance().Get() : uta::WeatherSnapshot{};
+    if (!scene_screen_) {
+        scene_screen_ = MediaShape(lv_display_get_layer_top(display_), 8, 36, 224, 164, 16, 0x10171b);
+        lv_obj_set_style_border_width(scene_screen_, 1, 0);
+        lv_obj_set_style_border_color(scene_screen_, lv_color_hex(0x294455), 0);
+        scene_icon_ = lv_image_create(scene_screen_);
+        lv_obj_set_pos(scene_icon_, 18, 22);
+        lv_image_set_scale(scene_icon_, 44 * 256 / 32);
+        scene_title_ = Label(scene_screen_, "", 78, 18, 132, 0x6ee8ef);
+        scene_detail_ = Label(scene_screen_, "", 18, 94, 204, 0xc8d7e3);
+        scene_temperature_ = Label(scene_screen_, "", 78, 46, 132, 0xf5f3f8, &uta::uta_font_temperature);
+        for (size_t i = 0; i < scene_particles_.size(); ++i) {
+            scene_particles_[i] = MediaShape(scene_screen_, 24 + static_cast<int>(i) * 25, 116,
+                                             2, 12, 1, 0x6ee8ef);
+        }
+    }
+    scene_rain_ = std::strcmp(scene, "weather/rain") == 0 ||
+                  (weather && snapshot.available && uta::DescribeWeather(snapshot.reading.code,
+                                                                            snapshot.reading.day)
+                                              .icon == uta::WeatherIcon::Rain);
+    const auto icon = weather && snapshot.available
+                          ? uta::DescribeWeather(snapshot.reading.code, snapshot.reading.day).icon
+                          : uta::WeatherIcon::Unknown;
+    lv_image_set_src(scene_icon_, uta::UiIcon(static_cast<unsigned>(icon)));
+    SetMediaText(scene_title_, SceneTitle(scene));
+    char detail[192];
+    if (weather && snapshot.location.available && snapshot.location.name.size() > 0) {
+        std::snprintf(detail, sizeof(detail), "%s · %s", snapshot.location.name.c_str(), text);
+    } else {
+        std::snprintf(detail, sizeof(detail), "%s", text);
+    }
+    SetMediaText(scene_detail_, detail);
+    char temperature[24];
+    if (weather && snapshot.available) {
+        std::snprintf(temperature, sizeof(temperature), "%d°%c",
+                      static_cast<int>(std::lround(snapshot.reading.temperature)), 'C');
+    } else {
+        temperature[0] = '\0';
+    }
+    SetMediaText(scene_temperature_, temperature);
+    for (auto* particle : scene_particles_)
+        Visible(particle, scene_rain_);
+    scene_phase_ = 0;
+    scene_until_ = esp_timer_get_time() + static_cast<int64_t>(std::max(duration_ms, 1000)) * 1000;
+    lv_obj_remove_flag(scene_screen_, LV_OBJ_FLAG_HIDDEN);
+    Unlock();
+}
 
 void UtaDisplay::UpdateSpectrum(const uta::Spectrum& values, const uta::MediaSnapshot* media) {
     if (!IsSetupUICalled() || !Lock(10))
@@ -301,6 +365,17 @@ void UtaDisplay::UpdateStandby(DeviceState state, bool media_active, bool wifi_c
     const bool eyes_visible = UpdateEyesLocked(state, eye_context && overlay_allowed, now);
     const bool show = idle && overlay_allowed && !has_message && !eyes_visible;
     Visible(idle_screen_, show);
+    if (scene_screen_) {
+        const bool scene_visible = now < scene_until_ && !boot;
+        Visible(scene_screen_, scene_visible);
+        if (scene_visible && scene_rain_) {
+            scene_phase_ = static_cast<uint8_t>((scene_phase_ + 1) % 24);
+            for (size_t i = 0; i < scene_particles_.size(); ++i) {
+                const int y = 108 + ((scene_phase_ + static_cast<uint8_t>(i * 3)) % 18);
+                lv_obj_set_y(scene_particles_[i], y);
+            }
+        }
+    }
     if (refresh) {
         content_at_ = now + 1000000;
         const time_t current_time = std::time(nullptr);

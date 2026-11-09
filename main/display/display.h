@@ -48,6 +48,13 @@ public:
     // an unsupported operation. For asynchronous displays, true does not promise that the
     // physical refresh has already completed. Callers are free to ignore the result.
     virtual bool SetEmotion(const char* emotion);
+    // Optional semantic scene requested by the assistant (weather, device state, etc.).
+    // Displays that do not support scenes intentionally ignore it.
+    virtual void ShowVisualScene(const char* scene, const char* text, int duration_ms = 6000) {
+        (void)scene;
+        (void)text;
+        (void)duration_ms;
+    }
     virtual void SetChatMessage(const char* role, const char* content);
     // Remove a matching message without clearing newer content, when supported.
     virtual void RemoveChatMessage(const char* role, const char* content) {}

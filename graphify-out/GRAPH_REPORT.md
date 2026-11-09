@@ -1,17 +1,17 @@
-# Graph Report - xiaozhi-esp32-cuong  (2026-11-07)
+# Graph Report - xiaozhi-esp32-cuong  (2026-11-09)
 
 ## Corpus Check
-- 1179 files · ~528,792 words
+- 1179 files · ~530,502 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 36 file(s) not represented in the graph (top: .csv 12, (none) 5, .rgb565 2)
 
 ## Summary
-- 14929 nodes · 29186 edges · 803 communities (565 shown, 238 thin omitted)
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 2551 edges (avg confidence: 0.85)
+- 14975 nodes · 29230 edges · 809 communities (572 shown, 237 thin omitted)
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 2555 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `17d94809`
+- Built from commit: `a5248194`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,7 +24,8 @@
 - scripts/build.py
 - AudioService
 - AfeAudioEngine
-- esp-hi/adc_pdm_audio_codec.cc
+- audio_codec.h
+- esp-sensairshuttle/adc_pdm_audio_codec.cc
 - .WakeUp
 - SpiLcdDisplay
 - AtomS3rEchoPyramidBoard
@@ -43,15 +44,15 @@
 - Display
 - M5StackTab5Board
 - build
-- .SetEnabled
+- XINGZHI_CUBE_1_54TFT_WIFI
 - PowerManager
 - 三、Otto 机器人工具命令
 - WaveshareEsp32s3TouchAMOLED1inch8
 - MqttProtocol
-- audio_service.cc
+- esp_lcd_panel_ops
 - CircularStrip
 - atk_dnesp32s3_box2_wifi
-- uta_display.cc
+- array
 - Oscillator
 - CustomLcdDisplay
 - CustomLcdDisplay
@@ -76,7 +77,7 @@
 - spiffs_assets_gen.py
 - LilygoTCircleS3V11Board
 - AtomS3rEchoBaseBoard
-- .WriteReg
+- RtcPcf8563
 - WaveshareEsp32s3TouchLCD1inch83
 - BoxAudioCodec
 - M5StackCardputerAdvBoard
@@ -95,7 +96,7 @@
 - GpioLed
 - ElectronBot
 - EspSensairShuttle
-- circular_strip.cc
+- MediaReadAhead
 - EDARobotDog
 - OttoRobot
 - PowerManager
@@ -119,12 +120,12 @@
 - Oscillator
 - M5StackStopwatchBoard
 - Oscillator
-- CompactMl307Board
+- DualNetworkBoard
 - WifiBoard
 - movements.cc
 - Esp32S3Korvo2V3Board
-- uta_display_emotions.cc
-- Led
+- Pca9557
+- labplus_ledong_v2
 - CustomBoard
 - CustomBoard
 - CustomBoard
@@ -179,7 +180,7 @@
 - PowerManager
 - FreenoveESP32S3Display
 - PowerManager
-- JiuchuanDevBoard
+- audio_service.cc
 - LCDWikiES3C35P_Board
 - M5StackCoreP4Board
 - PowerManager
@@ -205,7 +206,7 @@
 - CustomBoard
 - CustomBoard
 - AIPILite
-- McpTool
+- uta_display.cc
 - Ota
 - K10AudioCodec
 - LVGLImage.py
@@ -213,7 +214,7 @@
 - EspVideo
 - PowerManager
 - EmojiWidget
-- AIVOX3
+- versions.py
 - KevinBoxBoard
 - MINSI_K08_DUAL
 - SensecapWatcher
@@ -223,7 +224,7 @@
 - CustomBoard
 - WaveshareEsp32s3TouchAMOLED1inch8
 - CustomBoard
-- ActionType
+- uta_robot.cc
 - CustomBoard
 - WaveshareEsp32s3TouchLCD43c
 - BoardPowerBsp
@@ -246,11 +247,11 @@
 - NotifyPlayer
 - Blufi
 - Tdisplays3promvsrloraAudioCodec
-- Otto
-- PinIndex
+- MediaSnapshot
 - Application
+- JiuchuanDevBoard
 - CustomBoard
-- DecoderSession
+- SleepTimer
 - zectrix-s3-epaper-4.2/custom_lcd_display.cc
 - DeviceStateMachine
 - TextGlyph
@@ -259,7 +260,7 @@
 - CompactNt26Board
 - CompactWifiBoard
 - ESP32-S3-BOX-3
-- .GetInt
+- ChdEsp32s3BoxBoard
 - Cst816s
 - LichuangDevBoard
 - Tcamerapluss3AudioCodec
@@ -285,8 +286,8 @@
 - README.md
 - Py32IoExpander
 - BinaryProtocol2
-- EspVideo
-- CobLights
+- jpeg_to_image.c
+- Motion
 - attributes
 - attributes
 - WaveshareEsp32c6TouchLCD1inch83
@@ -301,13 +302,13 @@
 - WaveshareEsp32p4
 - esp_lcd_nv3030b.c
 - esp_io_expander_new_i2c_tca9554
-- string
+- Stm32PyramidCtrl
 - attributes
 - attributes
 - magiclick_c3_v2
 - magiclick_c3
 - ESP_S3_LCD_EV_Board_2
-- EspBox3Board
+- ESP32_CGC_144
 - Hu087Board
 - KEVIN_SP_V4Board
 - LCD Wiki ES3C35P
@@ -320,18 +321,18 @@
 - Audio codecs
 - lv_font_t
 - AudioEngine
-- esp32-s3-lcd-ev-board-2/esp_lcd_gc9503.c
-- WaveshareEsp32C6TouchLcd28
+- Otto
+- esp-hi/adc_pdm_audio_codec.cc
 - Button
 - Charge
-- ._handle_event
-- ColorFormat
+- Esp32S31Korvo1
+- Motion
 - MazaAiEsp32S3
 - esp32-s3-lcd-ev-board/esp_lcd_gc9503.c
 - M5StackCardputerBoard
 - Version 2 Partition Table
-- LVGLImage
-- yuying-313lcd/esp_lcd_gc9503.c
+- circular_strip.cc
+- Yuying_313lcd
 - AtomS3rCamM12EchoBaseBoard
 - Xpowers
 - hi8561_driver.cc
@@ -339,41 +340,43 @@
 - esp_lcd_panel_gc9301.c
 - EDARobotPro
 - ImageConverterApp
+- electron-bot/oscillator.cc
 - AudioConverterApp
 - Camera
 - spiffs_assets/build.py
 - MCP IoT Control Usage
 - Cw2017BatteryMonitor
 - uta_video_player.cc
-- freertos
+- m5stack_tab5.cc
 - atk_dnesp32s3m_wifi
 - WaveshareEsp32C5TouchLcd35
-- esp_lcd_st7123.c
-- esp_timer
+- esp_err_t
+- algorithm
 - RangeSensors
 - EdaSuperBearController
 - AtomMatrixEchoBaseBoard
 - MovecallMojiESP32S3
 - esp_lcd_jd9853.c
-- uta_weather_test.cc
+- WeatherIcon
 - An MCP-based Chatbot
 - MCP ベースのチャットボット
 - An MCP-based Chatbot
+- PressToTalkMcpTool
 - LCD Wiki ES3C40P
 - .SetInt
 - MatrixKeyboard
 - AudioTask
 - MCP 工具
 - MazaAiEsp32S31
-- esp_lcd_st7121.c
+- Esp32Camera
 - EDARobotDogController
-- esp_video.cc
+- WakeWord
 - LCD Wiki ES3C28P / ES3N28P
-- esp_hi.cc
+- CompactMl307Board
 - CustomBoard
 - system_info.cc
 - FixedQueue
-- DuChatX
+- Led
 - websocket_zh.md
 - struct
 - LvglStrategy
@@ -381,10 +384,10 @@
 - WakeWordAudioCache
 - ServoNeck
 - MovecallMoji2ESP32C5
-- Otto
+- CustomLcdDisplay
 - AiPassportBoard
 - PowerManager
-- AudioCodec 输入通道审计
+- LVGLImage
 - LvglImage
 - if
 - P3音频格式转换与播放工具
@@ -393,7 +396,7 @@
 - PowerManager
 - BlufiSecurity
 - PowerSaveTimer
-- CustomLcdDisplay
+- esp_lcd_nv3041a.c
 - ActionType
 - DoitS3AiBox
 - Qd35LcdBoard
@@ -403,30 +406,28 @@
 - BluFi Provisioning (with `esp-wifi-connect`)
 - otto-robot/websocket_control_server.cc
 - eda-robot-pro/oscillator.cc
-- WakeWord
+- MediaPlayer
 - ZhengchenCamBoard_ML307
 - Configuration
 - rm69a10_driver.cc
 - .EPD_Display
-- Stm32PyramidCtrl
 - P3PlayerApp
 - AGENTS.md
 - Formatting Tool
 - 代码格式化工具
 - AudioConverterApp
 - 可选风格
-- uta_ui_assets.cc
-- Axp2101
+- esp32_s31_korvo_1.cc
+- .WriteReg
 - M5Stack Cardputer Adv
-- EspVocatI2cTests
+- ColorFormat
 - 基本命令
 - json
 - MovecallCuicanESP32S3
 - Cst816s
 - AudioServiceCallbacks
 - Cst816s
-- otto-robot/oscillator.cc
-- jpeg_to_image.c
+- .to_bin
 - Maza AI ESP32-S31
 - Maza AI ESP32-S3
 - Build and Configuration Guide
@@ -434,12 +435,12 @@
 - CustomLcdDisplay
 - TouchEventType
 - Nt26CeregState
-- .to_bin
+- ._handle_event
 - ESP32_CGC
 - EmojiCollection
 - steps
 - LcdPin
-- ChdEsp32s3EyeBoard
+- EspBox3Board
 - NetworkEvent
 - ESP32-S31-Korvo-1
 - labplus 乐动掌控V2
@@ -448,28 +449,25 @@
 - esp_lcd_ili9486.c
 - Unbind a Previously Owned Device
 - TextFontCapability
-- SleepTimer
 - ElectronBotActionParams
 - Board
-- WebActions
+- matrix_keyboard.cc
 - Property
 - CompactWifiBoardLCD
 - EdaSuperBear
 - NoDisplay
-- Esp32Camera
 - 小智云聊 S3
 - LVGLImageHeader
 - PowerSaveTimerTests
 - Asynchronous Voice Notifications
 - contact_links
-- websocket_protocol.cc
+- WebsocketProtocol
 - DebugStatistics
 - 特性
-- WebSocket Communication Protocol
 - ESP32-P4-Function-EV-Board / ESP32-P4X-Function-EV-Board
 - FoloToy AI Passport (ai-passport)
 - jiuchuan-xiaozhi-sound
-- DogActionParams
+- AudioCodec 输入通道审计
 - EdaRobotActionParams
 - M5Stack AtomS3 + Echo Base
 - M5Stack AtomS3R + Echo Base
@@ -480,7 +478,7 @@
 - 无名科技星智 ABS 2.0
 - 配置、编译命令
 - esp32-c6-lcd-1.69/README.md
-- matrix_keyboard.cc
+- uta_ui_assets.cc
 - 使用说明
 - TextItem
 - 征辰科技 AI camera + 4G
@@ -523,7 +521,7 @@
 - .InitializeButtons
 - M5Stack CoreP4
 - xingzhi-metal-1.54-wifi/README.md
-- esp_lcd_new_panel_hi8561
+- mpython_v3
 - AtomEchoS3rBaseBoard
 - taiji-pi-s3/README.md
 - Waveshare ESP32-C6-ePaper-1.54
@@ -535,7 +533,6 @@
 - t-cameraplus-s3/README.md
 - Mixgo_Nova(元控·青春) 开发板
 - RYMCU BigSmart
-- tca8418_keyboard.cc
 - KevinBoxBoard
 - esp32-c5-touch-lcd-1.69/README.md
 - esp32-c6-lcd-0.85/README.md
@@ -559,21 +556,21 @@
 - Waveshare ESP32-S3-Touch-LCD-4B
 - esp32-cgc-144/README.md
 - esp32-cgc/README.md
-- MediaSnapshot
 - 1.54tft-ml307/README.md
 - espressif/esp_extractor
 - 1.54tft-wifi/README.md
+- EspBox3Board
 - .RegisterMcpTools
 - CompactWifiBoardS3Cam
 - espfriends/servo_dog_ctrl
 - esphome/esp-hub75
 - espressif/bq27220
-- CustomLcdDisplay
+- tca8418_keyboard.cc
 - espressif/esp_hosted
 - espressif/esp_image_effects
 - rgb_matrix_display.cc
 - LCD Wiki ES3C35P
-- CustomBacklight
+- CompactWifiBoardLCD
 - ReleaseTests
 - CardputerAudioCodec
 - espressif/esp_wifi_remote
@@ -584,7 +581,6 @@
 - VersionTests
 - waveshare/esp_lcd_hx8394
 - waveshare/esp_lcd_st7703
-- SystemReset
 - entrypoint.sh
 - bread-compact-esp32/README.md
 - bread-compact-wifi-s3cam/README.md
@@ -610,73 +606,75 @@
 - esp32-s3-touch-lcd-3.49-v2/README.md
 - c3-4g/README.md
 - c3-v3/README.md
-- DfrobotEsp32S3AiCam
+- context_t
 - HeadCommand
 - mp3_to_ogg.sh
-- audio_debugger.h
+- AudioDebugger
 - FitScaleTests
-- TextGlyphAllocator
-- uint32_t
-- uta_emotions.h
-- electron_emoji_display.cc
-- electron-bot/oscillator.cc
-- cardputer_audio_codec.cc
+- esp_err_t
+- uta_media_mcp.cc
+- WebActions
+- otto_emoji_display.cc
+- .SetEmojiCollection
+- CardputerAudioCodec::CardputerAudioCodec
 - esp_lcd_jd9853.h
 - build
 - chd-esp32s3-eye
-- Pca9557
 - LowBatteryShutdown
-- PressToTalkMcpTool
+- sscma_camera.cc
 - c3/led_strip_control.cc
 - espressif/bmi270_sensor
 - espressif/esp_lcd_jd9365
-- WsBroadcastJob
 - AudioCodec
-- uta_media_player.cc
+- Command
 - 3. MQTT 控制通道
 - McpServerTest
+- CustomLcdDisplay
+- freertos
+- uint32_t
+- Guition JC4827W543
+- DetectionState
 - ConfiguredAssetsTest
-- esp32-s3-lcd-0.85/led_strip_control.cc
-- KeyValue
-- Command
 - led_control.cc
 - steps
 - env
 - with
 - M5Stack Cardputer
 - sy6970.cc
-- OttoActionParams
+- TextGlyphAllocator
 - publish
 - prepare
 - 3. MQTT Control Channel
 - UtaEmotionTests
 - Waveshare ESP32-C5-Touch-LCD-3.5
 - AssetStrategy
+- electron_emoji_display.cc
 - espressif/esp32-camera
+- JpegData
 - espressif/esp_lcd_st7796
 - Waveshare ESP32-C6-Touch-LCD-2.8
 - pkolt/vl53l0x
 - t-circle-s3-v11/esp_lcd_gc9d01n.c
 - RobotCommand
-- ReplyGesture
-- WifiBoard::StartNetwork
+- GetAudioCodec
+- eda_tv_pro
 - espressif/touch_button_sensor
-- freertos
+- esp_timer
 - Axis
-- PassportAdcButton
+- esp32-s3-lcd-0.85/led_strip_control.cc
+- DogActionParams
 - LcdInitCommand
 - mmap_assets_table
 - waveshare/esp_lcd_st7735
-- AdcBatteryMonitor::AdcBatteryMonitor
-- PngQuant
+- CobLight
+- HlsTsAudio
 - Button::Button
-- I2cDevice
 - KeyValue
 - Publishing firmware releases
 - LC-S3-WIFI-1.54TFT
 - Mode
-- Tca8418Keyboard::Tca8418Keyboard
-- Es8311RegValue
+- PassportAdcButton
+- PressToTalkMcpTool
 - txp666/otto-emoji-gif-component
 - .RegisterMcpTools
 - espressif/esp_lcd_ek79007
@@ -686,17 +684,27 @@
 - esp32-c5-touch-lcd-2.8/README.md
 - esp32-c6-touch-amoled-1.8-v2/README.md
 - wvirgil123/sscma_client
-- ST77922_Display
+- KeyValue
+- RangePin
 - st77922_rounder_cb
 - manifest.json
-- mcp_server.h
-- AdcButton::AdcButton
+- Tca8418Keyboard::Tca8418Keyboard
+- CustomLcdDisplay
+- Opus_t
 - EyeEmotion
+- esp_lcd_new_panel_hi8561
+- LcdDriver
+- EspVocatI2cTests
+- ReplyGesture
 - uta_media_mcp.h
 - esp_log
-- GetAudioCodec
+- sensecap_watcher.cc
+- co5300_rounder_event_cb
+- PngQuant
 - TargetConfigurationTests
-- uta_media_player.cc
+- MediaPlayer
+- cJSON
+- PreviewTargetTests
 - AssetsTest
 - InvalidConfigTests
 - SpiffsAssetsEncodingTests
@@ -704,7 +712,7 @@
 - UtaRobotTests
 - BoardMenuTests
 - VariantSelectionTests
-- CustomLcdDisplay
+- CustomBacklight
 
 ## God Nodes (most connected - your core abstractions)
 1. `Application` - 340 edges
@@ -714,8 +722,8 @@
 5. `Backlight` - 161 edges
 6. `LcdDisplay` - 141 edges
 7. `AudioService` - 107 edges
-8. `PowerSaveTimer` - 95 edges
-9. `UtaRobot` - 92 edges
+8. `UtaRobot` - 96 edges
+9. `PowerSaveTimer` - 95 edges
 10. `AfeAudioEngine` - 85 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -733,7 +741,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (803 total, 238 thin omitted)
+## Communities (809 total, 237 thin omitted)
 
 ### Community 0 - "CustomBoard"
 Cohesion: 0.11
@@ -744,16 +752,16 @@ Cohesion: 0.19
 Nodes (4): LichuangC3DevBoard, boot_button_, codec_i2c_bus_, display_
 
 ### Community 2 - "LvglThemeManager"
-Cohesion: 0.12
-Nodes (5): Assets::LvglStrategy::Apply(), LvglTheme::LvglTheme(), LvglThemeManager, themes_, OledDisplay::OledDisplay()
+Cohesion: 0.17
+Nodes (3): LvglTheme::LvglTheme(), LvglThemeManager, themes_
 
 ### Community 3 - "gpio"
 Cohesion: 0.02
-Nodes (3): ColorSelection, ColorBlack, ColorWhite
+Nodes (3): Crc16(), IsCameraModuleDescriptor(), ReadLe16()
 
 ### Community 4 - "UtaRobot"
 Cohesion: 0.04
-Nodes (45): UtaBootButton, triple_click_, UtaRobot, active_, boot_, cob_, cob_pending_, cob_task_ (+37 more)
+Nodes (43): UtaBootButton, triple_click_, UtaRobot, active_, boot_, cob_, cob_effect_mode_, cob_effect_requested_ (+35 more)
 
 ### Community 5 - "scripts/build.py"
 Cohesion: 0.04
@@ -767,9 +775,9 @@ Nodes (45): AudioService, audio_debugger_, audio_decode_queue_, audio_encode_que
 Cohesion: 0.04
 Nodes (39): AfeAudioEngine, afe_control_dirty_, afe_data_, afe_iface_, codec_, control_generation_, custom_wake_word_, device_aec_enabled_ (+31 more)
 
-### Community 9 - "esp-hi/adc_pdm_audio_codec.cc"
-Cohesion: 0.06
-Nodes (14): AdcPdmAudioCodec, AdcPdmAudioCodec::AdcPdmAudioCodec(), input_dev_, output_dev_, output_timer_, pa_ctrl_pin_, TIMER_TIMEOUT_US, AdcPdmAudioCodec (+6 more)
+### Community 9 - "esp-sensairshuttle/adc_pdm_audio_codec.cc"
+Cohesion: 0.11
+Nodes (7): AdcPdmAudioCodec, AdcPdmAudioCodec::AdcPdmAudioCodec(), input_dev_, output_dev_, output_timer_, pa_ctrl_pin_, TIMER_TIMEOUT_US
 
 ### Community 10 - ".WakeUp"
 Cohesion: 0.07
@@ -777,18 +785,18 @@ Nodes (7): PowerSaveLevel, BALANCED, LOW_POWER, PERFORMANCE, Ml307Board::SetPowe
 
 ### Community 11 - "SpiLcdDisplay"
 Cohesion: 0.04
-Nodes (20): MosaicoDisplay, JC4827W543Display, CustomLcdDisplay, NV3023Display, GC9107Display, CustomLcdDisplay, OttoEmojiDisplay, CustomLcdDisplay (+12 more)
+Nodes (17): MosaicoDisplay, JC4827W543Display, CustomLcdDisplay, NV3023Display, GC9107Display, CustomLcdDisplay, CustomLcdDisplay, CustomLcdDisplay (+9 more)
 
 ### Community 12 - "AtomS3rEchoPyramidBoard"
-Cohesion: 0.07
-Nodes (26): AtomS3rEchoPyramidBoard, aw87559_, boot_button_, display_, i2c_bus_, i2c_bus_internal_, is_pyramid_connected_, led_ (+18 more)
+Cohesion: 0.08
+Nodes (23): AtomS3rEchoPyramidBoard, aw87559_, boot_button_, display_, i2c_bus_, i2c_bus_internal_, is_pyramid_connected_, led_ (+15 more)
 
 ### Community 13 - "EpdDisplay"
 Cohesion: 0.07
 Nodes (26): EpdDisplay_2_9, WF_Full, WF_Partial, COLOR_IMAGE, DRIVER_COLOR_BLACK, DRIVER_COLOR_WHITE, FONT_BACKGROUND, custom_lcd_spi_t (+18 more)
 
 ### Community 14 - "CustomEpdDisplay"
-Cohesion: 0.08
+Cohesion: 0.07
 Nodes (17): COLOR_IMAGE, custom_epd_spi_t, CustomEpdDisplay, buffer, CustomEpdDisplay::CustomEpdDisplay(), epd_spi_data, Height, spi (+9 more)
 
 ### Community 15 - "CyberVocat"
@@ -817,7 +825,7 @@ Nodes (12): GetBacklight(), LilygoTDisplayP4Board, audio_codec_i2c_bus_, boot_bu
 
 ### Community 22 - "application.cc"
 Cohesion: 0.05
-Nodes (52): AecMode, kAecOff, kAecOnDeviceSide, kAecOnServerSide, Application::ActivationTask(), Application::Alert(), Application::Application(), Application::BeginWakeWordInvoke() (+44 more)
+Nodes (50): AecMode, kAecOff, kAecOnDeviceSide, kAecOnServerSide, Application::ActivationTask(), Application::Application(), Application::BeginWakeWordInvoke(), Application::CanEnterSleepMode() (+42 more)
 
 ### Community 23 - "LiteAudioEngine"
 Cohesion: 0.06
@@ -828,8 +836,8 @@ Cohesion: 0.06
 Nodes (20): Aw9523, CustomBacklight, pmic_, Ft6336, read_buffer_, tp_, M5StackCoreS3Board, aw9523_ (+12 more)
 
 ### Community 25 - "Display"
-Cohesion: 0.05
-Nodes (8): Display, current_theme_, setup_ui_called_, DisplayLockGuard, display_, locked_, LvglFont, Theme
+Cohesion: 0.06
+Nodes (7): Display, current_theme_, setup_ui_called_, DisplayLockGuard, display_, locked_, Theme
 
 ### Community 26 - "M5StackTab5Board"
 Cohesion: 0.08
@@ -839,9 +847,9 @@ Nodes (13): M5StackTab5Board, boot_button_, camera_, display_, i2c_bus_, pi4ioe1
 Cohesion: 0.05
 Nodes (45): container, if, name, needs, runs-on, steps, strategy, image (+37 more)
 
-### Community 28 - ".SetEnabled"
-Cohesion: 0.06
-Nodes (19): XINGZHI_CUBE_1_54TFT_WIFI, boot_button_, display_, panel_, panel_io_, power_manager_, power_save_timer_, volume_down_button_ (+11 more)
+### Community 28 - "XINGZHI_CUBE_1_54TFT_WIFI"
+Cohesion: 0.11
+Nodes (9): XINGZHI_CUBE_1_54TFT_WIFI, boot_button_, display_, panel_, panel_io_, power_manager_, power_save_timer_, volume_down_button_ (+1 more)
 
 ### Community 29 - "PowerManager"
 Cohesion: 0.06
@@ -856,8 +864,8 @@ Cohesion: 0.06
 Nodes (18): CustomBacklight, panel_io_, CustomLcdDisplay, Pmic, WaveshareEsp32s3TouchAMOLED1inch8, backlight_, boot_button_, codec_i2c_bus_ (+10 more)
 
 ### Community 32 - "MqttProtocol"
-Cohesion: 0.05
-Nodes (23): CharToHex(), MqttProtocol, aes_key_id_, aes_nonce_, alive_, channel_mutex_, crypto_mutex_, event_group_handle_ (+15 more)
+Cohesion: 0.07
+Nodes (16): CharToHex(), MqttProtocol, aes_key_id_, aes_nonce_, alive_, channel_mutex_, crypto_mutex_, event_group_handle_ (+8 more)
 
 ### Community 34 - "CircularStrip"
 Cohesion: 0.09
@@ -867,9 +875,9 @@ Nodes (16): CircularStrip, blink_counter_, blink_interval_ms_, blink_on_, blink_
 Cohesion: 0.07
 Nodes (15): atk_dnesp32s3_box2_wifi, btn_driver_, btns, display_, i2c_bus_, instance_, io_exp_handle, kChgCtrlInterval (+7 more)
 
-### Community 36 - "uta_display.cc"
-Cohesion: 0.14
-Nodes (15): FormatMediaTime(), Icon(), IsVisible(), Label(), MediaShape(), Panel(), SetMediaText(), UtaDisplay::ApplyRotationLocked() (+7 more)
+### Community 36 - "array"
+Cohesion: 0.11
+Nodes (10): LoadEyeGif(), DecoderSession, aac, converted, converter, decoded, decoder, input (+2 more)
 
 ### Community 37 - "Oscillator"
 Cohesion: 0.06
@@ -896,8 +904,8 @@ Cohesion: 0.06
 Nodes (18): Cst816d, read_buffer_, tp_, Spotpear_esp32_s3_lcd_1_54, boot_button_, codec_i2c_bus_, cst816d_, display_ (+10 more)
 
 ### Community 44 - "Protocol"
-Cohesion: 0.08
-Nodes (11): 1. Overall Flow, 1. 总体流程概览, 7. 错误处理, Application::AbortSpeaking(), AbortReason, kAbortReasonNone, kAbortReasonWakeWordDetected, Protocol (+3 more)
+Cohesion: 0.07
+Nodes (17): 1. Overall Flow, 1. 总体流程概览, 7. 错误处理, Application::AbortSpeaking(), AbortReason, kAbortReasonNone, kAbortReasonWakeWordDetected, Protocol (+9 more)
 
 ### Community 45 - "atk_dnesp32s3_box2_4g"
 Cohesion: 0.07
@@ -936,23 +944,23 @@ Cohesion: 0.06
 Nodes (26): PowerManager, adc_handle_, adc_values_, battery_level_, charging_pin_, is_charging_, is_first_boot, is_low_battery_ (+18 more)
 
 ### Community 54 - "XINGZHI_ABS_2_0"
-Cohesion: 0.04
-Nodes (23): DualNetworkBoard, current_board_, ml307_dtr_pin_, ml307_rx_pin_, ml307_tx_pin_, network_type_, NetworkType, ML307 (+15 more)
+Cohesion: 0.06
+Nodes (14): XINGZHI_ABS_2_0, boot_button_, display_, err, i2c_bus_, is_sdcard_found, panel_, panel_io_ (+6 more)
 
 ### Community 55 - "CustomLcdDisplay"
-Cohesion: 0.10
-Nodes (16): CustomLcdDisplay, cs_, CustomLcdDisplay::CustomLcdDisplay(), dc_, DispBuffer, DisplayLen, height_, i2c_data_pdMS_TICKS (+8 more)
+Cohesion: 0.09
+Nodes (19): ColorSelection, ColorBlack, ColorWhite, CustomLcdDisplay, cs_, CustomLcdDisplay::CustomLcdDisplay(), dc_, DispBuffer (+11 more)
 
 ### Community 56 - "PowerManager"
-Cohesion: 0.10
+Cohesion: 0.09
 Nodes (10): calBattLife(), PowerManager, bt_link_callback_, call_count_, charging_callback_, discharging_callback_, is_charging_, is_discharging_ (+2 more)
 
 ### Community 57 - "LvglDisplay"
-Cohesion: 0.06
+Cohesion: 0.05
 Nodes (18): DynamicGlyphCache, LvglDisplay, battery_icon_, battery_label_, display_, dynamic_glyph_cache_, last_displayed_clock_min_, last_status_update_time_ (+10 more)
 
 ### Community 58 - "spiffs_assets_gen.py"
-Cohesion: 0.08
+Cohesion: 0.09
 Nodes (18): AssetCopyConfig, compute_checksum(), convert_image_to_qoi(), convert_image_to_raw(), convert_image_to_simg(), copy_assets(), create_header(), download_v9_script() (+10 more)
 
 ### Community 59 - "LilygoTCircleS3V11Board"
@@ -960,27 +968,27 @@ Cohesion: 0.10
 Nodes (13): Cst816x, read_buffer_, tp_, LilygoTCircleS3V11Board, boot_button_, cst816d_, display_, i2c_bus_ (+5 more)
 
 ### Community 60 - "AtomS3rEchoBaseBoard"
-Cohesion: 0.08
-Nodes (23): AtomS3rEchoBaseBoard, boot_button_, display_, i2c_bus_, i2c_bus_internal_, is_echo_base_connected_, lp5562_, pi4ioe_ (+15 more)
+Cohesion: 0.07
+Nodes (24): AtomS3rEchoBaseBoard, boot_button_, display_, i2c_bus_, i2c_bus_internal_, is_echo_base_connected_, lp5562_, pi4ioe_ (+16 more)
 
-### Community 61 - ".WriteReg"
-Cohesion: 0.08
-Nodes (9): Sy6970, Pi4ioe, Pmic, Pmic, RtcPcf8563, callback_, int_gpio_, interrupt_pending_ (+1 more)
+### Community 61 - "RtcPcf8563"
+Cohesion: 0.07
+Nodes (8): I2cDevice::I2cDevice(), Pmic, Pmic, RtcPcf8563, callback_, int_gpio_, interrupt_pending_, RtcPcf8563::RtcPcf8563()
 
 ### Community 62 - "WaveshareEsp32s3TouchLCD1inch83"
 Cohesion: 0.13
 Nodes (7): Pmic, WaveshareEsp32s3TouchLCD1inch83, boot_button_, display_, i2c_bus_, pmic_, power_save_timer_
 
 ### Community 63 - "BoxAudioCodec"
-Cohesion: 0.05
-Nodes (22): BoxAudioCodec, BoxAudioCodec::BoxAudioCodec(), data_if_, data_if_mutex_, gpio_if_, in_codec_if_, in_ctrl_if_, input_dev_ (+14 more)
+Cohesion: 0.06
+Nodes (19): BoxAudioCodec, BoxAudioCodec::BoxAudioCodec(), data_if_, data_if_mutex_, gpio_if_, in_codec_if_, in_ctrl_if_, input_dev_ (+11 more)
 
 ### Community 64 - "M5StackCardputerAdvBoard"
 Cohesion: 0.11
 Nodes (10): M5StackCardputerAdvBoard, battery_monitor_, boot_button_, display_, i2c_bus_, keyboard_, panel_, panel_io_ (+2 more)
 
 ### Community 65 - "release.py"
-Cohesion: 0.16
+Cohesion: 0.17
 Nodes (13): catalog(), inspect_gif(), blocks(), byte(), prepare(), create_manifest(), find_release(), firmware_metadata() (+5 more)
 
 ### Community 66 - "ChargeStatus"
@@ -996,8 +1004,8 @@ Cohesion: 0.06
 Nodes (23): CustomWakeWord, codec_, commands_, duration_, input_buffer_, input_buffer_mutex_, language_, last_detected_wake_word_ (+15 more)
 
 ### Community 70 - "SscmaCamera"
-Cohesion: 0.04
-Nodes (31): DetectionState, COOLDOWN, IDLE, VALIDATING, JpegData, buf, len, SscmaCamera (+23 more)
+Cohesion: 0.06
+Nodes (24): SscmaCamera, detect_debounce_sec, detect_duration_sec, detect_invoke_interval_sec, detect_target, detect_threshold, detection_state, explain_token_ (+16 more)
 
 ### Community 71 - "LcdDisplay"
 Cohesion: 0.05
@@ -1008,8 +1016,8 @@ Cohesion: 0.08
 Nodes (12): CustomBacklight, panel_io_, CustomLcdDisplay, Pmic, WaveshareEsp32c6TouchAMOLED1inch8, backlight_, boot_button_, codec_i2c_bus_ (+4 more)
 
 ### Community 73 - "WaveshareEsp32s3TouchAMOLED1inch75"
-Cohesion: 0.08
-Nodes (11): CustomBacklight, panel_io_, Pmic, WaveshareEsp32s3TouchAMOLED1inch75, backlight_, boot_button_, display_, i2c_bus_ (+3 more)
+Cohesion: 0.07
+Nodes (12): CustomBacklight, panel_io_, CustomLcdDisplay, Pmic, WaveshareEsp32s3TouchAMOLED1inch75, backlight_, boot_button_, display_ (+4 more)
 
 ### Community 74 - "MQTT + UDP Hybrid Communication Protocol"
 Cohesion: 0.06
@@ -1020,7 +1028,7 @@ Cohesion: 0.06
 Nodes (35): 10. 与 WebSocket 协议的比较, 11.1 网络环境, 11.2 服务器配置, 11.3 监控指标, 11. 部署建议, 12. 总结, 1.1 协议特点, 1. 协议概览 (+27 more)
 
 ### Community 76 - "ethernet_board.cc"
-Cohesion: 0.07
+Cohesion: 0.09
 Nodes (22): CreateEmacConfig(), CreatePhy(), EthernetBoard, connected_, eth_glue_, eth_handle_, eth_netif_, EthernetBoard::EthEventHandler() (+14 more)
 
 ### Community 77 - "GpioLed"
@@ -1035,16 +1043,16 @@ Nodes (6): InitializeElectronBotController(), ElectronBot, boot_button_, display
 Cohesion: 0.07
 Nodes (19): Cst816d, press_count_, read_buffer_, tp_, was_touched_, EspSensairShuttle, boot_button_, cst816d_ (+11 more)
 
-### Community 80 - "circular_strip.cc"
-Cohesion: 0.15
-Nodes (6): EnterDeepSleep(), CircularStrip::CircularStrip(), StripColor, blue, green, red
+### Community 80 - "MediaReadAhead"
+Cohesion: 0.07
+Nodes (24): HlsReader, cancelled_, demux_, last_progress_, next_sequence_, packet_, packet_used_, payload_ (+16 more)
 
 ### Community 81 - "EDARobotDog"
 Cohesion: 0.14
 Nodes (9): EDARobotDog, EDARobotDog::EDARobotDog(), final_time_, increment_, is_dog_resting_, partial_time_, servo_, servo_pins_ (+1 more)
 
 ### Community 82 - "OttoRobot"
-Cohesion: 0.10
+Cohesion: 0.08
 Nodes (12): OttoRobot, audio_codec_, boot_button_, camera_, camera_type_, display_, has_camera_, hw_config_ (+4 more)
 
 ### Community 83 - "PowerManager"
@@ -1064,16 +1072,16 @@ Cohesion: 0.09
 Nodes (13): gd_render_frame(), LvglGif, frame_callback_, gif_, img_dsc_, last_call_, loaded_, loop_delay_ms_ (+5 more)
 
 ### Community 87 - "WifiConfigUI"
-Cohesion: 0.05
-Nodes (39): WifiConfigResult, Cancelled, Connected, None, WifiConfigState, Connecting, Failed, InputManualPwd (+31 more)
+Cohesion: 0.06
+Nodes (35): WifiConfigState, Connecting, Failed, InputManualPwd, InputPassword, InputSsid, SavedList, Scanning (+27 more)
 
 ### Community 88 - "RndisBoard"
 Cohesion: 0.09
-Nodes (6): RndisBoard, network_event_callback_, rndis_eth_driver, s_event_group, s_rndis_netif, WifiBoard::TryWifiConnect()
+Nodes (8): NetworkEventCallback, EthernetBoard::SetNetworkEventCallback(), RndisBoard, network_event_callback_, rndis_eth_driver, s_event_group, s_rndis_netif, WifiBoard::SetNetworkEventCallback()
 
 ### Community 89 - "Assets"
 Cohesion: 0.10
-Nodes (21): Assets, Assets::Apply(), Assets::Assets(), Assets::DisableTextFontGlyphPush(), Assets::Download(), Assets::EmoteStrategy::Apply(), Assets::EmoteStrategy::GetAssetData(), Assets::EmoteStrategy::InitializePartition() (+13 more)
+Nodes (22): Assets, Assets::Apply(), Assets::Assets(), Assets::DisableTextFontGlyphPush(), Assets::Download(), Assets::EmoteStrategy::Apply(), Assets::EmoteStrategy::GetAssetData(), Assets::EmoteStrategy::InitializePartition() (+14 more)
 
 ### Community 90 - "EspWakeWord"
 Cohesion: 0.07
@@ -1084,8 +1092,8 @@ Cohesion: 0.09
 Nodes (12): Nt26Board, current_power_level_, dtr_pin_, modem_, network_event_callback_, network_ready_timer_, Nt26Board::Nt26Board(), pm_lock_cpu_max_ (+4 more)
 
 ### Community 92 - "LilygoTDisplays3ProMVSRLoraBoard"
-Cohesion: 0.15
-Nodes (7): LilygoTDisplays3ProMVSRLoraBoard, boot_button_, cst226se_, display_, i2c_bus_, power_save_timer_, sy6970_
+Cohesion: 0.09
+Nodes (14): Cst2xxse, read_buffer_, tp_, LilygoTDisplays3ProMVSRLoraBoard, boot_button_, cst226se_, display_, i2c_bus_ (+6 more)
 
 ### Community 93 - "AtomS3EchoBaseBoard"
 Cohesion: 0.10
@@ -1129,14 +1137,14 @@ Nodes (12): M5StackStopwatchBoard, backlight_, button1_, button2_, display_, i2c
 
 ### Community 103 - "Oscillator"
 Cohesion: 0.06
-Nodes (20): Oscillator, amplitude_, current_millis_, diff_limit_, inc_, is_attached_, ledc_channel_, ledc_speed_mode_ (+12 more)
+Nodes (22): Oscillator, amplitude_, current_millis_, diff_limit_, inc_, is_attached_, ledc_channel_, ledc_speed_mode_ (+14 more)
 
-### Community 105 - "CompactMl307Board"
-Cohesion: 0.12
-Nodes (9): CompactMl307Board, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, touch_button_, volume_down_button_ (+1 more)
+### Community 105 - "DualNetworkBoard"
+Cohesion: 0.06
+Nodes (16): DualNetworkBoard, current_board_, ml307_dtr_pin_, ml307_rx_pin_, ml307_tx_pin_, network_type_, NetworkType, ML307 (+8 more)
 
 ### Community 106 - "WifiBoard"
-Cohesion: 0.06
+Cohesion: 0.08
 Nodes (21): WifiBoard, connect_timer_, WifiBoard::GetBoardJson(), WifiBoard::GetBoardType(), WifiBoard::GetDeviceStatusJson(), WifiBoard::GetNetwork(), WifiBoard::GetNetworkStateIcon(), WifiBoard::GetWifiNetworkInfo() (+13 more)
 
 ### Community 107 - "movements.cc"
@@ -1147,21 +1155,21 @@ Nodes (6): ClampServoAmplitude(), ClampServoTarget(), EaseOutCubic(), Otto::Otto
 Cohesion: 0.11
 Nodes (9): Esp32S3Korvo2V3Board, adc_button_, boot_button_, camera_, display_, i2c_bus_, io_expander_, power_manager_ (+1 more)
 
-### Community 109 - "uta_display_emotions.cc"
-Cohesion: 0.20
-Nodes (8): ConversationCaption(), Hide(), SetTextIfChanged(), UtaDisplay::ReleaseEyesLocked(), UtaDisplay::SetEmotion(), UtaDisplay::SetupEyesLocked(), UtaDisplay::UpdateEyesLocked(), UtaDisplay::~UtaDisplay()
+### Community 109 - "Pca9557"
+Cohesion: 0.08
+Nodes (12): I2cDevice, device_address_, i2c_bus_, i2c_device_, Pca9557, Sy6970, Pi4ioe, CustomAudioCodec (+4 more)
 
-### Community 110 - "Led"
-Cohesion: 0.05
-Nodes (12): CompactWifiBoardLCD, boot_button_, display_, labplus_ledong_v2, boot_button_, display_, i2c_bus_, eda_tv_pro (+4 more)
+### Community 110 - "labplus_ledong_v2"
+Cohesion: 0.17
+Nodes (4): labplus_ledong_v2, boot_button_, display_, i2c_bus_
 
 ### Community 111 - "CustomBoard"
 Cohesion: 0.08
 Nodes (11): CustomBoard, boot_button_, disp_touch_dev_handle, display_, i2c_bus_, io_handle, panel_handle, pwr_button_ (+3 more)
 
 ### Community 112 - "CustomBoard"
-Cohesion: 0.08
-Nodes (11): CustomBoard, boot_button_, disp_touch_dev_handle, display_, i2c_bus_, io_expander, io_handle, panel_handle (+3 more)
+Cohesion: 0.07
+Nodes (12): CustomBoard, boot_button_, disp_touch_dev_handle, display_, i2c_bus_, io_expander, io_handle, panel_handle (+4 more)
 
 ### Community 113 - "CustomBoard"
 Cohesion: 0.08
@@ -1196,8 +1204,8 @@ Cohesion: 0.04
 Nodes (26): EspVocat, backlight_, battery_status_initialized_, bmi270_ready_, boot_button_, camera_, charge_, charge_task_handle_ (+18 more)
 
 ### Community 121 - "OledDisplay"
-Cohesion: 0.10
-Nodes (12): OledDisplay, chat_message_label_, container_, content_, content_left_, content_right_, emotion_label_, panel_ (+4 more)
+Cohesion: 0.08
+Nodes (13): OledDisplay, chat_message_label_, container_, content_, content_left_, content_right_, emotion_label_, OledDisplay::OledDisplay() (+5 more)
 
 ### Community 122 - "WaveshareEsp32s3TouchAMOLED2inch06"
 Cohesion: 0.10
@@ -1208,8 +1216,8 @@ Cohesion: 0.12
 Nodes (8): XminiC3Board, boot_button_, codec_i2c_bus_, display_, panel_, panel_io_, power_save_timer_, press_to_talk_tool_
 
 ### Community 124 - "McpServer"
-Cohesion: 0.19
-Nodes (15): Built-in Tools, Default (AI-callable) tools - from `AddCommonTools`, User-only tools - from `AddUserOnlyTools`, McpServer, McpServer::AddCommonTools(), McpServer::AddUserOnlyTools(), McpServer::DoToolCall(), McpServer::GetToolsList() (+7 more)
+Cohesion: 0.14
+Nodes (22): Notes, McpServer, McpServer::AddCommonTools(), McpServer::AddTool(), McpServer::AddUserOnlyTool(), McpServer::AddUserOnlyTools(), McpServer::DoToolCall(), McpServer::GetToolsList() (+14 more)
 
 ### Community 125 - "Tca8418Keyboard"
 Cohesion: 0.12
@@ -1232,8 +1240,8 @@ Cohesion: 0.10
 Nodes (13): Cst816x, read_buffer_, tp_, LilygoTCircleS3Board, boot_button_, cst816d_, display_, i2c_bus_ (+5 more)
 
 ### Community 130 - "Cst816x"
-Cohesion: 0.07
-Nodes (30): Cst816x, click_count_, Cst816x::Cst816x(), DEFAULT_THRESHOLD, Cst816x::getCurrentTimeUs(), Cst816x::InitCst816d(), is_touching_, is_volume_long_pressing_ (+22 more)
+Cohesion: 0.06
+Nodes (31): Cst816x, click_count_, Cst816x::Cst816x(), DEFAULT_THRESHOLD, Cst816x::getCurrentTimeUs(), Cst816x::InitCst816d(), is_touching_, is_volume_long_pressing_ (+23 more)
 
 ### Community 131 - "SingleLed"
 Cohesion: 0.10
@@ -1248,7 +1256,7 @@ Cohesion: 0.09
 Nodes (10): CustomBacklight, panel_io_, Pmic, WaveshareEsp32c6TouchAMOLED2inch06, backlight_, boot_button_, display_, i2c_bus_ (+2 more)
 
 ### Community 134 - "WaveshareEsp32c6TouchAMOLED2inch16"
-Cohesion: 0.09
+Cohesion: 0.10
 Nodes (9): CustomBacklight, panel_io_, WaveshareEsp32c6TouchAMOLED2inch16, backlight_, boot_button_, display_, i2c_bus_, pmic_ (+1 more)
 
 ### Community 135 - "CustomBoard"
@@ -1267,9 +1275,13 @@ Nodes (10): CustomBacklight, io_handle_, WaveshareEsp32s3TouchLCD7c, backlight_,
 Cohesion: 0.08
 Nodes (13): WaveshareAudioCodec, data_if_, data_if_mutex_, gpio_if_, in_codec_if_, in_ctrl_if_, input_dev_, out_codec_if_ (+5 more)
 
+### Community 139 - "otto_movements.cc"
+Cohesion: 0.10
+Nodes (11): EaseOutCubic(), Otto, final_time_, has_hands_, increment_, is_otto_resting_, Otto::Otto(), partial_time_ (+3 more)
+
 ### Community 140 - "XminiC3Board"
-Cohesion: 0.11
-Nodes (9): XminiC3Board, adc_battery_monitor_, boot_button_, codec_i2c_bus_, display_, panel_, panel_io_, press_to_talk_tool_ (+1 more)
+Cohesion: 0.09
+Nodes (10): InitializePowerSaveTimer(), XminiC3Board, adc_battery_monitor_, boot_button_, codec_i2c_bus_, display_, panel_, panel_io_ (+2 more)
 
 ### Community 141 - "ActionType"
 Cohesion: 0.07
@@ -1280,8 +1292,8 @@ Cohesion: 0.09
 Nodes (15): PowerManager, adc_channel_, adc_handle_, adc_values_, battery_level_, charging_pin_, is_charging_, is_low_battery_ (+7 more)
 
 ### Community 143 - "Spotpear_ESP32_S3_1_28_BOX"
-Cohesion: 0.10
-Nodes (10): Spotpear_ESP32_S3_1_28_BOX, boot_button_, codec_i2c_bus_, cst816d_, display_, i2c_bus_, panel_, power_manager_ (+2 more)
+Cohesion: 0.06
+Nodes (18): Cst816d, last_chip_id_, read_buffer_, tp_, Spotpear_ESP32_S3_1_28_BOX, boot_button_, codec_i2c_bus_, cst816d_ (+10 more)
 
 ### Community 144 - "atk_dnesp32s3m_4g"
 Cohesion: 0.15
@@ -1336,12 +1348,12 @@ Cohesion: 0.26
 Nodes (26): add_entry(), discard_sub_blocks(), dispose(), f_gif_close(), f_gif_open(), f_gif_read(), f_gif_seek(), gd_close_gif() (+18 more)
 
 ### Community 158 - "OggDemuxer"
-Cohesion: 0.06
-Nodes (30): context_t, body_offset, body_size, bytes_needed, data_offset, header, packet_buf, packet_continued (+22 more)
+Cohesion: 0.13
+Nodes (12): OggDemuxer, ctx_, has_error_, on_packet_, opus_info_, packet_count_, state_, ParseState (+4 more)
 
 ### Community 159 - "Ml307Board"
-Cohesion: 0.08
-Nodes (19): NetworkEventCallback, EthernetBoard::SetNetworkEventCallback(), Ml307Board, dtr_pin_, Ml307Board::GetBoardJson(), Ml307Board::GetBoardType(), Ml307Board::GetDeviceStatusJson(), Ml307Board::GetNetwork() (+11 more)
+Cohesion: 0.11
+Nodes (16): Ml307Board, dtr_pin_, Ml307Board::GetBoardJson(), Ml307Board::GetBoardType(), Ml307Board::GetDeviceStatusJson(), Ml307Board::GetNetwork(), Ml307Board::GetNetworkStateIcon(), Ml307Board::Ml307Board() (+8 more)
 
 ### Community 160 - "修改前逐板清单"
 Cohesion: 0.08
@@ -1367,17 +1379,13 @@ Nodes (8): FreenoveESP32S3Display, adc_battery_monitor_, boot_button_, codec_i2c
 Cohesion: 0.09
 Nodes (14): PowerManager, adc_handle_, adc_values_, battery_level_, charging_pin_, is_charging_, is_low_battery_, kBatteryAdcDataCount (+6 more)
 
-### Community 166 - "JiuchuanDevBoard"
-Cohesion: 0.09
-Nodes (11): JiuchuanDevBoard, boot_button_, cmd_button, codec_i2c_bus_, display_, panel, panel_io, power_manager_ (+3 more)
-
 ### Community 167 - "LCDWikiES3C35P_Board"
-Cohesion: 0.11
-Nodes (6): LCDWikiES3C35P_Board, boot_button_, display_, i2c_bus_, touch_i2c_read(), touchpad_read()
+Cohesion: 0.09
+Nodes (7): LCDWikiES3C35P_Board, boot_button_, display_, i2c_bus_, ST77922_Display, touch_i2c_read(), touchpad_read()
 
 ### Community 168 - "M5StackCoreP4Board"
-Cohesion: 0.10
-Nodes (9): M5IoE1Backlight, ioe_, M5StackCoreP4Board, backlight_, boot_button_, display_, i2c_bus_, ioe_ (+1 more)
+Cohesion: 0.05
+Nodes (17): M5IoE1Backlight, ioe_, M5StackCoreP4Board, backlight_, boot_button_, display_, i2c_bus_, ioe_ (+9 more)
 
 ### Community 169 - "PowerManager"
 Cohesion: 0.09
@@ -1404,8 +1412,8 @@ Cohesion: 0.09
 Nodes (14): PowerManager, adc_handle_, adc_values_, battery_level_, charging_pin_, is_charging_, is_low_battery_, kBatteryAdcDataCount (+6 more)
 
 ### Community 175 - "CustomBoard"
-Cohesion: 0.13
-Nodes (8): CustomBoard, display_, i2c_bus_, power_manager_, power_save_timer_, pwr_button_, volume_down_button_, volume_up_button_
+Cohesion: 0.10
+Nodes (9): CustomBoard, display_, i2c_bus_, power_manager_, power_save_timer_, pwr_button_, volume_down_button_, volume_up_button_ (+1 more)
 
 ### Community 176 - "PowerManager"
 Cohesion: 0.09
@@ -1428,15 +1436,15 @@ Cohesion: 0.08
 Nodes (26): 1. 创建新的开发板目录, 1. 显示屏, 2. 创建配置文件, 2. 音频编解码器, 3. 电源管理, 3. 编写板级初始化代码, 4. MCP设备控制, 4. 添加构建系统配置 (+18 more)
 
 ### Community 181 - ".GetInt"
-Cohesion: 0.15
-Nodes (5): ElectronBotController, action_queue_, action_task_handle_, electron_bot_, is_action_in_progress_
+Cohesion: 0.06
+Nodes (29): ActionType, ACTION_BODY_TURN_CENTER, ACTION_BODY_TURN_LEFT, ACTION_BODY_TURN_RIGHT, ACTION_HAND_BOTH_DOWN, ACTION_HAND_BOTH_FLAP, ACTION_HAND_BOTH_UP, ACTION_HAND_BOTH_WAVE (+21 more)
 
 ### Community 182 - "AIVOX3AudioCodec"
 Cohesion: 0.08
 Nodes (10): AIVOX3AudioCodec, codec_if_, ctrl_if_, data_if_, gpio_if_, input_dev_, output_dev_, read_pos_ (+2 more)
 
 ### Community 183 - "SensecapAudioCodec"
-Cohesion: 0.09
+Cohesion: 0.10
 Nodes (11): SensecapAudioCodec, data_if_, gpio_if_, in_codec_if_, in_ctrl_if_, input_dev_, out_codec_if_, out_ctrl_if_ (+3 more)
 
 ### Community 184 - "WaveshareEsp32c5TouchLCD1inch69"
@@ -1452,12 +1460,12 @@ Cohesion: 0.11
 Nodes (8): CustomBoard, boot_button_, display_, i2c_bus_, key_plus_button_, power_manager_, power_save_timer_, CustomButton
 
 ### Community 187 - "CustomBoard"
-Cohesion: 0.10
-Nodes (7): CustomBoard, boot_button_, camera_, display_, i2c_bus_, io_expander, esp_lcd_new_panel_jd9853()
+Cohesion: 0.12
+Nodes (6): CustomBoard, boot_button_, camera_, display_, i2c_bus_, io_expander
 
 ### Community 188 - "CustomBoard"
-Cohesion: 0.09
-Nodes (10): CustomBoard, display_, i2c_bus_, led_strip_, power_manager_, power_save_timer_, pwr_button_, volume_down_button_ (+2 more)
+Cohesion: 0.11
+Nodes (9): CustomBoard, display_, i2c_bus_, led_strip_, power_manager_, power_save_timer_, pwr_button_, volume_down_button_ (+1 more)
 
 ### Community 189 - "CustomBoard"
 Cohesion: 0.10
@@ -1471,9 +1479,9 @@ Nodes (9): CustomBoard, boot_button_, disp_touch_dev_handle, display_, i2c_bus_,
 Cohesion: 0.11
 Nodes (8): AIPILite, boot_button_, display_, i2c_bus_, panel_, power_button_, power_manager_, power_save_timer_
 
-### Community 192 - "McpTool"
-Cohesion: 0.15
-Nodes (12): Notes, McpServer::AddTool(), McpServer::AddUserOnlyTool(), McpTool, callback_, description_, name_, properties_ (+4 more)
+### Community 192 - "uta_display.cc"
+Cohesion: 0.16
+Nodes (10): FormatMediaTime(), Icon(), IsVisible(), Label(), MediaShape(), Panel(), SceneTitle(), SetMediaText() (+2 more)
 
 ### Community 193 - "Ota"
 Cohesion: 0.05
@@ -1484,7 +1492,7 @@ Cohesion: 0.11
 Nodes (10): K10AudioCodec, data_if_, gpio_if_, in_codec_if_, in_ctrl_if_, input_dev_, K10AudioCodec::K10AudioCodec(), out_codec_if_ (+2 more)
 
 ### Community 195 - "LVGLImage.py"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (9): CompressMethod, main(), OutputFormat, PNGConverter, RAWImage, NotSupported, test(), test_raw() (+1 more)
 
 ### Community 196 - "Tab5AudioCodec"
@@ -1492,8 +1500,8 @@ Cohesion: 0.10
 Nodes (10): Tab5AudioCodec, data_if_, gpio_if_, in_codec_if_, in_ctrl_if_, input_dev_, out_codec_if_, out_ctrl_if_ (+2 more)
 
 ### Community 197 - "EspVideo"
-Cohesion: 0.13
-Nodes (7): EspVideo::SetHMirror(), EspSparkBot, boot_button_, camera_, display_, i2c_bus_, light_mode_
+Cohesion: 0.05
+Nodes (25): EspVideo, encoder_thread_, EspVideo::Explain(), explain_token_, explain_url_, frame_, mmap_buffers_, sensor_format_ (+17 more)
 
 ### Community 198 - "PowerManager"
 Cohesion: 0.10
@@ -1503,9 +1511,9 @@ Nodes (13): PowerManager, adc_channel_, adc_handle_, adc_unit_, adc_values_, ADC
 Cohesion: 0.10
 Nodes (6): EmojiPlayer, EmojiPlayer::EmojiPlayer(), player_handle_, EmojiWidget, EmojiWidget::EmojiWidget(), player_
 
-### Community 200 - "AIVOX3"
-Cohesion: 0.12
-Nodes (7): AIVOX3, boot_button_, codec_i2c_bus_, display_, power_manager_, volume_down_button_, volume_up_button_
+### Community 200 - "versions.py"
+Cohesion: 0.10
+Nodes (16): download_artifact(), get_artifacts(), get_default_releases_dir(), main(), parse_github_run_url(), rename_artifact(), extract_zip(), find_app_partition() (+8 more)
 
 ### Community 201 - "KevinBoxBoard"
 Cohesion: 0.09
@@ -1516,12 +1524,12 @@ Cohesion: 0.11
 Nodes (9): MINSI_K08_DUAL, boot_button_, display_, panel_, panel_io_, power_manager_, power_save_timer_, volume_down_button_ (+1 more)
 
 ### Community 203 - "SensecapWatcher"
-Cohesion: 0.10
+Cohesion: 0.09
 Nodes (13): SensecapWatcher, btn_driver_, btns, camera_, display_, i2c_bus_, instance_, io_exp_handle (+5 more)
 
 ### Community 204 - "CustomBoard"
 Cohesion: 0.11
-Nodes (8): CustomBoard, boot_button_, display_, i2c_bus_, power_manager_, power_save_timer_, pwr_button_, CustomButton
+Nodes (7): CustomBoard, boot_button_, display_, i2c_bus_, power_manager_, power_save_timer_, pwr_button_
 
 ### Community 205 - "WaveshareEsp32p4nano"
 Cohesion: 0.10
@@ -1536,44 +1544,44 @@ Cohesion: 0.10
 Nodes (8): CustomBoard, adc1_handle, boot_button_, cali_handle, display_, i2c_bus_, power_, pwr_button_
 
 ### Community 208 - "WaveshareEsp32s3TouchAMOLED1inch8"
-Cohesion: 0.08
-Nodes (12): CustomBacklight, panel_io_, WaveshareEsp32s3TouchAMOLED1inch8, backlight_, boot_button_, codec_i2c_bus_, display_, io_expander (+4 more)
+Cohesion: 0.07
+Nodes (13): CustomBacklight, panel_io_, CustomLcdDisplay, WaveshareEsp32s3TouchAMOLED1inch8, backlight_, boot_button_, codec_i2c_bus_, display_ (+5 more)
 
 ### Community 209 - "CustomBoard"
 Cohesion: 0.11
 Nodes (9): CustomBoard, boot_btn, boot_btn_driver_, display_, i2c_bus_, instance_, io_expander, pwr_btn (+1 more)
 
-### Community 210 - "ActionType"
+### Community 210 - "uta_robot.cc"
 Cohesion: 0.08
-Nodes (24): ActionType, ACTION_BODY_TURN_CENTER, ACTION_BODY_TURN_LEFT, ACTION_BODY_TURN_RIGHT, ACTION_HAND_BOTH_DOWN, ACTION_HAND_BOTH_FLAP, ACTION_HAND_BOTH_UP, ACTION_HAND_BOTH_WAVE (+16 more)
+Nodes (3): FlushCallback, FlushIoReadyCallback, wifi_event_handler()
 
 ### Community 211 - "CustomBoard"
 Cohesion: 0.10
 Nodes (9): CustomBoard, boot_button_, camera_, display_, i2c_bus_, io_expander, pmic_, power_save_timer_ (+1 more)
 
 ### Community 212 - "WaveshareEsp32s3TouchLCD43c"
-Cohesion: 0.08
-Nodes (12): Backlight, step_, target_brightness_, transition_timer_, CustomBacklight, io_handle_, WaveshareEsp32s3TouchLCD43c, backlight_ (+4 more)
+Cohesion: 0.07
+Nodes (13): Backlight, step_, target_brightness_, transition_timer_, PwmBacklight::PwmBacklight(), CustomBacklight, io_handle_, WaveshareEsp32s3TouchLCD43c (+5 more)
 
 ### Community 213 - "BoardPowerBsp"
 Cohesion: 0.12
 Nodes (11): BoardPowerBsp, audioAmpPin_, audioPowerPin_, BoardPowerBsp::BoardPowerBsp(), charge_status_, epdPowerPin_, led_override_blink_, led_override_enabled_ (+3 more)
 
 ### Community 214 - "esp32_s31_adc_calibration.c"
-Cohesion: 0.07
-Nodes (20): bsp_s31_adc_calc_code_q(), bsp_s31_adc_calibration_init(), bsp_s31_adc_calibration_raw_to_mv(), bsp_s31_adc_collect_raw(), bsp_s31_adc_get_sar_base(), bsp_s31_adc_reset_weights(), bsp_s31_adc_set_cal_config(), bsp_s31_adc_set_cal_done() (+12 more)
+Cohesion: 0.17
+Nodes (12): bsp_s31_adc_calc_code_q(), bsp_s31_adc_calibration_init(), bsp_s31_adc_calibration_raw_to_mv(), bsp_s31_adc_collect_raw(), bsp_s31_adc_get_sar_base(), bsp_s31_adc_reset_weights(), bsp_s31_adc_set_cal_config(), bsp_s31_adc_set_cal_done() (+4 more)
 
 ### Community 218 - "AdcBatteryMonitor"
-Cohesion: 0.15
-Nodes (6): AdcBatteryMonitor, adc_battery_estimation_handle_, charging_pin_, is_charging_, on_charging_status_changed_, timer_handle_
+Cohesion: 0.11
+Nodes (7): AdcBatteryMonitor, adc_battery_estimation_handle_, AdcBatteryMonitor::AdcBatteryMonitor(), charging_pin_, is_charging_, on_charging_status_changed_, timer_handle_
 
 ### Community 219 - "Knob"
 Cohesion: 0.16
 Nodes (6): Knob, Knob::Knob(), knob_handle_, on_rotate_, pin_a_, pin_b_
 
 ### Community 220 - "LocationService"
-Cohesion: 0.05
-Nodes (52): JsonPtr, Location, available, from_ip, latitude, longitude, name, LocationService (+44 more)
+Cohesion: 0.06
+Nodes (41): LocationJsonDepthSafe(), JsonPtr, Location, available, from_ip, latitude, longitude, name (+33 more)
 
 ### Community 221 - "CoreS3AudioCodec"
 Cohesion: 0.11
@@ -1588,11 +1596,11 @@ Cohesion: 0.11
 Nodes (9): XINGZHI_CUBE_0_85TFT_WIFI, boot_button_, display_, panel_, panel_io_, power_manager_, power_save_timer_, volume_down_button_ (+1 more)
 
 ### Community 224 - "XINGZHI_CUBE_0_96OLED_ML307"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (10): XINGZHI_CUBE_0_96OLED_ML307, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, power_manager_, power_save_timer_ (+2 more)
 
 ### Community 225 - "XINGZHI_CUBE_0_96OLED_WIFI"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (10): XINGZHI_CUBE_0_96OLED_WIFI, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, power_manager_, power_save_timer_ (+2 more)
 
 ### Community 226 - "WaveshareEsp32s3TouchLcd1_85B"
@@ -1616,32 +1624,32 @@ Cohesion: 0.06
 Nodes (24): IsSupportedUrl(), NotifyPlayer, active_, audio_url_, cancelled_, completion_reported_, displayed_text_, finished_callback_ (+16 more)
 
 ### Community 231 - "Blufi"
-Cohesion: 0.08
-Nodes (19): Blufi, inited_, m_ap_records, m_ble_is_connected, m_deinited, m_provisioned, m_scan_in_progress, m_scan_should_save_ssid (+11 more)
+Cohesion: 0.09
+Nodes (18): Blufi, inited_, m_ap_records, m_ble_is_connected, m_deinited, m_provisioned, m_scan_in_progress, m_scan_should_save_ssid (+10 more)
 
 ### Community 232 - "Tdisplays3promvsrloraAudioCodec"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (15): Tdisplays3promvsrloraAudioCodec, Tdisplays3promvsrloraAudioCodec::CreateVoiceHardware(), data_if_, Tdisplays3promvsrloraAudioCodec::EnableInput(), Tdisplays3promvsrloraAudioCodec::EnableOutput(), gpio_if_, in_codec_if_, in_ctrl_if_ (+7 more)
 
-### Community 233 - "Otto"
-Cohesion: 0.12
-Nodes (9): Otto, final_time_, has_hands_, increment_, is_otto_resting_, partial_time_, servo_, servo_pins_ (+1 more)
-
-### Community 234 - "PinIndex"
-Cohesion: 0.06
-Nodes (26): PinIndex, kBacklight, kChassisRx, kChassisTx, kLcdClock, kLcdCs, kLcdDc, kLcdMosi (+18 more)
+### Community 233 - "MediaSnapshot"
+Cohesion: 0.08
+Nodes (18): MediaSnapshot, artist, duration_seconds, elapsed_seconds, paused, playing, preparing, replay_available (+10 more)
 
 ### Community 235 - "Application"
-Cohesion: 0.04
-Nodes (29): Application, aborted_, activation_task_handle_, aec_mode_, assets_version_checked_, audio_service_, clock_ticks_, clock_timer_handle_ (+21 more)
+Cohesion: 0.03
+Nodes (30): Application, aborted_, activation_task_handle_, aec_mode_, assets_version_checked_, audio_service_, clock_ticks_, clock_timer_handle_ (+22 more)
+
+### Community 236 - "JiuchuanDevBoard"
+Cohesion: 0.09
+Nodes (11): JiuchuanDevBoard, boot_button_, cmd_button, codec_i2c_bus_, display_, panel, panel_io, power_manager_ (+3 more)
 
 ### Community 237 - "CustomBoard"
-Cohesion: 0.13
-Nodes (8): CustomBoard, boot_button_, camera_, display_, i2c_bus_, io_expander, pmic_, power_save_timer_
+Cohesion: 0.11
+Nodes (9): CustomBoard, boot_button_, camera_, display_, i2c_bus_, io_expander, pmic_, power_save_timer_ (+1 more)
 
-### Community 238 - "DecoderSession"
-Cohesion: 0.13
-Nodes (9): DecoderSession, aac, converted, converter, decoded, decoder, input, mono (+1 more)
+### Community 238 - "SleepTimer"
+Cohesion: 0.16
+Nodes (10): SleepTimer, enabled_, in_light_sleep_mode_, on_enter_deep_sleep_mode_, on_enter_light_sleep_mode_, on_exit_light_sleep_mode_, seconds_to_deep_sleep_, seconds_to_light_sleep_ (+2 more)
 
 ### Community 239 - "zectrix-s3-epaper-4.2/custom_lcd_display.cc"
 Cohesion: 0.11
@@ -1668,16 +1676,16 @@ Cohesion: 0.11
 Nodes (9): CompactNt26Board, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, touch_button_, volume_down_button_ (+1 more)
 
 ### Community 245 - "CompactWifiBoard"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (9): CompactWifiBoard, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, touch_button_, volume_down_button_ (+1 more)
 
 ### Community 246 - "ESP32-S3-BOX-3"
 Cohesion: 0.09
 Nodes (21): 1. 为什么需要设备端 AEC？, 2. 表情动画风格无法显示？, 3. 如何恢复出厂设置？, Boot 按键功能, ESP32-S3-BOX-3, UI风格选择, 单击, 双击 (需启用设备端 AEC) (+13 more)
 
-### Community 247 - ".GetInt"
-Cohesion: 0.10
-Nodes (8): ChdEsp32s3BoxBoard, boot_button_, camera_, display_, i2c_bus_, power_manager_, power_save_timer_, touch_display_
+### Community 247 - "ChdEsp32s3BoxBoard"
+Cohesion: 0.06
+Nodes (13): ChdEsp32s3BoxBoard, boot_button_, camera_, display_, i2c_bus_, power_manager_, power_save_timer_, touch_display_ (+5 more)
 
 ### Community 248 - "Cst816s"
 Cohesion: 0.09
@@ -1724,7 +1732,7 @@ Cohesion: 0.10
 Nodes (12): GetBacklight(), InitializeDisplayI2c(), InitializeSpi(), InitializeSsd1306Display(), WkEsp32s3Dev, boot_button_, display_, display_i2c_bus_ (+4 more)
 
 ### Community 259 - "XminiC3Board"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (9): XminiC3Board, adc_battery_monitor_, boot_button_, codec_i2c_bus_, display_, panel_, panel_io_, power_save_timer_ (+1 more)
 
 ### Community 260 - "EspBoxBoardLite"
@@ -1736,8 +1744,8 @@ Cohesion: 0.05
 Nodes (21): ZHENGCHEN_1_54TFT_ML307, boot_button_, display_, panel_, panel_io_, power_manager_, power_save_timer_, volume_down_button_ (+13 more)
 
 ### Community 262 - "Custom Board Guide"
-Cohesion: 0.09
-Nodes (22): 1. Create the Board Directory, 2. Create the Configuration Files, 3. Implement the Board Class, 4. Hook Up the Build System, 5. Build and Flash, 6. Write the README, Add a branch in CMakeLists.txt, Add a Kconfig entry (+14 more)
+Cohesion: 0.07
+Nodes (27): 1. Create the Board Directory, 2. Create the Configuration Files, 3. Implement the Board Class, 4. Hook Up the Build System, 5. Build and Flash, 6. Write the README, Add a branch in CMakeLists.txt, Add a Kconfig entry (+19 more)
 
 ### Community 263 - "atk_dnesp32s3"
 Cohesion: 0.13
@@ -1748,12 +1756,12 @@ Cohesion: 0.12
 Nodes (8): atk_dnesp32s3_box, boot_button_, display_, es8311_detected_, i2c_bus_, xl9555_handle_, xl9555_in_, XL9555_IN
 
 ### Community 265 - "electron-bot/websocket_control_server.cc"
-Cohesion: 0.14
-Nodes (4): WebSocketControlServer, clients_, instance_, server_handle_
+Cohesion: 0.10
+Nodes (9): WebSocketControlServer, clients_, instance_, server_handle_, WsBroadcastJob, fd, len, payload (+1 more)
 
 ### Community 266 - "EspSpot"
 Cohesion: 0.11
-Nodes (12): EspSpot, adc1_cali_handle_, adc1_handle_, adc_calibration_lock_, boot_button_, i2c_bus_, key_button_, key_long_pressed_ (+4 more)
+Nodes (11): EspSpot, adc1_cali_handle_, adc1_handle_, adc_calibration_lock_, boot_button_, i2c_bus_, key_button_, key_long_pressed_ (+3 more)
 
 ### Community 267 - "uta_web_test.cjs"
 Cohesion: 0.05
@@ -1772,16 +1780,16 @@ Cohesion: 0.08
 Nodes (21): StackChan 使用说明, Py32IoExpander, DEFAULT_ADDR, i2c_device_, I2C_FREQ_HZ, I2C_INNER_RETRIES, I2C_RETRY_DELAY_MS, REG_GPIO_DRV_H (+13 more)
 
 ### Community 272 - "BinaryProtocol2"
-Cohesion: 0.11
-Nodes (20): 3.1 Version 1 (default), 3.2 Version 2, 3.3 Version 3, 3. Binary Protocol Versions, 3.1 版本1（默认）, 3.2 版本2, 3.3 版本3, 3. 二进制协议版本 (+12 more)
+Cohesion: 0.06
+Nodes (35): 10. Summary, 2. Common Request Headers, 3.1 Version 1 (default), 3.2 Version 2, 3.3 Version 3, 3. Binary Protocol Versions, 4.1 Device -> Server, 4.2 Server -> Device (+27 more)
 
-### Community 273 - "EspVideo"
+### Community 273 - "jpeg_to_image.c"
+Cohesion: 0.24
+Nodes (6): EspVideo::Capture(), decode_with_hardware_jpeg(), decode_with_new_jpeg(), fit_scale(), jpeg_to_image(), jpeg_to_image_fit()
+
+### Community 274 - "Motion"
 Cohesion: 0.08
-Nodes (20): EspVideo, encoder_thread_, EspVideo::Explain(), explain_token_, explain_url_, frame_, mmap_buffers_, sensor_format_ (+12 more)
-
-### Community 274 - "CobLights"
-Cohesion: 0.11
-Nodes (10): CobLights, kPeriod, kPixelCount, kTag, pwm_, strip_, PwmBank, comparators_ (+2 more)
+Nodes (24): PinIndex, kBacklight, kChassisRx, kChassisTx, kLcdClock, kLcdCs, kLcdDc, kLcdMosi (+16 more)
 
 ### Community 275 - "attributes"
 Cohesion: 0.10
@@ -1804,8 +1812,8 @@ Cohesion: 0.11
 Nodes (8): GenJuTech_s3_1_54TFT, boot_button_, codec_i2c_bus_, display_, power_manager_, power_save_timer_, volume_down_button_, volume_up_button_
 
 ### Community 280 - "image_to_jpeg.cpp"
-Cohesion: 0.18
-Nodes (12): convert_input_to_encoder_buf(), convert_input_to_hw_encoder_buf(), encode_with_esp_new_jpeg(), encode_with_hw_jpeg(), expand_5_to_8(), expand_6_to_8(), hw_jpeg_ensure_inited(), image_to_jpeg() (+4 more)
+Cohesion: 0.13
+Nodes (18): FrameBuffer, data, format, height, len, width, convert_input_to_encoder_buf(), convert_input_to_hw_encoder_buf() (+10 more)
 
 ### Community 281 - "XINGZHI_CUBE_1_54TFT_ML307"
 Cohesion: 0.11
@@ -1832,16 +1840,16 @@ Cohesion: 0.13
 Nodes (5): WaveshareEsp32p4, boot_button_, camera_, display_, i2c_bus_
 
 ### Community 287 - "esp_lcd_nv3030b.c"
-Cohesion: 0.18
-Nodes (13): esp_lcd_new_panel_nv3030b(), nv3030b_lcd_init_cmd_t, nv3030b_vendor_config_t, panel_nv3030b_del(), panel_nv3030b_disp_on_off(), panel_nv3030b_draw_bitmap(), panel_nv3030b_init(), panel_nv3030b_invert_color() (+5 more)
+Cohesion: 0.20
+Nodes (12): esp_lcd_new_panel_nv3030b(), nv3030b_lcd_init_cmd_t, nv3030b_vendor_config_t, panel_nv3030b_del(), panel_nv3030b_disp_on_off(), panel_nv3030b_draw_bitmap(), panel_nv3030b_init(), panel_nv3030b_invert_color() (+4 more)
 
 ### Community 288 - "esp_io_expander_new_i2c_tca9554"
-Cohesion: 0.32
+Cohesion: 0.26
 Nodes (8): del(), esp_io_expander_new_i2c_tca9554(), read_direction_reg(), read_input_reg(), read_output_reg(), reset(), write_direction_reg(), write_output_reg()
 
-### Community 289 - "string"
-Cohesion: 0.17
-Nodes (9): CJsonDeleter, CJsonStringDeleter, CJsonStringUniquePtr, CJsonUniquePtr, ImageContent, encoded_data_, mime_type_, has_default_value_ (+1 more)
+### Community 289 - "Stm32PyramidCtrl"
+Cohesion: 0.10
+Nodes (9): CustomBacklight, lp5562_, Lp5562, PyramidStatusLed, ctrl_, Si5351, kXtalFreq, Stm32PyramidCtrl (+1 more)
 
 ### Community 290 - "attributes"
 Cohesion: 0.11
@@ -1860,12 +1868,12 @@ Cohesion: 0.17
 Nodes (5): magiclick_c3, boot_button_, codec_i2c_bus_, display_, power_save_timer_
 
 ### Community 294 - "ESP_S3_LCD_EV_Board_2"
-Cohesion: 0.13
-Nodes (7): ESP_S3_LCD_EV_Board_2, boot_button_, camera_, display_, expander, i2c_bus_, InitializeCamera()
+Cohesion: 0.08
+Nodes (14): ESP_S3_LCD_EV_Board_2, boot_button_, camera_, display_, expander, i2c_bus_, InitializeCamera(), esp_lcd_new_panel_gc9503() (+6 more)
 
-### Community 295 - "EspBox3Board"
-Cohesion: 0.20
-Nodes (4): EspBox3Board, boot_button_, display_, i2c_bus_
+### Community 295 - "ESP32_CGC_144"
+Cohesion: 0.06
+Nodes (16): DuChatX, boot_button_, display_, panel_, power_manager_, power_save_timer_, GetBatteryLevel(), ESP32_CGC_144 (+8 more)
 
 ### Community 296 - "Hu087Board"
 Cohesion: 0.16
@@ -1880,8 +1888,8 @@ Cohesion: 0.11
 Nodes (16): st77922_rounder_cb(), I2C 设备地址, LCD Wiki ES3C35P, 产品规格, 关键配置说明, 外设, 完整引脚分配, 已知限制 (+8 more)
 
 ### Community 299 - "esp_lcd_nv3041a.c"
-Cohesion: 0.08
-Nodes (22): esp_lcd_new_panel_nv3041a(), nv3041a_tx_cmd(), panel_nv3041a_del(), panel_nv3041a_disp_on_off(), panel_nv3041a_draw_bitmap(), panel_nv3041a_init(), panel_nv3041a_invert_color(), panel_nv3041a_mirror() (+14 more)
+Cohesion: 0.16
+Nodes (4): JC4827W543Board, boot_button_, display_, touch_i2c_bus_
 
 ### Community 300 - "ActionType"
 Cohesion: 0.11
@@ -1892,8 +1900,8 @@ Cohesion: 0.16
 Nodes (6): MIXGO_NOVA, boot_button_, codec_i2c_bus_, display_, volume_down_button_, volume_up_button_
 
 ### Community 302 - "OttoController"
-Cohesion: 0.16
-Nodes (7): InitializeOttoController(), OttoController, action_queue_, action_task_handle_, has_hands_, is_action_in_progress_, otto_
+Cohesion: 0.10
+Nodes (14): InitializeOttoController(), OttoActionParams, action_type, amount, direction, servo_sequence_json, speed, steps (+6 more)
 
 ### Community 303 - "BoardPowerBsp"
 Cohesion: 0.15
@@ -1903,33 +1911,29 @@ Nodes (8): BoardPowerBsp, audioPowerPin_, BoardPowerBsp::BoardPowerBsp(), epdPow
 Cohesion: 0.22
 Nodes (7): align_x8(), clamp_rect(), on_refresh_idle_, Rect, rect_area(), rect_union(), sm_kick()
 
-### Community 305 - "Audio codecs"
-Cohesion: 0.18
-Nodes (7): Audio codecs, Common Board Components, Display drivers, MCP integration, Networking, Power management, DummyAudioCodec
-
 ### Community 306 - "lv_font_t"
 Cohesion: 0.18
 Nodes (3): LvglBuiltInFont, LvglCBinFont, LvglFont
 
-### Community 308 - "esp32-s3-lcd-ev-board-2/esp_lcd_gc9503.c"
-Cohesion: 0.21
-Nodes (7): esp_lcd_new_panel_gc9503(), panel_gc9503_del(), panel_gc9503_disp_on_off(), panel_gc9503_init(), panel_gc9503_mirror(), panel_gc9503_reset(), panel_gc9503_send_init_cmds()
+### Community 308 - "Otto"
+Cohesion: 0.15
+Nodes (9): Otto, final_time_, increment_, is_otto_resting_, partial_time_, servo_, servo_initial_, servo_pins_ (+1 more)
 
-### Community 309 - "WaveshareEsp32C6TouchLcd28"
+### Community 309 - "esp-hi/adc_pdm_audio_codec.cc"
 Cohesion: 0.11
-Nodes (8): ExpanderBacklight, expander_, WaveshareEsp32C6TouchLcd28, backlight_, boot_button_, display_, i2c_bus_, io_expander_
+Nodes (7): AdcPdmAudioCodec, AdcPdmAudioCodec::AdcPdmAudioCodec(), input_dev_, output_dev_, output_timer_, pa_ctrl_pin_, TIMER_TIMEOUT_US
 
 ### Community 310 - "Button"
-Cohesion: 0.07
-Nodes (15): Button, button_handle_, gpio_num_, on_click_, on_double_click_, on_long_press_, on_multiple_click_, on_press_down_ (+7 more)
+Cohesion: 0.11
+Nodes (12): Button, button_handle_, gpio_num_, on_click_, on_double_click_, on_long_press_, on_multiple_click_, on_press_down_ (+4 more)
 
 ### Community 311 - "Charge"
 Cohesion: 0.07
 Nodes (17): Charge, charging_, discharging_, kBatteryStatusDsg, kChargingCurrentMa, kRegAverageCurrent, kRegBatteryStatus, kRegCurrent (+9 more)
 
-### Community 313 - "ColorFormat"
-Cohesion: 0.17
-Nodes (3): bit_extend(), ColorFormat, unpack_colors()
+### Community 312 - "Esp32S31Korvo1"
+Cohesion: 0.12
+Nodes (8): ButtonMvMidpoint(), Esp32S31Korvo1, adc_button_, adc_handle_, boot_button_, camera_, codec_i2c_bus_, display_
 
 ### Community 314 - "MazaAiEsp32S3"
 Cohesion: 0.15
@@ -1947,20 +1951,24 @@ Nodes (9): M5StackCardputerBoard, battery_monitor_, boot_button_, display_, keyb
 Cohesion: 0.12
 Nodes (16): 16MB Flash Devices (`16m_c3.csv`) - ESP32-C3 Optimized, 16MB Flash Devices (`16m.csv`) - Standard, 32MB Flash Devices (`32m.csv`), 8MB Flash Devices (`8m.csv`), Assets Partition Features, Available Configurations, Benefits, Key Changes from v1 (+8 more)
 
-### Community 319 - "yuying-313lcd/esp_lcd_gc9503.c"
+### Community 318 - "circular_strip.cc"
+Cohesion: 0.15
+Nodes (6): EnterDeepSleep(), CircularStrip::CircularStrip(), StripColor, blue, green, red
+
+### Community 319 - "Yuying_313lcd"
 Cohesion: 0.10
 Nodes (11): esp_lcd_new_panel_gc9503(), panel_gc9503_del(), panel_gc9503_disp_on_off(), panel_gc9503_init(), panel_gc9503_mirror(), panel_gc9503_reset(), panel_gc9503_send_init_cmds(), Yuying_313lcd (+3 more)
 
 ### Community 320 - "AtomS3rCamM12EchoBaseBoard"
-Cohesion: 0.15
-Nodes (6): AtomS3rCamM12EchoBaseBoard, camera_, i2c_bus_, is_echo_base_connected_, pi4ioe_, Pi4ioe
+Cohesion: 0.20
+Nodes (5): AtomS3rCamM12EchoBaseBoard, camera_, i2c_bus_, is_echo_base_connected_, pi4ioe_
 
 ### Community 321 - "Xpowers"
 Cohesion: 0.14
 Nodes (3): Xpowers, pmu, s_instances_
 
 ### Community 322 - "hi8561_driver.cc"
-Cohesion: 0.31
+Cohesion: 0.39
 Nodes (9): hi8561_panel_t, panel_hi8561_del(), panel_hi8561_init(), panel_hi8561_invert_color(), panel_hi8561_mirror(), panel_hi8561_on_off(), panel_hi8561_reset(), panel_hi8561_send_init_cmds() (+1 more)
 
 ### Community 323 - "EspHi"
@@ -1972,11 +1980,11 @@ Cohesion: 0.22
 Nodes (11): esp_lcd_new_panel_gc9309na(), panel_gc9309na_del(), panel_gc9309na_disp_on_off(), panel_gc9309na_draw_bitmap(), panel_gc9309na_init(), panel_gc9309na_invert_color(), panel_gc9309na_mirror(), panel_gc9309na_reset() (+3 more)
 
 ### Community 326 - "EDARobotPro"
-Cohesion: 0.08
-Nodes (11): EspBox3Board, boot_button_, display_, i2c_bus_, EDARobotPro, boot_button_, display_, display_i2c_bus_ (+3 more)
+Cohesion: 0.14
+Nodes (7): EDARobotPro, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, touch_button_
 
 ### Community 330 - "Camera"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (3): Camera, GetCamera(), GetCamera()
 
 ### Community 331 - "spiffs_assets/build.py"
@@ -1984,8 +1992,8 @@ Cohesion: 0.12
 Nodes (14): copy_directory(), copy_file(), ensure_dir(), generate_config_json(), generate_index_json(), load_emoji_config(), main(), process_board_collection() (+6 more)
 
 ### Community 332 - "MCP IoT Control Usage"
-Cohesion: 0.18
-Nodes (11): 1. Get the tools list, 2. Move the chassis forward, 3. Switch the light mode, 4. Reboot the device (user-only), Example (ESP-Hi), Example - Registering a User-only Tool, Introduction, JSON-RPC Examples (+3 more)
+Cohesion: 0.14
+Nodes (14): 1. Get the tools list, 2. Move the chassis forward, 3. Switch the light mode, 4. Reboot the device (user-only), Built-in Tools, Default (AI-callable) tools - from `AddCommonTools`, Example (ESP-Hi), Example - Registering a User-only Tool (+6 more)
 
 ### Community 333 - "Cw2017BatteryMonitor"
 Cohesion: 0.16
@@ -1995,9 +2003,9 @@ Nodes (6): Cw2017BatteryMonitor, Cw2017BatteryMonitor::Cw2017BatteryMonitor(), d
 Cohesion: 0.05
 Nodes (29): H264AnnexB(), ConvertVideo(), DecodeAudio(), MovieInput, http_, open_, position_, range_end_ (+21 more)
 
-### Community 335 - "freertos"
-Cohesion: 0.03
-Nodes (10): gc9503_lcd_init_cmd_t, gc9503_vendor_config_t, gc9503_lcd_init_cmd_t, gc9503_vendor_config_t, gc9503_lcd_init_cmd_t, gc9503_vendor_config_t, st7121_lcd_init_cmd_t, st7121_vendor_config_t (+2 more)
+### Community 335 - "m5stack_tab5.cc"
+Cohesion: 0.06
+Nodes (8): gc9503_lcd_init_cmd_t, gc9503_vendor_config_t, gc9503_lcd_init_cmd_t, gc9503_vendor_config_t, gc9503_lcd_init_cmd_t, gc9503_vendor_config_t, st7121_lcd_init_cmd_t, st7121_vendor_config_t
 
 ### Community 336 - "atk_dnesp32s3m_wifi"
 Cohesion: 0.14
@@ -2007,12 +2015,16 @@ Nodes (7): atk_dnesp32s3m_wifi, boot_button_, display_, i2c_bus_, phone_button_,
 Cohesion: 0.08
 Nodes (11): ExpanderBacklight, expander_, WaveshareEsp32C5TouchLcd35, backlight_, boot_button_, camera_, display_, i2c_bus_ (+3 more)
 
-### Community 338 - "esp_lcd_st7123.c"
+### Community 338 - "esp_err_t"
 Cohesion: 0.23
-Nodes (8): esp_lcd_new_panel_st7123(), panel_st7123_del(), panel_st7123_disp_on_off(), panel_st7123_init(), panel_st7123_invert_color(), panel_st7123_mirror(), panel_st7123_reset(), panel_st7123_sleep()
+Nodes (8): esp_lcd_new_panel_st7121(), panel_st7121_del(), panel_st7121_disp_on_off(), panel_st7121_init(), panel_st7121_invert_color(), panel_st7121_mirror(), panel_st7121_reset(), panel_st7121_set_gap()
+
+### Community 339 - "algorithm"
+Cohesion: 0.10
+Nodes (10): CobLights, kPeriod, kPixelCount, kTag, pwm_, strip_, PwmBank, comparators_ (+2 more)
 
 ### Community 340 - "RangeSensors"
-Cohesion: 0.12
+Cohesion: 0.13
 Nodes (5): RangeSensors, kTag, tof_bus_, tof_mm_, ultrasonic_mm_
 
 ### Community 341 - "EdaSuperBearController"
@@ -2028,8 +2040,12 @@ Cohesion: 0.18
 Nodes (4): MovecallMojiESP32S3, boot_button_, codec_i2c_bus_, display_
 
 ### Community 345 - "esp_lcd_jd9853.c"
-Cohesion: 0.29
-Nodes (9): panel_jd9853_del(), panel_jd9853_disp_on_off(), panel_jd9853_draw_bitmap(), panel_jd9853_init(), panel_jd9853_invert_color(), panel_jd9853_mirror(), panel_jd9853_reset(), panel_jd9853_set_gap() (+1 more)
+Cohesion: 0.27
+Nodes (10): esp_lcd_new_panel_jd9853(), panel_jd9853_del(), panel_jd9853_disp_on_off(), panel_jd9853_draw_bitmap(), panel_jd9853_init(), panel_jd9853_invert_color(), panel_jd9853_mirror(), panel_jd9853_reset() (+2 more)
+
+### Community 346 - "WeatherIcon"
+Cohesion: 0.11
+Nodes (20): DescribeWeather(), ParseWeather(), WeatherCondition, description, icon, WeatherIcon, Cloud, Fog (+12 more)
 
 ### Community 347 - "An MCP-based Chatbot"
 Cohesion: 0.13
@@ -2043,13 +2059,17 @@ Nodes (15): 138のボードディレクトリと171のリリースバリアン�
 Cohesion: 0.13
 Nodes (15): An MCP-based Chatbot, Star History, 介绍, 关于项目, 固件烧录, 大模型配置, 已实现功能, 开发环境 (+7 more)
 
+### Community 350 - "PressToTalkMcpTool"
+Cohesion: 0.31
+Nodes (4): Input helpers, SystemReset, reset_factory_pin_, reset_nvs_pin_
+
 ### Community 351 - "LCD Wiki ES3C40P"
 Cohesion: 0.07
 Nodes (20): Qd40LcdBoard, boot_button_, display_, i2c_bus_, I2C 设备地址, LCD Wiki ES3C40P, 产品规格, 关键配置说明 (+12 more)
 
 ### Community 352 - ".SetInt"
-Cohesion: 0.06
-Nodes (15): Application::CheckAssetsVersion(), __himax_keepalive_check(), SscmaCamera::SscmaCamera(), YunliaoS3, boot_button_, codec_i2c_bus_, display_, power_manager_ (+7 more)
+Cohesion: 0.08
+Nodes (13): Application::CheckAssetsVersion(), YunliaoS3, boot_button_, codec_i2c_bus_, display_, power_manager_, power_save_timer_, Settings (+5 more)
 
 ### Community 353 - "MatrixKeyboard"
 Cohesion: 0.14
@@ -2064,48 +2084,48 @@ Cohesion: 0.14
 Nodes (13): AI 指令示例, AI 自编程动作, MCP 工具, WebSocket 调试, 单舵机调节, 头部动作, 手部动作, 校准 (+5 more)
 
 ### Community 356 - "MazaAiEsp32S31"
-Cohesion: 0.15
+Cohesion: 0.16
 Nodes (7): MazaAiEsp32S31, boot_button_, display_, i2c_bus_, touch_button_, volume_down_button_, volume_up_button_
 
-### Community 357 - "esp_lcd_st7121.c"
-Cohesion: 0.23
-Nodes (8): esp_lcd_new_panel_st7121(), panel_st7121_del(), panel_st7121_disp_on_off(), panel_st7121_init(), panel_st7121_invert_color(), panel_st7121_mirror(), panel_st7121_reset(), panel_st7121_set_gap()
+### Community 357 - "Esp32Camera"
+Cohesion: 0.13
+Nodes (9): Esp32Camera, current_fb_, encode_buf_, encode_buf_size_, encoder_thread_, explain_token_, explain_url_, streaming_on_ (+1 more)
 
 ### Community 358 - "EDARobotDogController"
 Cohesion: 0.21
 Nodes (5): EDARobotDogController, action_queue_, action_task_handle_, dog_, is_action_in_progress_
 
-### Community 359 - "esp_video.cc"
-Cohesion: 0.14
-Nodes (4): esp_video_deinit(), EspVideo::Capture(), EspVideo::EspVideo(), log_available_video_devices()
-
 ### Community 360 - "LCD Wiki ES3C28P / ES3N28P"
 Cohesion: 0.08
 Nodes (19): QuandongS3DevBoard, boot_button_, codec_i2c_bus_, display_, I2C 设备地址, LCD Wiki ES3C28P / ES3N28P, 产品规格, 关键配置说明 (+11 more)
 
-### Community 361 - "esp_hi.cc"
-Cohesion: 0.12
-Nodes (4): FlushCallback, FlushIoReadyCallback, wifi_event_handler(), MediaSnapshot
+### Community 361 - "CompactMl307Board"
+Cohesion: 0.11
+Nodes (9): CompactMl307Board, boot_button_, display_, display_i2c_bus_, panel_, panel_io_, touch_button_, volume_down_button_ (+1 more)
 
 ### Community 362 - "CustomBoard"
 Cohesion: 0.18
 Nodes (5): CustomBoard, boot_button_, display_, i2c_bus_, io_expander
 
+### Community 363 - "system_info.cc"
+Cohesion: 0.13
+Nodes (4): Application::HandleActivationDoneEvent(), Application::Initialize(), Ota::SetupHttp(), SystemInfo
+
 ### Community 364 - "FixedQueue"
-Cohesion: 0.19
+Cohesion: 0.21
 Nodes (3): FixedQueue, head_, storage_
 
-### Community 365 - "DuChatX"
-Cohesion: 0.10
-Nodes (6): DuChatX, boot_button_, display_, panel_, power_manager_, power_save_timer_
+### Community 365 - "Led"
+Cohesion: 0.12
+Nodes (5): Esp32S31FunctionCoreBoard1, boot_button_, codec_i2c_bus_, Led, NoLed
 
 ### Community 366 - "websocket_zh.md"
 Cohesion: 0.08
 Nodes (22): 1. 能力声明, 2. 服务器下发格式, 3. 服务器选择流程, 4. 设备缓存行为, 5. 兼容与版本管理, 6. 安全要求, 动态文字 Glyph Push 扩展, MCP (Model Context Protocol) 交互流程 (+14 more)
 
 ### Community 367 - "struct"
-Cohesion: 0.06
-Nodes (24): download_artifact(), get_artifacts(), get_default_releases_dir(), main(), parse_github_run_url(), rename_artifact(), encode_audio_to_opus(), decode_p3_to_audio() (+16 more)
+Cohesion: 0.12
+Nodes (9): main(), encode_audio_to_opus(), decode_p3_to_audio(), play_p3_file(), main(), play_p3_file(), pack_models(), read_data() (+1 more)
 
 ### Community 368 - "LvglStrategy"
 Cohesion: 0.15
@@ -2113,10 +2133,10 @@ Nodes (8): Asset, offset, size, LvglStrategy, assets_, checksum_valid_, mmap_han
 
 ### Community 369 - "WaveshareEsp32c6TouchAMOLED1inch8V2"
 Cohesion: 0.08
-Nodes (12): CustomBacklight, panel_io_, CustomLcdDisplay, Pmic, WaveshareEsp32c6TouchAMOLED1inch8V2, backlight_, boot_button_, codec_i2c_bus_ (+4 more)
+Nodes (11): CustomBacklight, panel_io_, Pmic, WaveshareEsp32c6TouchAMOLED1inch8V2, backlight_, boot_button_, codec_i2c_bus_, display_ (+3 more)
 
 ### Community 370 - "WakeWordAudioCache"
-Cohesion: 0.22
+Cohesion: 0.21
 Nodes (5): WakeWordAudioCache, buffer_, capacity_, mutex_, write_position_
 
 ### Community 371 - "ServoNeck"
@@ -2127,9 +2147,9 @@ Nodes (13): ScsBus, ServoNeck, BOOT_READPOS_MAX_ATTEMPTS, BOOT_READPOS_RETRY_MS,
 Cohesion: 0.14
 Nodes (7): MovecallMoji2ESP32C5, adc_battery_monitor_, boot_button_, codec_i2c_bus_, display_, power_save_timer_, press_to_talk_tool_
 
-### Community 373 - "Otto"
-Cohesion: 0.15
-Nodes (9): Otto, final_time_, increment_, is_otto_resting_, partial_time_, servo_, servo_initial_, servo_pins_ (+1 more)
+### Community 373 - "CustomLcdDisplay"
+Cohesion: 0.13
+Nodes (4): CustomLcdDisplay, click_handler_, setting_box_, volume_slider_
 
 ### Community 374 - "AiPassportBoard"
 Cohesion: 0.04
@@ -2139,12 +2159,8 @@ Nodes (26): AiPassportAudioCodec, AiPassportBoard, adc_button_, adc_handle_, AUD
 Cohesion: 0.10
 Nodes (14): PowerManager, adc_handle_, adc_values_, battery_level_, charging_pin_, is_charging_, is_low_battery_, kBatteryAdcDataCount (+6 more)
 
-### Community 376 - "AudioCodec 输入通道审计"
-Cohesion: 0.15
-Nodes (11): AudioCodec 输入通道审计, LILYGO T-CameraPlus-S3 V1.0/V1.1：明确的格式不一致, LILYGO T-Circle-S3 / T-Display-S3-Pro-MVSrLora：参考来源待硬件核实, 修改前审计：参考通道相关例外, 修改前审计：双麦配置, 修改前审计：范围与结论, 后续硬件验证, 定义了参考宏，但实际 codec 仍是 M (+3 more)
-
 ### Community 377 - "LvglImage"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (5): LvglAllocatedImage, valid_, LvglCBinImage, LvglImage, LvglRawImage
 
 ### Community 378 - "if"
@@ -2171,9 +2187,9 @@ Nodes (10): BlufiSecurity, aes_key, dec_operation, dh_param, dh_param_len, enc_o
 Cohesion: 0.14
 Nodes (13): PowerSaveTimer, cpu_max_freq_, enabled_, in_sleep_mode_, is_wake_word_running_, on_enter_sleep_mode_, on_exit_sleep_mode_, on_shutdown_request_ (+5 more)
 
-### Community 385 - "CustomLcdDisplay"
-Cohesion: 0.14
-Nodes (4): CustomLcdDisplay, click_handler_, setting_box_, volume_slider_
+### Community 385 - "esp_lcd_nv3041a.c"
+Cohesion: 0.25
+Nodes (11): esp_lcd_new_panel_nv3041a(), nv3041a_tx_cmd(), panel_nv3041a_del(), panel_nv3041a_disp_on_off(), panel_nv3041a_draw_bitmap(), panel_nv3041a_init(), panel_nv3041a_invert_color(), panel_nv3041a_mirror() (+3 more)
 
 ### Community 386 - "ActionType"
 Cohesion: 0.17
@@ -2204,24 +2220,24 @@ Cohesion: 0.15
 Nodes (11): BluFi Provisioning (with `esp-wifi-connect`), Notes, Prerequisites, Steps, Workflow, BluFi 配网（集成 esp-wifi-connect）, 使用步骤, 前置条件 (+3 more)
 
 ### Community 393 - "otto-robot/websocket_control_server.cc"
+Cohesion: 0.09
+Nodes (22): ClientInfo, client_id, WebSocketControlServer, WebSocketControlServer::AddClient(), WebSocketControlServer::BroadcastMessage(), clients_, WebSocketControlServer::GetClientCount(), WebSocketControlServer::GetClientId() (+14 more)
+
+### Community 395 - "MediaPlayer"
 Cohesion: 0.06
-Nodes (42): ClientInfo, client_id, WebSocketControlServer, WebSocketControlServer::AddClient(), WebSocketControlServer::BroadcastMessage(), clients_, WebSocketControlServer::GetClientCount(), WebSocketControlServer::GetClientId() (+34 more)
+Nodes (29): MediaPlayer, MediaPlayer::Cancelled(), duration_seconds_, MediaPlayer::GetSpectrum(), last_request_, mutex_, MediaPlayer::Pause(), paused_ (+21 more)
 
 ### Community 396 - "ZhengchenCamBoard_ML307"
 Cohesion: 0.09
 Nodes (11): InitializeMCPController(), ZhengchenCamBoard_ML307, boot_button_, camera_, display_, i2c_bus_, pca9557_, pca9557_handle_ (+3 more)
 
 ### Community 397 - "Configuration"
-Cohesion: 0.05
-Nodes (70): AllowedGpio(), kPinCount, PinSettings, pins, ValidatePins(), ActiveGpios(), CobPin, kCobBlue (+62 more)
+Cohesion: 0.07
+Nodes (49): AllowedGpio(), kPinCount, PinSettings, pins, ValidatePins(), ActiveGpios(), CobPin, kCobBlue (+41 more)
 
 ### Community 398 - "rm69a10_driver.cc"
-Cohesion: 0.37
+Cohesion: 0.33
 Nodes (10): panel_rm69a10_del(), panel_rm69a10_init(), panel_rm69a10_invert_color(), panel_rm69a10_mirror(), panel_rm69a10_on_off(), panel_rm69a10_reset(), panel_rm69a10_send_init_cmds(), panel_rm69a10_sleep() (+2 more)
-
-### Community 400 - "Stm32PyramidCtrl"
-Cohesion: 0.20
-Nodes (5): PyramidStatusLed, ctrl_, Si5351, kXtalFreq, Stm32PyramidCtrl
 
 ### Community 402 - "AGENTS.md"
 Cohesion: 0.18
@@ -2239,28 +2255,32 @@ Nodes (9): C++ 运行时与错误处理, IDE 集成, 主要格式规则, 代码�
 Cohesion: 0.18
 Nodes (10): ESP-VoCat 喵伴, Peripheral I2C error handling, UI风格选择, 可选风格, 基本配置, 微信消息风格 (Enable WeChat Message Style), 简介, 表情动画风格 (Emote animation style) - 推荐 (+2 more)
 
-### Community 407 - "uta_ui_assets.cc"
-Cohesion: 0.26
-Nodes (4): BootImage(), Image(), NeonImage(), UiIcon()
+### Community 407 - "esp32_s31_korvo_1.cc"
+Cohesion: 0.12
+Nodes (5): bsp_adc_button_t, korvo_adc_button_driver_t, korvo_adc_button_ladder_t, bsp_adc_button_t, bsp_adc_button_t
 
-### Community 408 - "Axp2101"
-Cohesion: 0.10
-Nodes (8): Axp2101, Axp2101::Axp2101(), Aw87559, Aw9523, CustomBacklight, pmic_, Pmic, Pmic
+### Community 408 - ".WriteReg"
+Cohesion: 0.16
+Nodes (6): Axp2101, Axp2101::Axp2101(), Aw87559, CustomBacklight, pmic_, Pmic
 
 ### Community 409 - "M5Stack Cardputer Adv"
 Cohesion: 0.20
 Nodes (9): M5Stack Cardputer Adv, 使用方法, 参考链接, 引脚定义, 显示屏 (ST7789V2), 烧录参数, 电池监测, 硬件规格 (+1 more)
+
+### Community 410 - "ColorFormat"
+Cohesion: 0.19
+Nodes (3): bit_extend(), ColorFormat, unpack_colors()
 
 ### Community 411 - "基本命令"
 Cohesion: 0.20
 Nodes (9): ESP32-S3 编译配置指南, Flash 配置:, 分区表配置：, 启用编译优化：, 基本命令, 开发板选择：, 打开配置界面：, 编译： (+1 more)
 
 ### Community 412 - "json"
-Cohesion: 0.06
-Nodes (18): generate_header(), get_sound_files(), load_base_language(), build_assets(), ensure_dir(), get_file_path(), main(), download_v8_script() (+10 more)
+Cohesion: 0.07
+Nodes (17): generate_header(), get_sound_files(), load_base_language(), build_assets(), ensure_dir(), get_file_path(), main(), download_v8_script() (+9 more)
 
 ### Community 413 - "MovecallCuicanESP32S3"
-Cohesion: 0.18
+Cohesion: 0.20
 Nodes (4): MovecallCuicanESP32S3, boot_button_, codec_i2c_bus_, display_
 
 ### Community 414 - "Cst816s"
@@ -2274,10 +2294,6 @@ Nodes (7): AudioServiceCallbacks, on_audio_testing_queue_full, on_playback_drain
 ### Community 416 - "Cst816s"
 Cohesion: 0.09
 Nodes (15): Cst816s, press_count_, read_buffer_, touch_isr_mux_, tp_, was_touched_, TouchEvent, TOUCH_HOLD (+7 more)
-
-### Community 418 - "jpeg_to_image.c"
-Cohesion: 0.36
-Nodes (5): decode_with_hardware_jpeg(), decode_with_new_jpeg(), fit_scale(), jpeg_to_image(), jpeg_to_image_fit()
 
 ### Community 419 - "Maza AI ESP32-S31"
 Cohesion: 0.22
@@ -2319,13 +2335,13 @@ Nodes (18): CXX, jobs, test, name, on, pull_request, push, workflow_dispatch (+1
 Cohesion: 0.29
 Nodes (7): LcdPin, kLcdClockPin, kLcdCommandPin, kLcdDataPin, kLcdLightPin, kLcdResetPin, kLcdSelectPin
 
-### Community 431 - "ChdEsp32s3EyeBoard"
-Cohesion: 0.14
-Nodes (5): ChdEsp32s3EyeBoard, boot_button_, camera_, display_, i2c_bus_
+### Community 431 - "EspBox3Board"
+Cohesion: 0.20
+Nodes (4): EspBox3Board, boot_button_, display_, i2c_bus_
 
 ### Community 432 - "NetworkEvent"
-Cohesion: 0.11
-Nodes (14): AudioCodec, Display, NetworkEvent, Connected, Connecting, Disconnected, ModemDetecting, ModemErrorInitFailed (+6 more)
+Cohesion: 0.17
+Nodes (12): NetworkEvent, Connected, Connecting, Disconnected, ModemDetecting, ModemErrorInitFailed, ModemErrorNoSim, ModemErrorRegDenied (+4 more)
 
 ### Community 433 - "ESP32-S31-Korvo-1"
 Cohesion: 0.25
@@ -2344,8 +2360,8 @@ Cohesion: 0.39
 Nodes (3): BuildTextNdefMessage(), BuildType2NdefTlv(), BuildUriNdefMessage()
 
 ### Community 437 - "esp_lcd_ili9486.c"
-Cohesion: 0.27
-Nodes (10): esp_lcd_new_panel_ili9486(), panel_ili9486_del(), panel_ili9486_disp_on_off(), panel_ili9486_draw_bitmap(), panel_ili9486_init(), panel_ili9486_invert_color(), panel_ili9486_mirror(), panel_ili9486_reset() (+2 more)
+Cohesion: 0.24
+Nodes (11): esp_lcd_new_panel_ili9486(), panel_ili9486_del(), panel_ili9486_disp_on_off(), panel_ili9486_draw_bitmap(), panel_ili9486_init(), panel_ili9486_invert_color(), panel_ili9486_mirror(), panel_ili9486_reset() (+3 more)
 
 ### Community 438 - "Unbind a Previously Owned Device"
 Cohesion: 0.29
@@ -2355,37 +2371,29 @@ Nodes (6): Account and Device Support, Find the Device ID, Find the MAC Address,
 Cohesion: 0.22
 Nodes (6): TextFontCapability, bpp, bundle, charset, glyph_push, size
 
-### Community 440 - "SleepTimer"
-Cohesion: 0.14
-Nodes (10): SleepTimer, enabled_, in_light_sleep_mode_, on_enter_deep_sleep_mode_, on_enter_light_sleep_mode_, on_exit_light_sleep_mode_, seconds_to_deep_sleep_, seconds_to_light_sleep_ (+2 more)
-
 ### Community 441 - "ElectronBotActionParams"
 Cohesion: 0.29
 Nodes (7): ElectronBotActionParams, action_type, amount, direction, servo_sequence_json, speed, steps
 
-### Community 443 - "WebActions"
-Cohesion: 0.10
-Nodes (21): Accepted(), JsonPtr, RegisterMediaTools(), Stations(), Status(), WebActions, brightness, cob (+13 more)
+### Community 443 - "matrix_keyboard.cc"
+Cohesion: 0.20
+Nodes (4): LogicalKeyMask(), key_callback_, key_event_callback_, MatrixKeyboard::MatrixKeyboard()
 
 ### Community 444 - "Property"
-Cohesion: 0.16
-Nodes (10): Property, max_length_, max_value_, min_value_, type_, value_, PropertyType, kPropertyTypeBoolean (+2 more)
+Cohesion: 0.08
+Nodes (21): CJsonDeleter, CJsonStringDeleter, CJsonStringUniquePtr, CJsonUniquePtr, ImageContent, encoded_data_, mime_type_, Property (+13 more)
 
 ### Community 445 - "CompactWifiBoardLCD"
 Cohesion: 0.19
 Nodes (5): CompactWifiBoardLCD, asr_button_, boot_button_, display_, touch_button_
 
 ### Community 446 - "EdaSuperBear"
-Cohesion: 0.27
+Cohesion: 0.28
 Nodes (3): EdaSuperBear, boot_button_, display_
 
 ### Community 447 - "NoDisplay"
 Cohesion: 0.08
 Nodes (20): Audio pin map, Build, Closest existing board, ESP32-S31-Function-CoreBoard-1, Supported on-board hardware, Build and flash, Choose the clock profile before building, Connections and controls (+12 more)
-
-### Community 448 - "Esp32Camera"
-Cohesion: 0.13
-Nodes (9): Esp32Camera, current_fb_, encode_buf_, encode_buf_size_, encoder_thread_, explain_token_, explain_url_, streaming_on_ (+1 more)
 
 ### Community 449 - "小智云聊 S3"
 Cohesion: 0.29
@@ -2407,9 +2415,9 @@ Nodes (5): Asynchronous Voice Notifications, Audio response, Device behavior, Me
 Cohesion: 0.33
 Nodes (5): blank_issues_enabled, contact_links, about, name, url
 
-### Community 454 - "websocket_protocol.cc"
+### Community 454 - "WebsocketProtocol"
 Cohesion: 0.11
-Nodes (5): on_network_error_, WebsocketProtocol, event_group_handle_, version_, websocket_
+Nodes (5): on_audio_channel_closed_, WebsocketProtocol, event_group_handle_, version_, websocket_
 
 ### Community 455 - "DebugStatistics"
 Cohesion: 0.33
@@ -2418,10 +2426,6 @@ Nodes (6): DebugStatistics, decode_count, encode_count, encode_drop_count, input
 ### Community 456 - "特性"
 Cohesion: 0.33
 Nodes (5): DFRobot ESP32-S3 AI智能摄像头模块, 介绍, 按键配置, 特性, 编译配置命令
-
-### Community 457 - "WebSocket Communication Protocol"
-Cohesion: 0.13
-Nodes (15): 10. Summary, 2. Common Request Headers, 4.1 Device -> Server, 4.2 Server -> Device, 4. JSON Message Structure, 5. Audio Codec, 6.1 Main states, 6.2 Typical transitions (+7 more)
 
 ### Community 458 - "ESP32-P4-Function-EV-Board / ESP32-P4X-Function-EV-Board"
 Cohesion: 0.33
@@ -2435,9 +2439,9 @@ Nodes (5): Build, Controls, FoloToy AI Passport (ai-passport), Hardware, Notes /
 Cohesion: 0.33
 Nodes (5): jiuchuan-xiaozhi-sound, 引脚, 🔌 烧录步骤, 🛠️ 编译指南, 编译步骤：
 
-### Community 461 - "DogActionParams"
-Cohesion: 0.33
-Nodes (6): DogActionParams, action_type, direction, height, speed, steps
+### Community 461 - "AudioCodec 输入通道审计"
+Cohesion: 0.15
+Nodes (11): AudioCodec 输入通道审计, LILYGO T-CameraPlus-S3 V1.0/V1.1：明确的格式不一致, LILYGO T-Circle-S3 / T-Display-S3-Pro-MVSrLora：参考来源待硬件核实, 修改前审计：参考通道相关例外, 修改前审计：双麦配置, 修改前审计：范围与结论, 后续硬件验证, 定义了参考宏，但实际 codec 仍是 M (+3 more)
 
 ### Community 462 - "EdaRobotActionParams"
 Cohesion: 0.33
@@ -2479,9 +2483,9 @@ Nodes (16): UI 风格选择, 低电自动关机, 使用板级构建脚本, 使�
 Cohesion: 0.33
 Nodes (5): BOOT 按键, PWR 按键, 产品链接, 按键操作, 编译配置命令
 
-### Community 472 - "matrix_keyboard.cc"
-Cohesion: 0.22
-Nodes (4): LogicalKeyMask(), key_callback_, key_event_callback_, MatrixKeyboard::MatrixKeyboard()
+### Community 472 - "uta_ui_assets.cc"
+Cohesion: 0.26
+Nodes (4): BootImage(), Image(), NeonImage(), UiIcon()
 
 ### Community 473 - "使用说明"
 Cohesion: 0.33
@@ -2508,7 +2512,7 @@ Cohesion: 0.33
 Nodes (5): ogg_covertor 小智AI OGG 音效批量转换器, 下载FFmpeg, 创建并激活虚拟环境, 安装依赖, 运行脚本
 
 ### Community 479 - "feetech_scs.cc"
-Cohesion: 0.25
+Cohesion: 0.24
 Nodes (4): calc_checksum(), FeetechScs, _ready, _uart
 
 ### Community 481 - "UTA-robot"
@@ -2544,8 +2548,8 @@ Cohesion: 0.40
 Nodes (4): Configuration, ESP32C6 Configuration, ESP32P4 Configuration, LILYGO T-Display-P4
 
 ### Community 490 - "UtaDisplay"
-Cohesion: 0.04
-Nodes (41): UtaDisplay, bar_heights_, bars_, boot_screen_, boot_until_, clock_label_, content_at_, date_label_ (+33 more)
+Cohesion: 0.03
+Nodes (59): ConversationCaption(), Hide(), SetTextIfChanged(), UtaDisplay::ReleaseEyesLocked(), UtaDisplay::SetEmotion(), UtaDisplay::SetupEyesLocked(), UtaDisplay::UpdateEyesLocked(), UtaDisplay::~UtaDisplay() (+51 more)
 
 ### Community 491 - "使用说明"
 Cohesion: 0.40
@@ -2635,6 +2639,10 @@ Nodes (3): Hardware, M5Stack CoreP4, 构建
 Cohesion: 0.50
 Nodes (3): 无名科技星智 1.54 METAL (wifi), 简介, 编译配置命令
 
+### Community 516 - "mpython_v3"
+Cohesion: 0.19
+Nodes (4): mpython_v3, boot_button_, display_, i2c_bus_
+
 ### Community 517 - "AtomEchoS3rBaseBoard"
 Cohesion: 0.27
 Nodes (3): AtomEchoS3rBaseBoard, boot_button_, i2c_bus_
@@ -2667,13 +2675,13 @@ Nodes (7): PwmBacklight, DmaPanel, buffer_, capacity_, target_, ClearDisplayToBl
 Cohesion: 0.22
 Nodes (4): KevinBoxBoard, boot_button_, codec_i2c_bus_, led_strip_
 
-### Community 552 - "MediaSnapshot"
-Cohesion: 0.18
-Nodes (11): MediaSnapshot, artist, duration_seconds, elapsed_seconds, paused, playing, preparing, replay_available (+3 more)
-
 ### Community 554 - "espressif/esp_extractor"
 Cohesion: 0.14
 Nodes (14): espressif/esp_extractor, espressif/esp_video, espressif/esp_video_codec, matches, rules, version, matches, rules (+6 more)
+
+### Community 556 - "EspBox3Board"
+Cohesion: 0.20
+Nodes (4): EspBox3Board, boot_button_, display_, i2c_bus_
 
 ### Community 558 - "CompactWifiBoardS3Cam"
 Cohesion: 0.17
@@ -2707,12 +2715,12 @@ Nodes (24): CustomBoard, display_, i2c_bus_, CustomMatrixDisplay, emoji_collecti
 Cohesion: 0.12
 Nodes (15): I2C 设备地址, LCD Wiki ES3C35P, 产品规格, 关键配置说明, 外设, 完整引脚分配, 已知限制, 文件结构 (+7 more)
 
-### Community 567 - "CustomBacklight"
-Cohesion: 0.36
-Nodes (3): CustomBacklight, mipi_dpi_panel_, tool_
+### Community 567 - "CompactWifiBoardLCD"
+Cohesion: 0.21
+Nodes (3): CompactWifiBoardLCD, boot_button_, display_
 
 ### Community 569 - "CardputerAudioCodec"
-Cohesion: 0.13
+Cohesion: 0.11
 Nodes (11): CardputerAudioCodec, chan_, last_write_us_, mic_clk_, mic_din_, mode_, mutex_, spk_bclk_ (+3 more)
 
 ### Community 570 - "espressif/esp_wifi_remote"
@@ -2743,41 +2751,37 @@ Nodes (3): waveshare/esp_lcd_hx8394, rules, version
 Cohesion: 0.67
 Nodes (3): waveshare/esp_lcd_st7703, rules, version
 
-### Community 578 - "SystemReset"
-Cohesion: 0.31
-Nodes (4): Input helpers, SystemReset, reset_factory_pin_, reset_nvs_pin_
-
 ### Community 592 - "release"
 Cohesion: 0.17
 Nodes (12): concurrency, cancel-in-progress, group, jobs, release, name, permissions, contents (+4 more)
 
 ### Community 601 - "esp32-c6-lcd-0.85/led_strip_control.cc"
-Cohesion: 0.43
+Cohesion: 0.40
 Nodes (4): LedStripControl, brightness_level_, led_strip_, LedStripControl::LedStripControl()
 
-### Community 605 - "DfrobotEsp32S3AiCam"
-Cohesion: 0.22
-Nodes (4): EspVideo::SetVFlip(), DfrobotEsp32S3AiCam, boot_button_, camera_
+### Community 605 - "context_t"
+Cohesion: 0.15
+Nodes (13): context_t, body_offset, body_size, bytes_needed, data_offset, header, packet_buf, packet_continued (+5 more)
 
 ### Community 608 - "HeadCommand"
 Cohesion: 0.22
 Nodes (9): HeadCommand, Dance, Down, Left, None, Right, Shake, Stop (+1 more)
 
-### Community 621 - "audio_debugger.h"
-Cohesion: 0.22
-Nodes (4): AudioDebugger, udp_server_addr_, udp_sockfd_, main()
+### Community 621 - "AudioDebugger"
+Cohesion: 0.40
+Nodes (3): AudioDebugger, udp_server_addr_, udp_sockfd_
 
-### Community 623 - "TextGlyphAllocator"
-Cohesion: 0.29
-Nodes (3): operator==(), TextGlyphAllocator, TextGlyphStorageUsesPsram()
+### Community 623 - "esp_err_t"
+Cohesion: 0.23
+Nodes (8): esp_lcd_new_panel_st7123(), panel_st7123_del(), panel_st7123_disp_on_off(), panel_st7123_init(), panel_st7123_invert_color(), panel_st7123_mirror(), panel_st7123_reset(), panel_st7123_sleep()
 
-### Community 624 - "uint32_t"
-Cohesion: 0.28
-Nodes (7): color_pre_multiply(), pack(), multiply(), RLEHeader, uint16_t(), uint24_t(), uint32_t()
+### Community 624 - "uta_media_mcp.cc"
+Cohesion: 0.33
+Nodes (7): Accepted(), JsonPtr, RegisterMediaTools(), Stations(), Status(), MediaPlayer::MediaPlayer(), ToolResult
 
-### Community 625 - "uta_emotions.h"
-Cohesion: 0.32
-Nodes (4): Application::SetDeviceState(), FindEyeEmotion(), IsEyeConversationState(), ResolveEyeEmotion()
+### Community 625 - "WebActions"
+Cohesion: 0.11
+Nodes (16): WebActions, brightness, cob, cob_available, cob_effect, extra_servo, restart, robot (+8 more)
 
 ### Community 629 - "esp_lcd_jd9853.h"
 Cohesion: 0.29
@@ -2791,16 +2795,12 @@ Nodes (10): container, name, needs, runs-on, strategy, image, build, include (+2
 Cohesion: 0.20
 Nodes (9): Boot 按键功能, chd-esp32s3-eye, 单击, 合并固件命令 idf.py merge-bin, 唤醒词配置, 基本配置, 按键说明, 简介 (+1 more)
 
-### Community 633 - "Pca9557"
-Cohesion: 0.32
-Nodes (3): CustomAudioCodec, pca9557_, Pca9557
-
 ### Community 634 - "LowBatteryShutdown"
 Cohesion: 0.20
 Nodes (7): LowBatteryShutdown, confirm_ms_, kMaxSampleGapMs, last_sample_ms_, low_since_ms_, max_percent_, max_voltage_mv_
 
 ### Community 636 - "c3/led_strip_control.cc"
-Cohesion: 0.43
+Cohesion: 0.40
 Nodes (4): LedStripControl, brightness_level_, led_strip_, LedStripControl::LedStripControl()
 
 ### Community 637 - "espressif/bmi270_sensor"
@@ -2811,33 +2811,33 @@ Nodes (3): espressif/bmi270_sensor, rules, version
 Cohesion: 0.67
 Nodes (3): espressif/esp_lcd_jd9365, rules, version
 
-### Community 639 - "WsBroadcastJob"
-Cohesion: 0.33
-Nodes (5): WsBroadcastJob, fd, len, payload, server
-
 ### Community 640 - "AudioCodec"
 Cohesion: 0.19
 Nodes (7): AudioCodec, last_rx_error_us_, rx_buffer_, tx_buffer_, ReportRx(), XiaoEsp32S3ReSpeakerXvf3800Board, boot_button_
 
-### Community 644 - "uta_media_player.cc"
-Cohesion: 0.05
-Nodes (51): FindRadioStation(), IsHttpUrl(), IsMp4Url(), RadioStation, id, name, url, ResolveRedirect() (+43 more)
+### Community 644 - "Command"
+Cohesion: 0.40
+Nodes (4): Command, action, command, text
 
 ### Community 645 - "3. MQTT 控制通道"
 Cohesion: 0.25
 Nodes (8): 3.1 连接建立, 3.2.1 设备端发送 Hello, 3.2.2 服务器响应 Hello, 3.2 Hello 消息交换, 3.3.1 设备端→服务器, 3.3.2 服务器→设备端, 3.3 JSON 消息类型, 3. MQTT 控制通道
 
-### Community 649 - "esp32-s3-lcd-0.85/led_strip_control.cc"
-Cohesion: 0.43
-Nodes (4): LedStripControl, brightness_level_, led_strip_, LedStripControl::LedStripControl()
+### Community 648 - "freertos"
+Cohesion: 0.02
+Nodes (23): AudioCodec, Display, Esp32Camera::Esp32Camera(), JpegChunk, data, len, esp_video_deinit(), EspVideo::EspVideo() (+15 more)
 
-### Community 651 - "KeyValue"
-Cohesion: 0.40
-Nodes (5): KeyValue, normal, normal_code, shifted, shifted_code
+### Community 649 - "uint32_t"
+Cohesion: 0.24
+Nodes (8): color_pre_multiply(), pack(), multiply(), RLEHeader, uint16_t(), uint24_t(), uint32_t(), uint8_t()
 
-### Community 652 - "Command"
-Cohesion: 0.40
-Nodes (4): Command, action, command, text
+### Community 651 - "Guition JC4827W543"
+Cohesion: 0.25
+Nodes (7): SilenceOnboardAmplifier(), Build, Guition JC4827W543, Hardware notes, Starting a conversation, Two speaker variants, What this board does not have
+
+### Community 652 - "DetectionState"
+Cohesion: 0.50
+Nodes (4): DetectionState, COOLDOWN, IDLE, VALIDATING
 
 ### Community 654 - "led_control.cc"
 Cohesion: 0.43
@@ -2859,9 +2859,9 @@ Nodes (9): with, compression-level, if-no-files-found, merge-multiple, name, ove
 Cohesion: 0.22
 Nodes (8): Build, Flash, Half-duplex audio, Hardware, Keys, M5Stack Cardputer, Pins, Using a self-hosted server
 
-### Community 660 - "OttoActionParams"
+### Community 660 - "TextGlyphAllocator"
 Cohesion: 0.29
-Nodes (7): OttoActionParams, action_type, amount, direction, servo_sequence_json, speed, steps
+Nodes (3): operator==(), TextGlyphAllocator, TextGlyphStorageUsesPsram()
 
 ### Community 661 - "publish"
 Cohesion: 0.25
@@ -2883,6 +2883,10 @@ Nodes (6): BOOT 按键, Waveshare ESP32-C5-Touch-LCD-3.5, 电池与省电, 硬�
 Cohesion: 0.67
 Nodes (3): espressif/esp32-camera, rules, version
 
+### Community 669 - "JpegData"
+Cohesion: 0.67
+Nodes (3): JpegData, buf, len
+
 ### Community 670 - "espressif/esp_lcd_st7796"
 Cohesion: 0.67
 Nodes (3): espressif/esp_lcd_st7796, rules, version
@@ -2896,32 +2900,36 @@ Cohesion: 0.67
 Nodes (3): pkolt/vl53l0x, rules, version
 
 ### Community 673 - "t-circle-s3-v11/esp_lcd_gc9d01n.c"
-Cohesion: 0.20
+Cohesion: 0.19
 Nodes (12): esp_lcd_new_panel_gc9d01n(), gc9d01n_lcd_init_cmd_t, gc9d01n_vendor_config_t, panel_gc9d01n_del(), panel_gc9d01n_disp_on_off(), panel_gc9d01n_draw_bitmap(), panel_gc9d01n_init(), panel_gc9d01n_invert_color() (+4 more)
 
 ### Community 674 - "RobotCommand"
 Cohesion: 0.50
 Nodes (4): RobotCommand, dance, duration_ms, text
 
-### Community 675 - "ReplyGesture"
-Cohesion: 0.32
-Nodes (5): ReplyGesture, Nod, None, Shake, ReplyGestureFor()
+### Community 676 - "eda_tv_pro"
+Cohesion: 0.21
+Nodes (3): eda_tv_pro, boot_button_, display_
 
 ### Community 677 - "espressif/touch_button_sensor"
 Cohesion: 0.67
 Nodes (3): espressif/touch_button_sensor, rules, version
 
-### Community 678 - "freertos"
-Cohesion: 0.03
-Nodes (14): PwmBacklight::PwmBacklight(), Esp32Camera::Esp32Camera(), JpegChunk, data, len, JpegChunk, data, len (+6 more)
+### Community 678 - "esp_timer"
+Cohesion: 0.09
+Nodes (3): EnableImuIntForWakeup(), Initialize(), set_value()
 
 ### Community 679 - "Axis"
 Cohesion: 0.25
 Nodes (8): Axis, current_deg, move_duration_ms, move_start_ms, moving, request_token, start_deg, target_deg
 
-### Community 680 - "PassportAdcButton"
-Cohesion: 0.47
-Nodes (3): AdcButton, PassportAdcButton, on_press_end_
+### Community 680 - "esp32-s3-lcd-0.85/led_strip_control.cc"
+Cohesion: 0.40
+Nodes (4): LedStripControl, brightness_level_, led_strip_, LedStripControl::LedStripControl()
+
+### Community 681 - "DogActionParams"
+Cohesion: 0.33
+Nodes (6): DogActionParams, action_type, direction, height, speed, steps
 
 ### Community 682 - "LcdInitCommand"
 Cohesion: 0.40
@@ -2935,9 +2943,13 @@ Nodes (6): mmap_assets_table, asset_height, asset_name, asset_offset, asset_size
 Cohesion: 0.67
 Nodes (3): waveshare/esp_lcd_st7735, rules, version
 
-### Community 688 - "I2cDevice"
-Cohesion: 0.06
-Nodes (21): I2cDevice, device_address_, i2c_bus_, i2c_device_, I2cDevice::I2cDevice(), Cst2xxse, read_buffer_, tp_ (+13 more)
+### Community 685 - "CobLight"
+Cohesion: 0.40
+Nodes (5): CobLight, kCobLightCount, kEdisonLight, kRgbLight, kStripLight
+
+### Community 686 - "HlsTsAudio"
+Cohesion: 0.11
+Nodes (13): HlsTsAudio, audio_pid_, header_, header_size_, header_used_, last_counter_, pes_remaining_, pmt_pid_ (+5 more)
 
 ### Community 689 - "KeyValue"
 Cohesion: 0.40
@@ -2955,9 +2967,9 @@ Nodes (3): Build, Hardware, LC-S3-WIFI-1.54TFT
 Cohesion: 0.50
 Nodes (4): Mode, kIdle, kMic, kSpeaker
 
-### Community 696 - "Es8311RegValue"
-Cohesion: 0.67
-Nodes (3): Es8311RegValue, reg, value
+### Community 694 - "PassportAdcButton"
+Cohesion: 0.47
+Nodes (3): AdcButton, PassportAdcButton, on_press_end_
 
 ### Community 698 - "txp666/otto-emoji-gif-component"
 Cohesion: 0.67
@@ -2979,41 +2991,65 @@ Nodes (3): espressif/esp_lcd_st7701, rules, version
 Cohesion: 0.67
 Nodes (3): wvirgil123/sscma_client, rules, version
 
-### Community 735 - "mcp_server.h"
-Cohesion: 0.08
-Nodes (10): SystemReset::SystemReset(), bsp_adc_button_t, korvo_adc_button_driver_t, korvo_adc_button_ladder_t, Crc16(), IsCameraModuleDescriptor(), ReadLe16(), co5300_rounder_event_cb() (+2 more)
+### Community 729 - "KeyValue"
+Cohesion: 0.40
+Nodes (5): KeyValue, normal, normal_code, shifted, shifted_code
+
+### Community 730 - "RangePin"
+Cohesion: 0.29
+Nodes (7): RangePin, kRangePinCount, kTofScl, kTofSda, kTofShutdown, kUltrasonicEcho, kUltrasonicTrig
+
+### Community 740 - "Opus_t"
+Cohesion: 0.40
+Nodes (5): Opus_t, head_seen, mono, sample_rate, tags_seen
 
 ### Community 741 - "EyeEmotion"
 Cohesion: 0.08
-Nodes (24): LoadEyeGif(), EyeEmotion, Angry, AngrySoft, Blink, Confused, Count, Curious (+16 more)
+Nodes (26): EyeEmotion, Angry, AngrySoft, Blink, Confused, Count, Curious, Distressed (+18 more)
+
+### Community 748 - "LcdDriver"
+Cohesion: 0.09
+Nodes (17): ExtendPortal(), PortalIndex(), SaveLocation(), __wrap_httpd_register_uri_handler(), LcdDriver, Gc9a01, Ili9341, Off (+9 more)
+
+### Community 752 - "ReplyGesture"
+Cohesion: 0.32
+Nodes (5): ReplyGesture, Nod, None, Shake, ReplyGestureFor()
 
 ### Community 757 - "esp_log"
 Cohesion: 0.08
-Nodes (7): bsp_adc_button_t, bsp_adc_button_t, bsp_adc_button_t, st7796_lcd_init_cmd_t, st7796_vendor_config_t, st7796_lcd_init_cmd_t, st7796_vendor_config_t
+Nodes (5): st7796_lcd_init_cmd_t, st7796_vendor_config_t, st7796_lcd_init_cmd_t, st7796_vendor_config_t, ReturnValue
 
-### Community 771 - "uta_media_player.cc"
-Cohesion: 0.04
-Nodes (44): AddMusicHeaders(), HlsReader, cancelled_, demux_, last_progress_, next_sequence_, packet_, packet_used_ (+36 more)
+### Community 771 - "MediaPlayer"
+Cohesion: 0.07
+Nodes (45): Application::Alert(), Application::PlaySound(), WifiConfigResult, Cancelled, Connected, None, FindRadioStation(), IsHttpUrl() (+37 more)
+
+### Community 776 - "cJSON"
+Cohesion: 0.19
+Nodes (10): JsonReply(), LocationConfig(), Integer(), JsonPtr, Reply(), Text(), WebServer, actions_ (+2 more)
+
+### Community 811 - "CustomBacklight"
+Cohesion: 0.43
+Nodes (3): CustomBacklight, mipi_dpi_panel_, tool_
 
 ## Knowledge Gaps
-- **3547 isolated node(s):** `text`, `duration_ms`, `dance`, `None`, `Left` (+3542 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 7257 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **238 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **3567 isolated node(s):** `text`, `duration_ms`, `dance`, `None`, `Left` (+3562 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 7287 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **237 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `WifiBoard` connect `WifiBoard` to `CustomBoard`, `LichuangC3DevBoard`, `UtaRobot`, `AtomEchoS3rBaseBoard`, `.WakeUp`, `AtomS3rEchoPyramidBoard`, `CustomEpdDisplay`, `CyberVocat`, `KevinBoxBoard`, `EspMosaicoBoard`, `LilygoTDisplayP4Board`, `M5StackCoreS3Board`, `M5StackTab5Board`, `.SetEnabled`, `WaveshareEsp32s3TouchAMOLED1inch8`, `atk_dnesp32s3_box2_wifi`, `CustomBoard`, `Spotpear_esp32_s3_lcd_1_54`, `CompactWifiBoardS3Cam`, `CyberVocat`, `atk_dnesp32s3_box0`, `atk_dnesp32s3_box3`, `LilygoTCameraPlusS3Board`, `rgb_matrix_display.cc`, `LilygoTCircleS3V11Board`, `AtomS3rEchoBaseBoard`, `WaveshareEsp32s3TouchLCD1inch83`, `M5StackCardputerAdvBoard`, `WaveshareEsp32c6TouchAMOLED1inch8`, `WaveshareEsp32s3TouchAMOLED1inch75`, `ElectronBot`, `EspSensairShuttle`, `OttoRobot`, `RndisBoard`, `LilygoTDisplays3ProMVSRLoraBoard`, `DfrobotEsp32S3AiCam`, `AtomS3EchoBaseBoard`, `CustomBoard`, `ESP32P4FunctionEvBoard`, `WaveshareEsp32TouchLCD3inch5`, `M5StackStopwatchBoard`, `Esp32S3Korvo2V3Board`, `Led`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED2inch16`, `XINGZHI_METAL_1_54_WIFI`, `Df_K10Board`, `EspVocat`, `WaveshareEsp32s3TouchAMOLED2inch06`, `XminiC3Board`, `AudioCodec`, `LilygoTCircleS3Board`, `TaijiPiS3Board`, `WaveshareEsp32c6TouchAMOLED2inch06`, `WaveshareEsp32c6TouchAMOLED2inch16`, `CustomBoard`, `WaveshareEsp32s3TouchLCD4b`, `WaveshareEsp32s3TouchLCD7c`, `Spotpear_ESP32_S3_1_28_BOX`, `magiclick_2p4`, `ZhengchenCamBoard`, `Ml307Board`, `WifiBoard::StartNetwork`, `FreenoveESP32S3Display`, `JiuchuanDevBoard`, `LCDWikiES3C35P_Board`, `M5StackCoreP4Board`, `CustomBoard`, `自定义开发板指南`, `WaveshareEsp32c5TouchLCD1inch69`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `AIPILite`, `EspVideo`, `SensecapWatcher`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED1inch8`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchLCD43c`, `esp32_s31_adc_calibration.c`, `XINGZHI_CUBE_0_85TFT_WIFI`, `XINGZHI_CUBE_0_96OLED_WIFI`, `WaveshareEsp32s3TouchLcd1_85B`, `SurferC3114TFT`, `CustomBoard`, `StackChanBoard`, `Blufi`, `Application`, `CustomBoard`, `WaveshareEsp32C5TouchLcd28`, `CompactWifiBoard`, `esp_log`, `LichuangDevBoard`, `ESP_S3_LCD_EV_Board`, `WkEsp32s3Dev`, `XminiC3Board`, `EspBoxBoardLite`, `.SetEnabled`, `Custom Board Guide`, `atk_dnesp32s3`, `atk_dnesp32s3_box`, `EspSpot`, `WaveshareEsp32c6TouchLCD1inch83`, `WaveshareEsp32p4`, `GenJuTech_s3_1_54TFT`, `CompactWifiBoard`, `M5StackStickS3Board`, `RymcuBigsmartBoard`, `WaveshareEsp32p4`, `magiclick_c3_v2`, `magiclick_c3`, `ESP_S3_LCD_EV_Board_2`, `EspBox3Board`, `Hu087Board`, `KEVIN_SP_V4Board`, `esp_lcd_nv3041a.c`, `MIXGO_NOVA`, `Audio codecs`, `WaveshareEsp32C6TouchLcd28`, `Button`, `MazaAiEsp32S3`, `M5StackCardputerBoard`, `yuying-313lcd/esp_lcd_gc9503.c`, `AtomS3rCamM12EchoBaseBoard`, `EspHi`, `EDARobotPro`, `atk_dnesp32s3m_wifi`, `WaveshareEsp32C5TouchLcd35`, `AtomMatrixEchoBaseBoard`, `MovecallMojiESP32S3`, `LCD Wiki ES3C40P`, `MazaAiEsp32S31`, `LCD Wiki ES3C28P / ES3N28P`, `CustomBoard`, `DuChatX`, `WaveshareEsp32c6TouchAMOLED1inch8V2`, `MovecallMoji2ESP32C5`, `AiPassportBoard`, `DoitS3AiBox`, `Qd35LcdBoard`, `lc_s3_wifi_1_54tft`, `KEVIN_SP_V3Board`, `MovecallCuicanESP32S3`, `ESP32_CGC`, `ChdEsp32s3EyeBoard`, `Board`, `CompactWifiBoardLCD`, `EdaSuperBear`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `WifiBoard` connect `WifiBoard` to `CustomBoard`, `LichuangC3DevBoard`, `mpython_v3`, `AtomEchoS3rBaseBoard`, `UtaRobot`, `.WakeUp`, `AtomS3rEchoPyramidBoard`, `CustomEpdDisplay`, `CyberVocat`, `KevinBoxBoard`, `EspMosaicoBoard`, `LilygoTDisplayP4Board`, `M5StackCoreS3Board`, `M5StackTab5Board`, `XINGZHI_CUBE_1_54TFT_WIFI`, `WaveshareEsp32s3TouchAMOLED1inch8`, `atk_dnesp32s3_box2_wifi`, `CustomBoard`, `Spotpear_esp32_s3_lcd_1_54`, `EspBox3Board`, `CompactWifiBoardS3Cam`, `CyberVocat`, `atk_dnesp32s3_box0`, `atk_dnesp32s3_box3`, `LilygoTCameraPlusS3Board`, `rgb_matrix_display.cc`, `CompactWifiBoardLCD`, `LilygoTCircleS3V11Board`, `AtomS3rEchoBaseBoard`, `WaveshareEsp32s3TouchLCD1inch83`, `M5StackCardputerAdvBoard`, `WaveshareEsp32c6TouchAMOLED1inch8`, `WaveshareEsp32s3TouchAMOLED1inch75`, `ElectronBot`, `EspSensairShuttle`, `OttoRobot`, `RndisBoard`, `LilygoTDisplays3ProMVSRLoraBoard`, `AtomS3EchoBaseBoard`, `CustomBoard`, `ESP32P4FunctionEvBoard`, `WaveshareEsp32TouchLCD3inch5`, `M5StackStopwatchBoard`, `Esp32S3Korvo2V3Board`, `labplus_ledong_v2`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED2inch16`, `XINGZHI_METAL_1_54_WIFI`, `Df_K10Board`, `EspVocat`, `WaveshareEsp32s3TouchAMOLED2inch06`, `XminiC3Board`, `AudioCodec`, `LilygoTCircleS3Board`, `TaijiPiS3Board`, `WaveshareEsp32c6TouchAMOLED2inch06`, `WaveshareEsp32c6TouchAMOLED2inch16`, `CustomBoard`, `WaveshareEsp32s3TouchLCD4b`, `WaveshareEsp32s3TouchLCD7c`, `Spotpear_ESP32_S3_1_28_BOX`, `magiclick_2p4`, `ZhengchenCamBoard`, `FreenoveESP32S3Display`, `eda_tv_pro`, `LCDWikiES3C35P_Board`, `M5StackCoreP4Board`, `CustomBoard`, `自定义开发板指南`, `WaveshareEsp32c5TouchLCD1inch69`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `AIPILite`, `EspVideo`, `SensecapWatcher`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED1inch8`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchLCD43c`, `XINGZHI_CUBE_0_85TFT_WIFI`, `XINGZHI_CUBE_0_96OLED_WIFI`, `WaveshareEsp32s3TouchLcd1_85B`, `SurferC3114TFT`, `CustomBoard`, `StackChanBoard`, `Application`, `JiuchuanDevBoard`, `CustomBoard`, `WaveshareEsp32C5TouchLcd28`, `CompactWifiBoard`, `esp_log`, `ChdEsp32s3BoxBoard`, `LichuangDevBoard`, `ESP_S3_LCD_EV_Board`, `WkEsp32s3Dev`, `XminiC3Board`, `EspBoxBoardLite`, `.SetEnabled`, `Custom Board Guide`, `atk_dnesp32s3`, `atk_dnesp32s3_box`, `EspSpot`, `WaveshareEsp32c6TouchLCD1inch83`, `WaveshareEsp32p4`, `GenJuTech_s3_1_54TFT`, `CompactWifiBoard`, `M5StackStickS3Board`, `RymcuBigsmartBoard`, `WaveshareEsp32p4`, `magiclick_c3_v2`, `magiclick_c3`, `ESP_S3_LCD_EV_Board_2`, `ESP32_CGC_144`, `Hu087Board`, `KEVIN_SP_V4Board`, `esp_lcd_nv3041a.c`, `MIXGO_NOVA`, `Esp32S31Korvo1`, `MazaAiEsp32S3`, `M5StackCardputerBoard`, `Yuying_313lcd`, `AtomS3rCamM12EchoBaseBoard`, `EspHi`, `EDARobotPro`, `atk_dnesp32s3m_wifi`, `WaveshareEsp32C5TouchLcd35`, `AtomMatrixEchoBaseBoard`, `MovecallMojiESP32S3`, `LCD Wiki ES3C40P`, `MazaAiEsp32S31`, `LCD Wiki ES3C28P / ES3N28P`, `CustomBoard`, `Led`, `WaveshareEsp32c6TouchAMOLED1inch8V2`, `MovecallMoji2ESP32C5`, `AiPassportBoard`, `DoitS3AiBox`, `Qd35LcdBoard`, `lc_s3_wifi_1_54tft`, `KEVIN_SP_V3Board`, `MovecallCuicanESP32S3`, `ESP32_CGC`, `EspBox3Board`, `Board`, `CompactWifiBoardLCD`, `EdaSuperBear`?**
+  _High betweenness centrality (0.081) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `WifiBoard` (e.g. with `3. Implement the Board Class` and `Board Class Hierarchy`) actually correct?**
   _`WifiBoard` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `text`, `duration_ms`, `dance` to the rest of the system?**
-  _3547 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _3567 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `CustomBoard` be split into smaller, more focused modules?**
   _Cohesion score 0.10666666666666667 - nodes in this community are weakly interconnected._
-- **Why does `LcdDisplay` connect `LcdDisplay` to `CustomBoard`, `LichuangC3DevBoard`, `LvglThemeManager`, `CustomLcdDisplay`, `SpiLcdDisplay`, `EpdDisplay`, `CustomEpdDisplay`, `Esp32S3Korvo2V3Board`, `LilygoTDisplayP4Board`, `M5StackCoreS3Board`, `M5StackTab5Board`, `.SetEnabled`, `atk_dnesp32s3_box2_wifi`, `CustomLcdDisplay`, `CustomLcdDisplay`, `LvglTheme`, `atk_dnesp32s3_box2_4g`, `CompactWifiBoardS3Cam`, `atk_dnesp32s3_box0`, `atk_dnesp32s3_box3`, `CustomLcdDisplay`, `LilygoTCameraPlusS3Board`, `CustomLcdDisplay`, `LvglDisplay`, `LilygoTCircleS3V11Board`, `M5StackCardputerAdvBoard`, `OttoRobot`, `LvglGif`, `WifiConfigUI`, `LilygoTDisplays3ProMVSRLoraBoard`, `.HandleLegacyKeyPress`, `CustomLcdDisplay`, `ESP32P4FunctionEvBoard`, `WaveshareEsp32TouchLCD3inch5`, `Esp32S3Korvo2V3Board`, `Led`, `Df_K10Board`, `LilygoTCircleS3Board`, `TaijiPiS3Board`, `WaveshareEsp32s3TouchLCD4b`, `WaveshareEsp32s3TouchLCD7c`, `atk_dnesp32s3m_4g`, `magiclick_2p5`, `ZhengchenCamBoard`, `FreenoveESP32S3Display`, `JiuchuanDevBoard`, `M5StackCoreP4Board`, `CustomBoard`, `WaveshareEsp32c5TouchLCD1inch69`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `AIPILite`, `AIVOX3`, `MINSI_K08_DUAL`, `SensecapWatcher`, `CustomBoard`, `WaveshareEsp32p4nano`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchLCD43c`, `esp32_s31_adc_calibration.c`, `ST77922_Display`, `SurferC3114TFT`, `CustomBoard`, `WaveshareEsp32C5TouchLcd28`, `esp_log`, `ESP_S3_LCD_EV_Board`, `EspBoxBoardLite`, `atk_dnesp32s3`, `atk_dnesp32s3_box`, `WaveshareEsp32p4`, `GenJuTech_s3_1_54TFT`, `M5StackStickS3Board`, `WaveshareEsp32p4`, `ESP_S3_LCD_EV_Board_2`, `KEVIN_SP_V4Board`, `esp_lcd_nv3041a.c`, `MIXGO_NOVA`, `WaveshareEsp32C6TouchLcd28`, `Button`, `M5StackCardputerBoard`, `yuying-313lcd/esp_lcd_gc9503.c`, `atk_dnesp32s3m_wifi`, `WaveshareEsp32C5TouchLcd35`, `LCD Wiki ES3C40P`, `LCD Wiki ES3C28P / ES3N28P`, `CustomBoard`, `DuChatX`, `AiPassportBoard`, `Qd35LcdBoard`, `KEVIN_SP_V3Board`, `ZhengchenCamBoard_ML307`, `ESP32_CGC`, `CompactWifiBoardLCD`, `CustomLcdDisplay`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
-- **Should `LvglThemeManager` be split into smaller, more focused modules?**
-  _Cohesion score 0.11904761904761904 - nodes in this community are weakly interconnected._
-- **Why does `Button` connect `Button` to `LichuangC3DevBoard`, `UtaRobot`, `AtomEchoS3rBaseBoard`, `AtomS3rEchoPyramidBoard`, `CustomEpdDisplay`, `CyberVocat`, `Esp32S3Korvo2V3Board`, `KevinBoxBoard`, `EspMosaicoBoard`, `LilygoTDisplayP4Board`, `M5StackTab5Board`, `.SetEnabled`, `WaveshareEsp32s3TouchAMOLED1inch8`, `CustomBoard`, `Spotpear_esp32_s3_lcd_1_54`, `CompactWifiBoardS3Cam`, `CyberVocat`, `atk_dnesp32s3_box0`, `LilygoTCameraPlusS3Board`, `XINGZHI_ABS_2_0`, `LilygoTCircleS3V11Board`, `AtomS3rEchoBaseBoard`, `WaveshareEsp32s3TouchLCD1inch83`, `M5StackCardputerAdvBoard`, `SystemReset`, `WaveshareEsp32c6TouchAMOLED1inch8`, `WaveshareEsp32s3TouchAMOLED1inch75`, `ElectronBot`, `EspSensairShuttle`, `OttoRobot`, `LilygoTDisplays3ProMVSRLoraBoard`, `DfrobotEsp32S3AiCam`, `AtomS3EchoBaseBoard`, `CustomBoard`, `ESP32P4FunctionEvBoard`, `WaveshareEsp32TouchLCD3inch5`, `M5StackStopwatchBoard`, `CompactMl307Board`, `WifiBoard`, `Esp32S3Korvo2V3Board`, `Led`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED2inch16`, `XINGZHI_METAL_1_54_WIFI`, `EspVocat`, `WaveshareEsp32s3TouchAMOLED2inch06`, `XminiC3Board`, `AudioCodec`, `LilygoTCircleS3Board`, `WaveshareEsp32c6TouchAMOLED2inch06`, `WaveshareEsp32c6TouchAMOLED2inch16`, `CustomBoard`, `WaveshareEsp32s3TouchLCD4b`, `XminiC3Board`, `Spotpear_ESP32_S3_1_28_BOX`, `atk_dnesp32s3m_4g`, `magiclick_2p4`, `magiclick_2p5`, `ZhengchenCamBoard`, `FreenoveESP32S3Display`, `JiuchuanDevBoard`, `LCDWikiES3C35P_Board`, `PassportAdcButton`, `M5StackCoreP4Board`, `WaveshareEsp32c5TouchLCD1inch69`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `AIPILite`, `EspVideo`, `AIVOX3`, `KevinBoxBoard`, `MINSI_K08_DUAL`, `CustomBoard`, `WaveshareEsp32p4nano`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED1inch8`, `CustomBoard`, `esp32_s31_adc_calibration.c`, `XINGZHI_CUBE_0_85TFT_ML307`, `XINGZHI_CUBE_0_85TFT_WIFI`, `XINGZHI_CUBE_0_96OLED_ML307`, `XINGZHI_CUBE_0_96OLED_WIFI`, `WaveshareEsp32s3TouchLcd1_85B`, `SurferC3114TFT`, `CustomBoard`, `Application`, `CustomBoard`, `WaveshareEsp32C5TouchLcd28`, `CompactNt26Board`, `CompactWifiBoard`, `esp_log`, `.GetInt`, `LichuangDevBoard`, `ESP_S3_LCD_EV_Board`, `WkEsp32s3Dev`, `XminiC3Board`, `EspBoxBoardLite`, `.SetEnabled`, `atk_dnesp32s3`, `atk_dnesp32s3_box`, `EspSpot`, `WaveshareEsp32c6TouchLCD1inch83`, `WaveshareEsp32p4`, `GenJuTech_s3_1_54TFT`, `XINGZHI_CUBE_1_54TFT_ML307`, `CompactWifiBoard`, `M5StackStickS3Board`, `RymcuBigsmartBoard`, `WaveshareEsp32p4`, `magiclick_c3_v2`, `magiclick_c3`, `ESP_S3_LCD_EV_Board_2`, `EspBox3Board`, `Hu087Board`, `KEVIN_SP_V4Board`, `esp_lcd_nv3041a.c`, `MIXGO_NOVA`, `WaveshareEsp32C6TouchLcd28`, `MazaAiEsp32S3`, `M5StackCardputerBoard`, `yuying-313lcd/esp_lcd_gc9503.c`, `EspHi`, `EDARobotPro`, `atk_dnesp32s3m_wifi`, `WaveshareEsp32C5TouchLcd35`, `AtomMatrixEchoBaseBoard`, `MovecallMojiESP32S3`, `LCD Wiki ES3C40P`, `.SetInt`, `MazaAiEsp32S31`, `LCD Wiki ES3C28P / ES3N28P`, `CustomBoard`, `DuChatX`, `WaveshareEsp32c6TouchAMOLED1inch8V2`, `MovecallMoji2ESP32C5`, `DoitS3AiBox`, `Qd35LcdBoard`, `lc_s3_wifi_1_54tft`, `KEVIN_SP_V3Board`, `ZhengchenCamBoard_ML307`, `MovecallCuicanESP32S3`, `ESP32_CGC`, `ChdEsp32s3EyeBoard`, `CompactWifiBoardLCD`, `EdaSuperBear`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Why does `Application` connect `Application` to `CustomBoard`, `UtaRobot`, `AtomEchoS3rBaseBoard`, `AudioService`, `.WakeUp`, `SpiLcdDisplay`, `CyberVocat`, `Esp32S3Korvo2V3Board`, `LilygoTDisplayP4Board`, `application.cc`, `M5StackCoreS3Board`, `WaveshareEsp32s3TouchAMOLED1inch8`, `atk_dnesp32s3_box2_wifi`, `Spotpear_esp32_s3_lcd_1_54`, `Protocol`, `atk_dnesp32s3_box2_4g`, `.RegisterMcpTools`, `CyberVocat`, `atk_dnesp32s3_box0`, `atk_dnesp32s3_box3`, `LilygoTCameraPlusS3Board`, `rgb_matrix_display.cc`, `LvglDisplay`, `LilygoTCircleS3V11Board`, `AtomS3rEchoBaseBoard`, `M5StackCardputerAdvBoard`, `GpioLed`, `EspSensairShuttle`, `MediaReadAhead`, `Assets`, `Nt26Board`, `LilygoTDisplays3ProMVSRLoraBoard`, `AtomS3EchoBaseBoard`, `DualNetworkBoard`, `WifiBoard`, `Esp32S3Korvo2V3Board`, `Df_K10Board`, `EspVocat`, `sscma_camera.cc`, `McpServer`, `.InitializePowerSaveTimer`, `LilygoTCircleS3Board`, `Cst816x`, `SingleLed`, `TaijiPiS3Board`, `freertos`, `Spotpear_ESP32_S3_1_28_BOX`, `atk_dnesp32s3m_4g`, `ZhengchenCamBoard`, `FreenoveESP32S3Display`, `.HandleLegacyKeyPress`, `.RegisterMcpTools`, `CustomBoard`, `Ota`, `CustomBoard`, `CustomBoard`, `.HandleKeyEvent`, `LocationService`, `NotifyPlayer`, `SleepTimer`, `DeviceStateMachine`, `esp_log`, `ChdEsp32s3BoxBoard`, `MediaPlayer`, `Stm32PyramidCtrl`, `Hu087Board`, `MIXGO_NOVA`, `Esp32S31Korvo1`, `M5StackCardputerBoard`, `circular_strip.cc`, `WaveshareEsp32C5TouchLcd35`, `.SetInt`, `MazaAiEsp32S31`, `system_info.cc`, `CustomLcdDisplay`, `AiPassportBoard`, `PowerSaveTimer`, `BluFi Provisioning (with `esp-wifi-connect`)`, `MediaPlayer`, `ZhengchenCamBoard_ML307`, `.InitializeNeckTools`, `WebsocketProtocol`?**
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Should `gpio` be split into smaller, more focused modules?**
+  _Cohesion score 0.01580188679245283 - nodes in this community are weakly interconnected._
+- **Why does `Button` connect `Button` to `LichuangC3DevBoard`, `mpython_v3`, `AtomEchoS3rBaseBoard`, `UtaRobot`, `AtomS3rEchoPyramidBoard`, `CustomEpdDisplay`, `CyberVocat`, `Esp32S3Korvo2V3Board`, `KevinBoxBoard`, `EspMosaicoBoard`, `LilygoTDisplayP4Board`, `M5StackTab5Board`, `XINGZHI_CUBE_1_54TFT_WIFI`, `WaveshareEsp32s3TouchAMOLED1inch8`, `CustomBoard`, `Spotpear_esp32_s3_lcd_1_54`, `EspBox3Board`, `CompactWifiBoardS3Cam`, `CyberVocat`, `atk_dnesp32s3_box0`, `LilygoTCameraPlusS3Board`, `XINGZHI_ABS_2_0`, `CompactWifiBoardLCD`, `LilygoTCircleS3V11Board`, `AtomS3rEchoBaseBoard`, `WaveshareEsp32s3TouchLCD1inch83`, `M5StackCardputerAdvBoard`, `WaveshareEsp32c6TouchAMOLED1inch8`, `WaveshareEsp32s3TouchAMOLED1inch75`, `ElectronBot`, `EspSensairShuttle`, `OttoRobot`, `LilygoTDisplays3ProMVSRLoraBoard`, `AtomS3EchoBaseBoard`, `CustomBoard`, `ESP32P4FunctionEvBoard`, `WaveshareEsp32TouchLCD3inch5`, `M5StackStopwatchBoard`, `DualNetworkBoard`, `Esp32S3Korvo2V3Board`, `labplus_ledong_v2`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED2inch16`, `XINGZHI_METAL_1_54_WIFI`, `EspVocat`, `WaveshareEsp32s3TouchAMOLED2inch06`, `XminiC3Board`, `AudioCodec`, `LilygoTCircleS3Board`, `WaveshareEsp32c6TouchAMOLED2inch06`, `WaveshareEsp32c6TouchAMOLED2inch16`, `CustomBoard`, `WaveshareEsp32s3TouchLCD4b`, `XminiC3Board`, `Spotpear_ESP32_S3_1_28_BOX`, `atk_dnesp32s3m_4g`, `magiclick_2p4`, `magiclick_2p5`, `ZhengchenCamBoard`, `FreenoveESP32S3Display`, `eda_tv_pro`, `LCDWikiES3C35P_Board`, `M5StackCoreP4Board`, `CustomBoard`, `PassportAdcButton`, `WaveshareEsp32c5TouchLCD1inch69`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `CustomBoard`, `AIPILite`, `EspVideo`, `KevinBoxBoard`, `MINSI_K08_DUAL`, `WaveshareEsp32p4nano`, `CustomBoard`, `CustomBoard`, `WaveshareEsp32s3TouchAMOLED1inch8`, `CustomBoard`, `XINGZHI_CUBE_0_85TFT_ML307`, `XINGZHI_CUBE_0_85TFT_WIFI`, `XINGZHI_CUBE_0_96OLED_ML307`, `XINGZHI_CUBE_0_96OLED_WIFI`, `WaveshareEsp32s3TouchLcd1_85B`, `SurferC3114TFT`, `CustomBoard`, `Application`, `JiuchuanDevBoard`, `CustomBoard`, `WaveshareEsp32C5TouchLcd28`, `CompactNt26Board`, `CompactWifiBoard`, `esp_log`, `ChdEsp32s3BoxBoard`, `LichuangDevBoard`, `ESP_S3_LCD_EV_Board`, `WkEsp32s3Dev`, `XminiC3Board`, `EspBoxBoardLite`, `.SetEnabled`, `atk_dnesp32s3`, `atk_dnesp32s3_box`, `EspSpot`, `WaveshareEsp32c6TouchLCD1inch83`, `WaveshareEsp32p4`, `GenJuTech_s3_1_54TFT`, `XINGZHI_CUBE_1_54TFT_ML307`, `CompactWifiBoard`, `M5StackStickS3Board`, `RymcuBigsmartBoard`, `WaveshareEsp32p4`, `magiclick_c3_v2`, `magiclick_c3`, `ESP_S3_LCD_EV_Board_2`, `ESP32_CGC_144`, `Hu087Board`, `KEVIN_SP_V4Board`, `esp_lcd_nv3041a.c`, `MIXGO_NOVA`, `Esp32S31Korvo1`, `MazaAiEsp32S3`, `M5StackCardputerBoard`, `Yuying_313lcd`, `EspHi`, `EDARobotPro`, `atk_dnesp32s3m_wifi`, `WaveshareEsp32C5TouchLcd35`, `AtomMatrixEchoBaseBoard`, `MovecallMojiESP32S3`, `PressToTalkMcpTool`, `LCD Wiki ES3C40P`, `.SetInt`, `MazaAiEsp32S31`, `LCD Wiki ES3C28P / ES3N28P`, `CompactMl307Board`, `CustomBoard`, `Led`, `WaveshareEsp32c6TouchAMOLED1inch8V2`, `MovecallMoji2ESP32C5`, `DoitS3AiBox`, `Qd35LcdBoard`, `lc_s3_wifi_1_54tft`, `KEVIN_SP_V3Board`, `ZhengchenCamBoard_ML307`, `MovecallCuicanESP32S3`, `ESP32_CGC`, `EspBox3Board`, `CompactWifiBoardLCD`, `EdaSuperBear`?**
+  _High betweenness centrality (0.054) - this node is a cross-community bridge._

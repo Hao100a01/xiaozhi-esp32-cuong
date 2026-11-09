@@ -23,6 +23,7 @@ public:
     bool SetRotation(int degrees);
     int Rotation() const { return rotation_.load(); }
     bool SetEmotion(const char* emotion) override;
+    void ShowVisualScene(const char* scene, const char* text, int duration_ms = 6000) override;
     void UpdateStandby(DeviceState state, bool media_active, bool wifi_connected);
 
     void UpdateVideo(const uint16_t* pixels, int width, int height) {
@@ -107,6 +108,15 @@ private:
     lv_obj_t* media_duration_ = nullptr;
     unsigned record_angle_ = 0;
     lv_obj_t* video_image_ = nullptr;
+    lv_obj_t* scene_screen_ = nullptr;
+    lv_obj_t* scene_icon_ = nullptr;
+    lv_obj_t* scene_title_ = nullptr;
+    lv_obj_t* scene_detail_ = nullptr;
+    lv_obj_t* scene_temperature_ = nullptr;
+    std::array<lv_obj_t*, 8> scene_particles_{};
+    int64_t scene_until_ = 0;
+    bool scene_rain_ = false;
+    uint8_t scene_phase_ = 0;
     uint16_t* video_pixels_ = nullptr;
     lv_image_dsc_t video_descriptor_{};
     std::array<lv_obj_t*, uta::kSpectrumBands> bars_{};
