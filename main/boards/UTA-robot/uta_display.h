@@ -3,9 +3,13 @@
 #include <esp_heap_caps.h>
 #include <src/misc/cache/instance/lv_image_cache.h>
 #include <cstring>
+#include "config.h"
 #include "device_state.h"
 #include "display/lcd_display.h"
 #include "uta_emotions.h"
+#if UTA_ENABLE_MIMO_EYES
+#include "uta_mimo_eyes.h"
+#endif
 #include "uta_spectrum.h"
 
 namespace uta {
@@ -23,6 +27,10 @@ public:
     bool SetRotation(int degrees);
     int Rotation() const { return rotation_.load(); }
     bool SetEmotion(const char* emotion) override;
+    bool SetMimoEyesEnabled(bool enabled);
+    bool MimoEyesEnabled() const;
+    bool MimoEyesAvailable() const;
+    bool PlayEyeTrick(std::size_t index, DeviceState state);
     void ShowVisualScene(const char* scene, const char* text, int duration_ms = 6000) override;
     void UpdateStandby(DeviceState state, bool media_active, bool wifi_connected);
 
@@ -73,13 +81,20 @@ private:
     void SetupEyesLocked();
     bool UpdateEyesLocked(DeviceState state, bool visible, int64_t now);
     void ReleaseEyesLocked();
+    void ReleaseMimoEyesLocked();
+    void UpdateEyeCaptionLocked(DeviceState state);
     lv_obj_t* eyes_screen_ = nullptr;
     lv_obj_t* eyes_image_ = nullptr;
     lv_obj_t* eyes_status_ = nullptr;
     lv_obj_t* eyes_subtitle_ = nullptr;
     std::unique_ptr<uint8_t, decltype(&heap_caps_free)> eyes_gif_data_{nullptr, heap_caps_free};
     std::unique_ptr<LvglGif> eyes_controller_;
+#if UTA_ENABLE_MIMO_EYES
+    std::unique_ptr<uta::MimoEyes> mimo_eyes_;
+    std::atomic<bool> mimo_available_{false};
+#endif
     std::atomic<uta::EyeEmotion> requested_eye_{uta::EyeEmotion::Neutral};
+    std::atomic<bool> use_mimo_eyes_{false};
     std::atomic<bool> use_base_emotion_{false};
     std::atomic<int64_t> expression_until_{0};
     uta::EyeEmotion loaded_eye_ = uta::EyeEmotion::Count;
@@ -114,8 +129,13 @@ private:
     lv_obj_t* scene_detail_ = nullptr;
     lv_obj_t* scene_temperature_ = nullptr;
     std::array<lv_obj_t*, 8> scene_particles_{};
+    std::array<lv_obj_t*, 4> scene_steps_{};
     int64_t scene_until_ = 0;
+    int64_t scene_started_at_ = 0;
     bool scene_rain_ = false;
+    bool scene_emotion_ = false;
+    bool scene_steps_mode_ = false;
+    uint8_t scene_step_count_ = 0;
     uint8_t scene_phase_ = 0;
     uint16_t* video_pixels_ = nullptr;
     lv_image_dsc_t video_descriptor_{};

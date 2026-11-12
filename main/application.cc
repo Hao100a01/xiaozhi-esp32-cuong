@@ -32,6 +32,11 @@ const char* InferVisualScene(const std::string& text) {
         return "weather/sunny";
     if (text.find("nhiều mây") != std::string::npos || text.find("mây") != std::string::npos)
         return "weather/cloudy";
+    if (text.find("phép tính") != std::string::npos || text.find("bước tính") != std::string::npos ||
+        text.find("=") != std::string::npos)
+        return "math";
+    if (text.find("bước 1") != std::string::npos || text.find("bước đầu") != std::string::npos)
+        return "storyboard";
     return nullptr;
 }
 }  // namespace
@@ -713,8 +718,11 @@ void Application::InitializeProtocol() {
             auto emotion = cJSON_GetObjectItem(root, "emotion");
             auto visual = cJSON_GetObjectItem(root, "visual");
             if (cJSON_IsString(emotion)) {
-                Schedule([display, emotion_str = std::string(emotion->valuestring)]() {
+                const std::string emotion_name(emotion->valuestring);
+                Schedule([display, emotion_str = emotion_name]() {
                     display->SetEmotion(emotion_str.c_str());
+                    const std::string scene = "emotion/" + emotion_str;
+                    display->ShowVisualScene(scene.c_str(), "", 5000);
                 });
             }
             if (cJSON_IsObject(visual)) {
@@ -723,8 +731,19 @@ void Application::InitializeProtocol() {
                 auto duration = cJSON_GetObjectItem(visual, "duration_ms");
                 if (cJSON_IsString(scene) && scene->valuestring[0] != '\0') {
                     const std::string scene_name(scene->valuestring);
-                    const std::string scene_text =
-                        cJSON_IsString(visual_text) ? visual_text->valuestring : "";
+                    std::string scene_text = cJSON_IsString(visual_text) ? visual_text->valuestring : "";
+                    auto steps = cJSON_GetObjectItem(visual, "steps");
+                    if (cJSON_IsArray(steps)) {
+                        scene_text.clear();
+                        cJSON* step = nullptr;
+                        cJSON_ArrayForEach(step, steps) {
+                            if (!cJSON_IsString(step) || !step->valuestring)
+                                continue;
+                            if (!scene_text.empty())
+                                scene_text.push_back('\n');
+                            scene_text += step->valuestring;
+                        }
+                    }
                     const int duration_ms = cJSON_IsNumber(duration) && duration->valueint > 0
                                                 ? duration->valueint
                                                 : 6000;

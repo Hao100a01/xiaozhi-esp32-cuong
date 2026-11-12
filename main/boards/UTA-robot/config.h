@@ -31,6 +31,9 @@
 #define DISPLAY_MIRROR_Y false
 #define DISPLAY_SWAP_XY false
 
+// ATFUTA Emotion Engine: compile Mimo eyes; GIF remains the runtime default.
+#define UTA_ENABLE_MIMO_EYES 1
+
 // Cảm ứng và bộ điều khiển robot là phụ kiện tùy chọn, mặc định tắt.
 #define TOUCH_CS_PIN GPIO_NUM_12
 #define TOUCH_INT_PIN GPIO_NUM_13

@@ -9,6 +9,7 @@
 #include <esp_timer.h>
 
 #include "uta_emotion_assets.h"
+#include "uta_eye_tricks.h"
 #include "uta_ui_assets.h"
 
 namespace {
@@ -41,6 +42,7 @@ const char* ConversationCaption(DeviceState state) {
 UtaDisplay::~UtaDisplay() {
     DisplayLockGuard lock(this);
     ReleaseEyesLocked();
+    ReleaseMimoEyesLocked();
 }
 
 bool UtaDisplay::SetEmotion(const char* emotion) {
@@ -63,6 +65,62 @@ bool UtaDisplay::SetEmotion(const char* emotion) {
     return accepted;
 }
 
+bool UtaDisplay::SetMimoEyesEnabled(bool enabled) {
+#if UTA_ENABLE_MIMO_EYES
+    use_mimo_eyes_.store(enabled);
+    return true;
+#else
+    return !enabled;
+#endif
+}
+
+bool UtaDisplay::MimoEyesEnabled() const {
+#if UTA_ENABLE_MIMO_EYES
+    return use_mimo_eyes_.load() && MimoEyesAvailable();
+#else
+    return false;
+#endif
+}
+
+bool UtaDisplay::MimoEyesAvailable() const {
+#if UTA_ENABLE_MIMO_EYES
+    return mimo_available_.load();
+#else
+    return false;
+#endif
+}
+
+bool UtaDisplay::PlayEyeTrick(std::size_t index, DeviceState state) {
+#if UTA_ENABLE_MIMO_EYES
+    if (index >= uta::kEyeTrickCount || !uta::CanPreviewEyeTrick(state) || !IsSetupUICalled() ||
+        !Lock(20))
+        return false;
+    const auto now = esp_timer_get_time();
+    const auto shown = [](lv_obj_t* object) {
+        return object && !lv_obj_has_flag(object, LV_OBJ_FLAG_HIDDEN);
+    };
+    bool accepted = false;
+    if (mimo_eyes_ && now >= boot_until_ && now >= scene_until_ &&
+        !use_base_emotion_.load() && !shown(notification_label_) &&
+        !shown(low_battery_popup_) && !shown(preview_image_)) {
+        mimo_eyes_->SetActivityState(state);
+        mimo_eyes_->SetEmotion(uta::EyeEmotion::Neutral);
+        mimo_eyes_->SetVisible(true);
+        accepted = mimo_eyes_->PlayTrick(index);
+        if (accepted) {
+            UpdateEyesLocked(state, true, now);
+            Hide(idle_screen_);
+        }
+    }
+    Unlock();
+    return accepted;
+#else
+    (void)index;
+    (void)state;
+    return false;
+#endif
+}
+
 void UtaDisplay::SetupEyesLocked() {
     eyes_screen_ = lv_obj_create(lv_display_get_layer_top(display_));
     lv_obj_remove_style_all(eyes_screen_);
@@ -72,8 +130,21 @@ void UtaDisplay::SetupEyesLocked() {
     lv_obj_remove_flag(eyes_screen_, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_bg_color(eyes_screen_, lv_color_black(), 0);
     lv_obj_set_style_bg_opa(eyes_screen_, LV_OPA_COVER, 0);
+#if UTA_ENABLE_MIMO_EYES
+    if (width_ == 240 && height_ == 240) {
+        mimo_eyes_.reset(new (std::nothrow) uta::MimoEyes(eyes_screen_));
+        if (mimo_eyes_ && !mimo_eyes_->IsAvailable())
+            mimo_eyes_.reset();
+        if (!mimo_eyes_)
+            ESP_LOGW("UTA_Emotion", "Không khởi tạo được Mimo Eyes; dùng GIF");
+    }
+    mimo_available_.store(mimo_eyes_ != nullptr);
+#endif
     eyes_image_ = lv_image_create(eyes_screen_);
     lv_obj_center(eyes_image_);
+#if UTA_ENABLE_MIMO_EYES
+    Hide(eyes_image_);
+#endif
     auto label = [this](int y, uint32_t color) {
         auto* object = lv_label_create(eyes_screen_);
         lv_obj_set_pos(object, 16, y);
@@ -104,16 +175,66 @@ void UtaDisplay::ReleaseEyesLocked() {
     loaded_eye_ = uta::EyeEmotion::Count;
 }
 
+void UtaDisplay::ReleaseMimoEyesLocked() {
+#if UTA_ENABLE_MIMO_EYES
+    mimo_available_.store(false);
+    mimo_eyes_.reset();
+#endif
+}
+
+void UtaDisplay::UpdateEyeCaptionLocked(DeviceState state) {
+    SetTextIfChanged(eyes_status_, ConversationCaption(state));
+    const char* text = chat_message_label_ ? lv_label_get_text(chat_message_label_) : "";
+    std::array<char, 193> subtitle{};
+    const size_t length = std::strlen(text);
+    size_t count = std::min(length, subtitle.size() - 4);
+    // Không cắt ở giữa một ký tự UTF-8; giới hạn bộ nhớ cho phụ đề dài từ mạng.
+    while (count && (static_cast<unsigned char>(text[count]) & 0xc0) == 0x80)
+        --count;
+    std::memcpy(subtitle.data(), text, count);
+    if (count < length)
+        std::memcpy(subtitle.data() + count, "...", 3);
+    SetTextIfChanged(eyes_subtitle_, subtitle.data());
+}
+
 bool UtaDisplay::UpdateEyesLocked(DeviceState state, bool visible, int64_t now) {
     if (!eyes_screen_)
         return false;
     if (!visible || use_base_emotion_.load()) {
         if (eyes_controller_ && eyes_controller_->IsPlaying())
             eyes_controller_->Pause();
+#if UTA_ENABLE_MIMO_EYES
+        if (mimo_eyes_)
+            mimo_eyes_->SetVisible(false);
+#endif
         Hide(eyes_screen_);
         return false;
     }
-    const auto emotion = uta::ResolveEyeEmotion(requested_eye_.load(), state);
+    auto requested = requested_eye_.load();
+    if (requested != uta::EyeEmotion::Neutral && now >= expression_until_.load()) {
+        requested_eye_.store(uta::EyeEmotion::Neutral);
+        requested = uta::EyeEmotion::Neutral;
+    }
+    const auto emotion = uta::ResolveEyeEmotion(requested, state);
+#if UTA_ENABLE_MIMO_EYES
+    const bool preview = uta::CanPreviewEyeTrick(state) && mimo_eyes_ &&
+                         mimo_eyes_->IsTrickPreviewPlaying();
+    if (mimo_eyes_ && (use_mimo_eyes_.load() || preview)) {
+        if (eyes_controller_ && eyes_controller_->IsPlaying())
+            eyes_controller_->Pause();
+        if (gif_controller_ && gif_controller_->IsPlaying())
+            gif_controller_->Pause();
+        Hide(eyes_image_);
+        mimo_eyes_->SetEmotion(preview ? uta::EyeEmotion::Neutral : emotion);
+        mimo_eyes_->SetActivityState(state);
+        mimo_eyes_->SetVisible(true);
+        UpdateEyeCaptionLocked(state);
+        lv_obj_remove_flag(eyes_screen_, LV_OBJ_FLAG_HIDDEN);
+        return true;
+    }
+    if (mimo_eyes_)
+        mimo_eyes_->SetVisible(false);
+#endif
     if (emotion == failed_eye_ && now < eye_retry_at_) {
         Hide(eyes_screen_);
         return false;
@@ -160,18 +281,8 @@ bool UtaDisplay::UpdateEyesLocked(DeviceState state, bool visible, int64_t now) 
     } else if (!eyes_controller_->IsPlaying()) {
         eyes_controller_->Resume();
     }
-    SetTextIfChanged(eyes_status_, ConversationCaption(state));
-    const char* text = chat_message_label_ ? lv_label_get_text(chat_message_label_) : "";
-    std::array<char, 193> subtitle{};
-    const size_t length = std::strlen(text);
-    size_t count = std::min(length, subtitle.size() - 4);
-    // Không cắt ở giữa một ký tự UTF-8; giới hạn bộ nhớ cho phụ đề dài từ mạng.
-    while (count && (static_cast<unsigned char>(text[count]) & 0xc0) == 0x80)
-        --count;
-    std::memcpy(subtitle.data(), text, count);
-    if (count < length)
-        std::memcpy(subtitle.data() + count, "...", 3);
-    SetTextIfChanged(eyes_subtitle_, subtitle.data());
+    lv_obj_remove_flag(eyes_image_, LV_OBJ_FLAG_HIDDEN);
+    UpdateEyeCaptionLocked(state);
     lv_obj_remove_flag(eyes_screen_, LV_OBJ_FLAG_HIDDEN);
     return true;
 }

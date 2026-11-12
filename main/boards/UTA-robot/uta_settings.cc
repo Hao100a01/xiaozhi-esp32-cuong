@@ -82,6 +82,8 @@ SettingsStore::SettingsStore() {
     config_.music_key = stored.GetString("khoa_nhac", config_.music_key);
     config_.radio_url = stored.GetString("url_radio", config_.radio_url);
     config_.radio_name = stored.GetString("ten_radio", config_.radio_name);
+    // Preserve the existing vector-mode preference when upgrading to Mimo.
+    config_.mimo_eyes_enabled = stored.GetInt("eyes_proc", 0) != 0;
     // Khóa mật khẩu web cũ được giữ nguyên trong bộ nhớ để tương thích bản cũ,
     // nhưng không còn được đọc hoặc dùng để xác thực.
 }
@@ -143,6 +145,7 @@ bool SettingsStore::Save(const Configuration& value) {
     integer("phien_ban_gpio", 2);
     integer("robot_uart", value.robot_enabled);
     integer("cam_ung", value.touch_enabled);
+    integer("eyes_proc", value.mimo_eyes_enabled);
     text("may_chu_nhac", value.music_server);
     text("khoa_nhac", value.music_key);
     text("url_radio", value.radio_url);
@@ -154,6 +157,19 @@ bool SettingsStore::Save(const Configuration& value) {
         return false;
     config_ = value;
     return true;
+}
+
+bool SettingsStore::SaveMimoEyesEnabled(bool enabled) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    nvs_handle_t handle = 0;
+    if (nvs_open("uta_robot", NVS_READWRITE, &handle) != ESP_OK)
+        return false;
+    const auto result = nvs_set_i32(handle, "eyes_proc", enabled) == ESP_OK &&
+                        nvs_commit(handle) == ESP_OK;
+    nvs_close(handle);
+    if (result)
+        config_.mimo_eyes_enabled = enabled;
+    return result;
 }
 
 }  // namespace uta

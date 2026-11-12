@@ -4,12 +4,16 @@
 #include <cstring>
 #include <memory>
 #include <mutex>
+#include <new>
+#include <string>
 #include <string_view>
 
 #include <esp_http_server.h>
 #include <esp_log.h>
+#include <nvs.h>
 #include "sdkconfig.h"
 
+#include "uta_helpers.h"
 #include "uta_location.h"
 #include "uta_location_json.h"
 #include "uta_portal_style.h"
@@ -25,6 +29,7 @@ using JsonPtr = std::unique_ptr<cJSON, decltype(&cJSON_Delete)>;
 httpd_handle_t candidate_server = nullptr;
 httpd_uri_t original_index{};
 std::mutex registration_mutex;
+constexpr size_t kMaxOtaUrl = 2048;
 
 esp_err_t JsonReply(httpd_req_t* request, const cJSON* root) {
     char* body = cJSON_PrintUnformatted(root);
@@ -35,6 +40,73 @@ esp_err_t JsonReply(httpd_req_t* request, const cJSON* root) {
     const auto error = httpd_resp_sendstr(request, body);
     cJSON_free(body);
     return error;
+}
+
+esp_err_t OtaConfig(httpd_req_t* request) {
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    if (request->method == HTTP_GET) {
+        auto url = std::unique_ptr<char[]>(new (std::nothrow) char[kMaxOtaUrl + 1]{});
+        if (!url)
+            return ESP_ERR_NO_MEM;
+        nvs_handle_t nvs;
+        auto error = nvs_open("wifi", NVS_READONLY, &nvs);
+        if (error == ESP_OK) {
+            size_t size = kMaxOtaUrl + 1;
+            error = nvs_get_str(nvs, "ota_url", url.get(), &size);
+            nvs_close(nvs);
+        }
+        if (error != ESP_OK && error != ESP_ERR_NVS_NOT_FOUND)
+            return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
+                                      "Failed to read OTA URL");
+        JsonPtr root(cJSON_CreateObject(), cJSON_Delete);
+        if (!root || !cJSON_AddStringToObject(root.get(), "ota_url", url.get()))
+            return ESP_ERR_NO_MEM;
+        return JsonReply(request, root.get());
+    }
+
+    std::array<char, 32> type{};
+    std::array<char, 8> marker{};
+    if (httpd_req_get_hdr_value_str(request, "Content-Type", type.data(), type.size()) != ESP_OK ||
+        std::strcmp(type.data(), "application/json") != 0 ||
+        httpd_req_get_hdr_value_str(request, "X-UTA-Yeu-Cau", marker.data(), marker.size()) !=
+            ESP_OK ||
+        std::strcmp(marker.data(), "1") != 0)
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Invalid request headers");
+    if (request->content_len == 0 || request->content_len > kMaxOtaUrl + 32)
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Invalid OTA URL length");
+    std::string body(request->content_len, '\0');
+    size_t received = 0;
+    while (received < body.size()) {
+        const auto count = httpd_req_recv(request, body.data() + received, body.size() - received);
+        if (count <= 0)
+            return httpd_resp_send_408(request);
+        received += count;
+    }
+    if (body.find('\0') != std::string::npos || body.find('\\') != std::string::npos ||
+        !uta::LocationJsonDepthSafe(body))
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+    JsonPtr root(cJSON_ParseWithLengthOpts(body.c_str(), body.size() + 1, nullptr, true),
+                 cJSON_Delete);
+    const auto* item = cJSON_GetObjectItemCaseSensitive(root.get(), "ota_url");
+    if (!cJSON_IsObject(root.get()) || cJSON_GetArraySize(root.get()) != 1 ||
+        !cJSON_IsString(item) || !item->valuestring)
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Invalid OTA URL field");
+    const std::string_view url(item->valuestring);
+    if (url.size() > kMaxOtaUrl || (!url.empty() && !uta::IsHttpUrl(url)))
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Invalid HTTP(S) OTA URL");
+
+    nvs_handle_t nvs;
+    auto error = nvs_open("wifi", NVS_READWRITE, &nvs);
+    if (error == ESP_OK) {
+        error = nvs_set_str(nvs, "ota_url", item->valuestring);
+        if (error == ESP_OK)
+            error = nvs_commit(nvs);
+        nvs_close(nvs);
+    }
+    if (error != ESP_OK)
+        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to save OTA URL");
+    httpd_resp_set_type(request, "application/json");
+    return httpd_resp_sendstr(request, "{\"success\":true}");
 }
 
 esp_err_t LocationConfig(httpd_req_t* request) {
@@ -150,6 +222,14 @@ esp_err_t ExtendPortal(httpd_handle_t server) {
     post.method = HTTP_POST;
     post.handler = SaveLocation;
     error = __real_httpd_register_uri_handler(server, &post);
+    auto ota = get;
+    ota.uri = "/uta/ota";
+    ota.handler = OtaConfig;
+    if (error == ESP_OK)
+        error = __real_httpd_register_uri_handler(server, &ota);
+    ota.method = HTTP_POST;
+    if (error == ESP_OK)
+        error = __real_httpd_register_uri_handler(server, &ota);
     if (error == ESP_OK) {
         error = httpd_unregister_uri_handler(server, "/", HTTP_GET);
         if (error == ESP_OK) {
@@ -163,6 +243,8 @@ esp_err_t ExtendPortal(httpd_handle_t server) {
     if (error != ESP_OK) {
         httpd_unregister_uri_handler(server, "/uta/location", HTTP_GET);
         httpd_unregister_uri_handler(server, "/uta/location", HTTP_POST);
+        httpd_unregister_uri_handler(server, "/uta/ota", HTTP_GET);
+        httpd_unregister_uri_handler(server, "/uta/ota", HTTP_POST);
     }
     return error;
 }

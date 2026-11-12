@@ -53,6 +53,7 @@ struct Configuration {
     std::string music_key = "your-esp32-secret-key-2024";
     std::string radio_url = kStations[0].url;
     std::string radio_name = kStations[0].name;
+    bool mimo_eyes_enabled = false;
 };
 
 inline bool IsOled(LcdDriver driver) {
@@ -246,6 +247,7 @@ public:
     SettingsStore();
     Configuration Get();
     bool Save(const Configuration& value);
+    bool SaveMimoEyesEnabled(bool enabled);
 
 private:
     std::mutex mutex_;

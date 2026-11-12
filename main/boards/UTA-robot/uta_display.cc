@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include <ctime>
+#include <string>
 
 #include <esp_timer.h>
 #include <nvs.h>
@@ -60,6 +61,22 @@ const char* SceneTitle(const char* scene) {
         return "THỜI TIẾT · NHIỀU MÂY";
     if (std::strcmp(scene, "weather/storm") == 0)
         return "THỜI TIẾT · DÔNG";
+    if (std::strcmp(scene, "emotion/happy") == 0 || std::strcmp(scene, "emotion/joy") == 0)
+        return "CẢM XÚC · VUI";
+    if (std::strcmp(scene, "emotion/sad") == 0)
+        return "CẢM XÚC · BUỒN";
+    if (std::strcmp(scene, "emotion/angry") == 0)
+        return "CẢM XÚC · TỨC GIẬN";
+    if (std::strcmp(scene, "emotion/surprised") == 0)
+        return "CẢM XÚC · BẤT NGỜ";
+    if (std::strcmp(scene, "emotion/thinking") == 0)
+        return "CẢM XÚC · SUY NGHĨ";
+    if (std::strncmp(scene, "emotion/", 8) == 0)
+        return "CẢM XÚC";
+    if (std::strncmp(scene, "math", 4) == 0)
+        return "GIẢI PHÉP TÍNH";
+    if (std::strncmp(scene, "storyboard", 10) == 0 || std::strncmp(scene, "drawing", 7) == 0)
+        return "VẼ THEO TỪNG BƯỚC";
     return "TRẠNG THÁI";
 }
 
@@ -112,6 +129,10 @@ void UtaDisplay::ShowVisualScene(const char* scene, const char* text, int durati
     if (!scene || !text || !IsSetupUICalled() || !Lock(20))
         return;
     const bool weather = std::strncmp(scene, "weather", 7) == 0;
+    const bool emotion = std::strncmp(scene, "emotion/", 8) == 0;
+    const bool steps = std::strncmp(scene, "math", 4) == 0 ||
+                       std::strncmp(scene, "storyboard", 10) == 0 ||
+                       std::strncmp(scene, "drawing", 7) == 0;
     const auto snapshot = weather ? uta::WeatherService::GetInstance().Get() : uta::WeatherSnapshot{};
     if (!scene_screen_) {
         scene_screen_ = MediaShape(lv_display_get_layer_top(display_), 8, 36, 224, 164, 16, 0x10171b);
@@ -127,7 +148,12 @@ void UtaDisplay::ShowVisualScene(const char* scene, const char* text, int durati
             scene_particles_[i] = MediaShape(scene_screen_, 24 + static_cast<int>(i) * 25, 116,
                                              2, 12, 1, 0x6ee8ef);
         }
+        for (size_t i = 0; i < scene_steps_.size(); ++i)
+            scene_steps_[i] = Label(scene_screen_, "", 18, 78 + static_cast<int>(i) * 24, 204,
+                                     0xc8d7e3);
     }
+    scene_emotion_ = emotion;
+    scene_steps_mode_ = steps;
     scene_rain_ = std::strcmp(scene, "weather/rain") == 0 ||
                   (weather && snapshot.available && uta::DescribeWeather(snapshot.reading.code,
                                                                             snapshot.reading.day)
@@ -136,6 +162,9 @@ void UtaDisplay::ShowVisualScene(const char* scene, const char* text, int durati
                           ? uta::DescribeWeather(snapshot.reading.code, snapshot.reading.day).icon
                           : uta::WeatherIcon::Unknown;
     lv_image_set_src(scene_icon_, uta::UiIcon(static_cast<unsigned>(icon)));
+    Visible(scene_icon_, !emotion && !steps);
+    lv_obj_set_style_bg_opa(scene_screen_, emotion ? LV_OPA_TRANSP : LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(scene_screen_, emotion ? 0 : 1, 0);
     SetMediaText(scene_title_, SceneTitle(scene));
     char detail[192];
     if (weather && snapshot.location.available && snapshot.location.name.size() > 0) {
@@ -143,6 +172,7 @@ void UtaDisplay::ShowVisualScene(const char* scene, const char* text, int durati
     } else {
         std::snprintf(detail, sizeof(detail), "%s", text);
     }
+    Visible(scene_detail_, !steps);
     SetMediaText(scene_detail_, detail);
     char temperature[24];
     if (weather && snapshot.available) {
@@ -152,9 +182,35 @@ void UtaDisplay::ShowVisualScene(const char* scene, const char* text, int durati
         temperature[0] = '\0';
     }
     SetMediaText(scene_temperature_, temperature);
-    for (auto* particle : scene_particles_)
-        Visible(particle, scene_rain_);
+    Visible(scene_temperature_, weather);
+    std::array<std::string, 4> step_text{};
+    size_t start = 0;
+    for (size_t i = 0; i < step_text.size() && start <= std::strlen(text); ++i) {
+        const char* end = std::strchr(text + start, '\n');
+        const size_t length = end ? static_cast<size_t>(end - (text + start)) : std::strlen(text) - start;
+        step_text[i].assign(text + start, length);
+        if (!end) {
+            scene_step_count_ = static_cast<uint8_t>(i + 1);
+            start = std::strlen(text) + 1;
+            break;
+        }
+        start += length + 1;
+        scene_step_count_ = static_cast<uint8_t>(i + 1);
+    }
+    for (size_t i = 0; i < scene_steps_.size(); ++i) {
+        SetMediaText(scene_steps_[i], step_text[i].c_str());
+        Visible(scene_steps_[i], steps && i < scene_step_count_);
+    }
+    const uint32_t accent = std::strcmp(scene, "emotion/angry") == 0 ? 0xff5d73
+                            : std::strcmp(scene, "emotion/sad") == 0 ? 0x6ea8ff
+                            : std::strcmp(scene, "emotion/thinking") == 0 ? 0xc084fc
+                            : 0xf46bb2;
+    for (auto* particle : scene_particles_) {
+        lv_obj_set_style_bg_color(particle, lv_color_hex(accent), 0);
+        Visible(particle, scene_rain_ || emotion);
+    }
     scene_phase_ = 0;
+    scene_started_at_ = esp_timer_get_time();
     scene_until_ = esp_timer_get_time() + static_cast<int64_t>(std::max(duration_ms, 1000)) * 1000;
     lv_obj_remove_flag(scene_screen_, LV_OBJ_FLAG_HIDDEN);
     Unlock();
@@ -360,9 +416,16 @@ void UtaDisplay::UpdateStandby(DeviceState state, bool media_active, bool wifi_c
     const bool has_message = chat_message_label_ && lv_label_get_text(chat_message_label_)[0];
     const bool overlay_allowed = !boot && !IsVisible(notification_label_) &&
                                  !IsVisible(low_battery_popup_) && !IsVisible(preview_image_);
-    const bool eye_context =
-        uta::IsEyeConversationState(state) || (idle && now < expression_until_.load());
-    const bool eyes_visible = UpdateEyesLocked(state, eye_context && overlay_allowed, now);
+    bool mimo_active = MimoEyesEnabled();
+#if UTA_ENABLE_MIMO_EYES
+    mimo_active |= mimo_eyes_ && mimo_eyes_->IsTrickPreviewPlaying();
+#endif
+    const bool eye_context = uta::IsEyeConversationState(state) ||
+                             (idle && (mimo_active || now < expression_until_.load()));
+    const bool scene_active = scene_screen_ && now < scene_until_ && !scene_emotion_;
+    const bool mimo_blocked = mimo_active && (media_active || scene_active);
+    const bool eyes_visible = UpdateEyesLocked(state, eye_context && overlay_allowed && !mimo_blocked,
+                                               now);
     const bool show = idle && overlay_allowed && !has_message && !eyes_visible;
     Visible(idle_screen_, show);
     if (scene_screen_) {
@@ -373,6 +436,27 @@ void UtaDisplay::UpdateStandby(DeviceState state, bool media_active, bool wifi_c
             for (size_t i = 0; i < scene_particles_.size(); ++i) {
                 const int y = 108 + ((scene_phase_ + static_cast<uint8_t>(i * 3)) % 18);
                 lv_obj_set_y(scene_particles_[i], y);
+            }
+        }
+        if (scene_visible && scene_emotion_) {
+            scene_phase_ = static_cast<uint8_t>((scene_phase_ + 1) % 40);
+            for (size_t i = 0; i < scene_particles_.size(); ++i) {
+                const int x = 22 + static_cast<int>(i) * 26 +
+                              ((scene_phase_ + i * 5) % 9) - 4;
+                const int y = 96 + static_cast<int>((scene_phase_ * (i + 2)) % 42);
+                lv_obj_set_pos(scene_particles_[i], x, y);
+                lv_obj_set_height(scene_particles_[i], 4 + static_cast<int>((i + scene_phase_) % 9));
+            }
+        }
+        if (scene_visible && scene_steps_mode_) {
+            const uint8_t revealed = static_cast<uint8_t>(
+                std::min<int>(scene_step_count_, (now - scene_started_at_) / 650000 + 1));
+            for (size_t i = 0; i < scene_steps_.size(); ++i) {
+                Visible(scene_steps_[i], i < revealed && i < scene_step_count_);
+                if (i < revealed && i < scene_step_count_)
+                    lv_obj_set_style_text_color(scene_steps_[i],
+                                                lv_color_hex(i + 1 == revealed ? 0x6ee8ef : 0xc8d7e3),
+                                                0);
             }
         }
     }

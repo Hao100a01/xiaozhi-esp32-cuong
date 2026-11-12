@@ -113,7 +113,15 @@ fieldset{margin:0;padding:0;border:0;min-width:0}.section-label{color:var(--mu);
 
 <section class="pn"><h2>Phát video MP4</h2><label for="urlvideo">Địa chỉ tệp MP4 trực tiếp</label><input id="urlvideo" type="url" maxlength="2048" placeholder="https://may-chu/video.mp4"><p class="hint">Phát hình và tiếng trên thiết bị. Dùng H.264 Baseline hoặc MJPEG, tối đa 240×240, 15 hình/giây; âm thanh AAC-LC hoặc MP3. Máy chủ cần hỗ trợ tải từng phần. Không dùng liên kết trang xem video.</p><button id="phatvideo">Phát video trên thiết bị</button><p class="hint">Dùng các nút tạm dừng, tiếp tục và dừng ở phần nhạc. Phổ nhạc hiển thị trên màn hình khi nghe nhạc hoặc radio.</p></section>
 <section class="pn"><h2>Đài phát thanh Internet</h2><p class="hint">Các đài cần kết nối mạng. Đây không phải bộ thu sóng FM bằng anten.</p><label for="dai">Chọn đài</label><select id="dai"></select><button id="phatdai">Phát đài đã chọn</button><button id="phattuychinh">Phát đài tùy chỉnh đã lưu</button></section>
-<section class="pn"><h2>Thiết bị</h2><button id="cauhinhwifi">Cấu hình lại Wi-Fi</button><p class="hint">Mở trực tiếp trang cấu hình, không cần đăng nhập. Nhấn BOOT ba lần để hiện lại địa chỉ trên màn hình.</p></section>
+<section class="pn"><h2>Biểu cảm mắt</h2><label for="renderermat">Renderer</label><select id="renderermat"><option value="gif">GIF Eyes</option><option value="mimo">Mimo Eyes</option></select><button id="apdungrenderer">Áp dụng</button><p class="hint" id="rendererhint"></p></section><section class="pn"><h2>Thiết bị</h2><button id="cauhinhwifi">Cấu hình lại Wi-Fi</button><p class="hint">Mở trực tiếp trang cấu hình, không cần đăng nhập. Nhấn BOOT ba lần để hiện lại địa chỉ trên màn hình.</p></section>
+<section class="pn">
+<h2>Thử trò mắt</h2>
+<label for="tromat">Hiệu ứng</label>
+<select id="tromat"></select>
+<button type="button" id="chaytromat" disabled>Diễn thử</button>
+<p class="hint">Thử khi robot đang rảnh. Sau khi diễn, robot trở về chế độ mắt đã chọn.</p>
+<p class="hint" id="tromat-status" role="status" aria-live="polite"></p>
+</section>
 </div></details></div><script>
 let duLieu=null,giuNut=null,dangGui=false;const el=id=>document.getElementById(id);
 const nhom=[
@@ -627,6 +635,58 @@ for(const key of ['gocdau','gocco']){
 el('phatvideo').onclick=()=>lenh('video',{url:el('urlvideo').value});el('gocdau').onchange=()=>{el('gocdau').oninput();return lenh('servo',{truc:0,goc:Number(el('gocdau').value)})};el('gocco').onchange=()=>{el('gocco').oninput();return lenh('servo',{truc:1,goc:Number(el('gocco').value)})};el('daugiua').onclick=()=>{el('gocdau').value=duLieu.dang_nha_0;el('gocdau').onchange()};el('cogiua').onclick=()=>{el('gocco').value=duLieu.dang_nha_1;el('gocco').onchange()};
 el('caidat').onsubmit=async e=>{e.preventDefault();if(!duLieu||el('luugpio').disabled){thongBao('Kiểm tra các chân GPIO trước khi lưu.',true);return}const chan={};document.querySelectorAll('[data-chan]').forEach(x=>chan[x.dataset.chan]=Number(x.value));const dongCo={driver_dc:Number(el('driverdc').value),toc_do_dc:Number(el('tocdodc').value),dao_dc_trai:el('daotrai').checked,dao_dc_phai:el('daophai').checked,bat_servo:el('batservo').checked&&el('batcose').checked,bat_servo_dau:el('batservo').checked,bat_servo_co:el('batcose').checked};for(let i=0;i<2;i++){dongCo['goc_min_'+i]=Number(el('min'+i).value);dongCo['goc_max_'+i]=Number(el('max'+i).value);dongCo['goc_nha_'+i]=Number(el('nha'+i).value)}try{const data=await yeuCau('/api/cai-dat',{may_chu_nhac:el('maychu').value,khoa_nhac:el('khoanhac').value,ten_radio:el('tendai').value,url_radio:el('urldai').value,man_chinh:lcdForms.man_chinh(),man_phu:lcdForms.man_phu(),servo_mo_rong:extraServoConfig(),chan_cam_bien:rangeConfig(),chan_den_cob:cobConfig(),cam_ung:el('camung').checked,robot_uart:el('robotuart').checked,chan,...dongCo});el('khoanhac').value='';duLieu.chan.forEach(pin=>pin.gia_tri=chan[pin.ma]);thongBao(data.thong_bao)}catch(err){thongBao(err.message,true)}};
 el('luugoc').onclick=async()=>{const nut=el('luugoc');nut.disabled=true;try{if(await lenh('xoay_man_hinh',{gia_tri:Number(el('gocmanhinh').value)}))await capNhat()}finally{nut.disabled=false}};
+async function napTroMat() {
+    try {
+        const tricks = await yeuCau('/api/tro-mat');
+        el('tromat').replaceChildren(...tricks.map(trick => new Option(trick.ten, trick.id)));
+        el('chaytromat').disabled = tricks.length === 0;
+    } catch (error) {
+        el('tromat-status').textContent = error.message;
+    }
+}
+el('chaytromat').onclick = async () => {
+    const button = el('chaytromat');
+    const status = el('tromat-status');
+    button.disabled = true;
+    status.textContent = 'Đang gửi lệnh…';
+    try {
+        const data = await yeuCau('/api/lenh', {lenh: 'tro_mat', hieu_ung: el('tromat').value});
+        status.textContent = data.thong_bao;
+    } catch (error) {
+        status.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+};
+napTroMat();
+async function capNhatRenderer() {
+    const select = el('renderermat');
+    const button = el('apdungrenderer');
+    const hint = el('rendererhint');
+    try {
+        const data = await yeuCau('/api/trang-thai');
+        select.value = data.renderer_mat === 'mimo' ? 'mimo' : 'gif';
+        const mimo = [...select.options].find(option => option.value === 'mimo');
+        if (mimo) mimo.disabled = !data.renderer_mimo_kha_dung;
+        hint.textContent = data.renderer_mimo_kha_dung
+            ? 'Lưu vào bộ nhớ flash và áp dụng ngay sau khi bấm nút.'
+            : 'Mimo Eyes chưa khả dụng trên thiết bị này.';
+        button.disabled = false;
+    } catch (error) {
+        hint.textContent = error.message;
+    }
+}
+el('apdungrenderer').onclick = async () => {
+    const button = el('apdungrenderer');
+    button.disabled = true;
+    try {
+        if (await lenh('renderer_mat', {che_do: el('renderermat').value})) await capNhatRenderer();
+    } finally {
+        button.disabled = false;
+    }
+};
+el('apdungrenderer').disabled = true;
+capNhatRenderer();
 el('khoidonglai').onclick=()=>{if(confirm('Khởi động lại UTA-robot và áp dụng sơ đồ chân đã lưu?'))lenh('khoi_dong_lai')};el('cauhinhwifi').onclick=()=>{if(confirm('Dừng phát nhạc và mở chế độ cấu hình Wi-Fi?'))lenh('cau_hinh_wifi')};capNhat(true);setInterval(()=>capNhat(false),3000);
 </script></body></html>)UTA";
 

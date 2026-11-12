@@ -23,6 +23,10 @@ struct WebActions {
     std::function<void(int)> brightness;
     std::function<int()> rotation;
     std::function<bool(int)> set_rotation;
+    std::function<bool(bool)> set_mimo_eyes;
+    std::function<bool()> mimo_eyes_enabled;
+    std::function<bool()> mimo_eyes_available;
+    std::function<bool(std::size_t)> play_eye_trick;
     std::function<void()> restart;
     std::function<void()> wifi;
 };

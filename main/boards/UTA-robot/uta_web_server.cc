@@ -5,7 +5,10 @@
 #include <cstring>
 #include <memory>
 
+#include <esp_heap_caps.h>
+
 #include "config.h"
+#include "uta_eye_tricks.h"
 #include "uta_web_page.h"
 
 namespace uta {
@@ -73,11 +76,12 @@ bool WebServer::Start() {
     if (httpd_start(&server_, &config) != ESP_OK) {
         return false;
     }
-    constexpr std::array<const char*, 4> paths{"/", "/api/trang-thai", "/api/cai-dat", "/api/lenh"};
+    constexpr std::array<const char*, 5> paths{
+        "/", "/api/trang-thai", "/api/tro-mat", "/api/cai-dat", "/api/lenh"};
     for (size_t i = 0; i < paths.size(); ++i) {
         httpd_uri_t route{};
         route.uri = paths[i];
-        route.method = i < 2 ? HTTP_GET : HTTP_POST;
+        route.method = i < 3 ? HTTP_GET : HTTP_POST;
         route.handler = Dispatch;
         route.user_ctx = this;
         if (httpd_register_uri_handler(server_, &route) != ESP_OK) {
@@ -109,6 +113,26 @@ esp_err_t WebServer::Handle(httpd_req_t* request) {
     if (request->method == HTTP_GET) {
         if (std::strcmp(request->uri, "/api/trang-thai") == 0) {
             return Status(request);
+        }
+        if (std::strcmp(request->uri, "/api/tro-mat") == 0) {
+            JsonPtr list(cJSON_CreateArray(), cJSON_Delete);
+            if (!list)
+                return ESP_ERR_NO_MEM;
+            for (const auto& trick : kEyeTricks) {
+                JsonPtr item(cJSON_CreateObject(), cJSON_Delete);
+                if (!item || !cJSON_AddStringToObject(item.get(), "id", trick.id.data()) ||
+                    !cJSON_AddStringToObject(item.get(), "ten", trick.label) ||
+                    !cJSON_AddItemToArray(list.get(), item.get()))
+                    return ESP_ERR_NO_MEM;
+                item.release();
+            }
+            auto* json = cJSON_PrintUnformatted(list.get());
+            if (!json)
+                return ESP_ERR_NO_MEM;
+            httpd_resp_set_type(request, "application/json; charset=utf-8");
+            const auto result = httpd_resp_send(request, json, HTTPD_RESP_USE_STRLEN);
+            cJSON_free(json);
+            return result;
         }
         httpd_resp_set_hdr(
             request, "Content-Security-Policy",
@@ -163,6 +187,14 @@ esp_err_t WebServer::Status(httpd_req_t* request) {
     }
     cJSON_AddStringToObject(root.get(), "trang_thai_nhac", media_.Status().c_str());
     cJSON_AddNumberToObject(root.get(), "goc_man_hinh", actions_.rotation());
+    cJSON_AddStringToObject(root.get(), "renderer_mat",
+                            actions_.mimo_eyes_enabled() ? "mimo" : "gif");
+    cJSON_AddBoolToObject(root.get(), "renderer_mimo_kha_dung",
+                          actions_.mimo_eyes_available());
+    cJSON_AddNumberToObject(root.get(), "heap_trong", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    cJSON_AddNumberToObject(root.get(), "psram_trong",
+                            heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+    cJSON_AddNumberToObject(root.get(), "muc_tieu_fps_mat", 30);
     cJSON_AddStringToObject(root.get(), "may_chu_nhac", config.music_server.c_str());
     cJSON_AddStringToObject(root.get(), "url_radio", config.radio_url.c_str());
     cJSON_AddStringToObject(root.get(), "ten_radio", config.radio_name.c_str());
@@ -506,6 +538,39 @@ esp_err_t WebServer::Command(httpd_req_t* request, const cJSON* body) {
             return Reply(request, "409 Conflict", "Chưa lưu được góc xoay màn hình");
         }
         return Reply(request, "200 OK", "Đã xoay màn hình và lưu góc");
+    } else if (command == "tro_mat") {
+        if (!actions_.mimo_eyes_available())
+            return Reply(request, "409 Conflict", "Mimo Eyes chưa khả dụng trên thiết bị này");
+        std::string id;
+        if (Text(body, "hieu_ung", id, 24)) {
+            for (std::size_t i = 0; i < kEyeTrickCount; ++i) {
+                if (kEyeTricks[i].id != id)
+                    continue;
+                if (actions_.play_eye_trick && actions_.play_eye_trick(i))
+                    return Reply(request, "200 OK", "Đang diễn trò mắt");
+                return Reply(request, "409 Conflict",
+                             "Chưa diễn được. Đợi robot rảnh, hết thông báo hoặc cảnh đang hiển thị rồi thử lại.");
+            }
+        }
+        return Reply(request, "400 Bad Request", "Hiệu ứng mắt không hợp lệ");
+    } else if (command == "renderer_mat") {
+        std::string renderer;
+        if (!Text(body, "che_do", renderer, 16) ||
+            (renderer != "gif" && renderer != "mimo" && renderer != "procedural")) {
+            return Reply(request, "400 Bad Request", "Chọn renderer GIF hoặc Mimo");
+        }
+        const bool mimo = renderer != "gif";
+        if (mimo && !actions_.mimo_eyes_available()) {
+            return Reply(request, "409 Conflict", "Mimo Eyes chưa khả dụng trong firmware này");
+        }
+        if (!settings_.SaveMimoEyesEnabled(mimo)) {
+            return Reply(request, "500 Internal Server Error", "Chưa lưu được renderer vào bộ nhớ thiết bị");
+        }
+        if (!actions_.set_mimo_eyes(mimo)) {
+            return Reply(request, "409 Conflict", "Mimo Eyes chưa khả dụng trong firmware này");
+        }
+        return Reply(request, "200 OK",
+                     mimo ? "Đã chuyển sang Mimo Eyes" : "Đã chuyển sang GIF Eyes");
     } else if (command == "am_luong" || command == "do_sang") {
         int value = 0;
         accepted = Integer(body, "gia_tri", value, command == "do_sang" ? 5 : 0, 100);

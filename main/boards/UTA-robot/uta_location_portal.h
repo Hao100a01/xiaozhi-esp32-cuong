@@ -5,9 +5,10 @@ namespace uta {
 // Chèn trước </body> của trang AP gốc. Form độc lập với form Wi-Fi/OTA.
 inline constexpr char kLocationPortal[] = R"UTA(
 <style>
-#advanced-tab #ota_url_row { display: block !important; }
-#advanced-tab #ota_url {
+#advanced-tab #ota_url_row { display: none !important; }
+#advanced-tab #uta-ota-url {
     box-sizing: border-box;
+    width: 100%;
     min-width: 0;
     min-height: 42px;
     padding: 10px 12px;
@@ -18,19 +19,84 @@ inline constexpr char kLocationPortal[] = R"UTA(
 (() => {
     const tab = document.getElementById('advanced-tab');
     if (!tab) return;
-    // Reuse the native advanced form and its wifi/ota_url storage.
-    const otaUrl = document.getElementById('ota_url');
-    const otaRow = document.getElementById('ota_url_row');
-    if (otaUrl && otaRow) {
-        otaUrl.inputMode = 'url';
-        otaUrl.maxLength = 255;
-        otaUrl.pattern = 'https?://.+';
-        otaUrl.setAttribute('aria-describedby', 'uta-ota-hint');
-        const hint = document.createElement('small');
-        hint.id = 'uta-ota-hint';
-        hint.textContent = 'Lưu trong tab Nâng cao để dùng URL này khi firmware kiểm tra cập nhật. Để trống để dùng URL mặc định.';
-        otaRow.append(hint);
+    const otaSection = document.createElement('section');
+    otaSection.className = 'section';
+    otaSection.innerHTML = `<h3>Địa chỉ OTA</h3>
+      <form id="uta-ota-form">
+        <label for="uta-ota-url">URL OTA tùy chỉnh</label>
+        <input id="uta-ota-url" type="text" inputmode="url" maxlength="2048" spellcheck="false"
+               autocomplete="off" aria-describedby="uta-ota-hint" disabled>
+        <p id="uta-ota-hint">Để trống và bấm Lưu URL OTA để dùng địa chỉ mặc định.</p>
+        <p id="uta-ota-status" role="status" aria-live="polite">Đang đọc URL OTA…</p>
+        <button id="uta-ota-save" type="submit" disabled>Lưu URL OTA</button>
+      </form>`;
+    tab.prepend(otaSection);
+    const otaUrl = otaSection.querySelector('#uta-ota-url');
+    const otaStatus = otaSection.querySelector('#uta-ota-status');
+    const otaSave = otaSection.querySelector('#uta-ota-save');
+    async function loadOta() {
+        try {
+            const response = await fetch('/uta/ota', {cache: 'no-store'});
+            if (!response.ok) throw new Error('Không đọc được URL OTA từ bộ nhớ.');
+            const data = await response.json();
+            otaUrl.value = data.ota_url;
+            otaUrl.disabled = otaSave.disabled = false;
+            otaStatus.textContent = data.ota_url ? 'Đang dùng URL đã lưu.' : 'Đang dùng URL mặc định.';
+        } catch (error) {
+            otaStatus.textContent = error.message;
+        }
     }
+    otaSection.querySelector('#uta-ota-form').addEventListener('submit', async event => {
+        event.preventDefault();
+        const url = otaUrl.value.trim();
+        otaUrl.disabled = otaSave.disabled = true;
+        try {
+            const response = await fetch('/uta/ota', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'X-UTA-Yeu-Cau': '1'},
+                body: JSON.stringify({ota_url: url})
+            });
+            if (response.status === 400) throw new Error('Nhập URL HTTP(S) hợp lệ, tối đa 2048 byte.');
+            if (!response.ok) throw new Error('Không lưu được URL OTA vào bộ nhớ.');
+            otaUrl.value = url;
+            otaStatus.textContent = url ? 'Đã lưu URL OTA.' : 'Đã lưu lựa chọn dùng URL mặc định.';
+        } catch (error) {
+            otaStatus.textContent = error.message;
+        } finally {
+            otaUrl.disabled = otaSave.disabled = false;
+        }
+    });
+    // The stock form still handles Wi-Fi settings. Keep OTA out of its payload so
+    // saving Wi-Fi settings cannot overwrite the URL with its cached value.
+    const advancedForm = tab.querySelector('form[action="/advanced/submit"]');
+    if (advancedForm) {
+        advancedForm.onsubmit = async event => {
+            event.preventDefault();
+            const button = document.getElementById('advanced_button');
+            const status = document.getElementById('advanced_error');
+            button.disabled = true;
+            status.textContent = '';
+            try {
+                const response = await fetch('/advanced/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        max_tx_power: parseInt(document.getElementById('max_tx_power').value, 10),
+                        remember_bssid: document.getElementById('remember_bssid').checked,
+                        sleep_mode: document.getElementById('sleep_mode').checked
+                    })
+                });
+                if (!response.ok || !(await response.json()).success)
+                    throw new Error('Không lưu được cài đặt Wi-Fi nâng cao.');
+                showToast('Đã lưu cài đặt Wi-Fi.');
+            } catch (error) {
+                status.textContent = error.message;
+            } finally {
+                button.disabled = false;
+            }
+        };
+    }
+    loadOta();
     const section = document.createElement('section');
     section.className = 'section';
     section.innerHTML = `<h3>Vị trí và thời tiết</h3>

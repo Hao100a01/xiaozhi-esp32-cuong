@@ -17,6 +17,7 @@
 #include <esp_lvgl_port.h>
 #include <esp_log.h>
 #include <esp_netif.h>
+#include <esp_random.h>
 #include <esp_timer.h>
 #include <freertos/queue.h>
 
@@ -30,6 +31,7 @@
 #include "mcp_server.h"
 #include "uta_cob_lights.h"
 #include "uta_display.h"
+#include "uta_eye_tricks.h"
 #include "uta_location.h"
 #include "uta_media_mcp.h"
 #include "uta_media_player.h"
@@ -144,6 +146,20 @@ public:
         actions.brightness = [this](int value) { SetBrightness(value); };
         actions.rotation = [this]() { return display_ ? display_->Rotation() : 0; };
         actions.set_rotation = [this](int degrees) { return display_ && display_->SetRotation(degrees); };
+        actions.set_mimo_eyes = [this](bool enabled) {
+            return display_ && display_->SetMimoEyesEnabled(enabled);
+        };
+        actions.mimo_eyes_enabled = [this]() {
+            return display_ && display_->MimoEyesEnabled();
+        };
+        actions.mimo_eyes_available = [this]() {
+            return display_ && display_->MimoEyesAvailable();
+        };
+        actions.play_eye_trick = [this](std::size_t index) {
+            return display_ && !media_.IsPlaying() && !media_.IsVideo() &&
+                   Application::GetInstance().GetDeviceState() == kDeviceStateIdle &&
+                   display_->PlayEyeTrick(index, kDeviceStateIdle);
+        };
         actions.restart = [this]() { QueueRestart(); };
         actions.wifi = [this]() {
             stop_robot_ = true;
@@ -228,6 +244,7 @@ private:
     std::array<std::atomic<int>, uta::kExtraServoCount> extra_servo_pending_{
         kNoExtraServoCommand, kNoExtraServoCommand, kNoExtraServoCommand, kNoExtraServoCommand};
     std::atomic<uta::ReplyGesture> pending_gesture_{uta::ReplyGesture::None};
+    std::atomic<int> pending_eye_trick_{-1};
     std::atomic<HeadCommand> head_pending_{HeadCommand::None};
     uta::MediaPlayer media_;
     UtaBootButton boot_;
@@ -394,6 +411,7 @@ private:
                     io, panel, lcd.width, lcd.height, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y,
                     DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
                 display_->RestoreRotation(lcd.driver == uta::LcdDriver::St7789);
+                display_->SetMimoEyesEnabled(active_.mimo_eyes_enabled);
             }
         }
         if (active_.secondary_lcd.driver != uta::LcdDriver::Off)
@@ -903,6 +921,8 @@ private:
         int64_t stop_at = 0;
         std::array<int64_t, uta::kWheelServoCount> wheel_stop_at{};
         int64_t spectrum_at = 0;
+        int eye_trick = -1;
+        int64_t eye_trick_until = 0;
         int64_t gesture_at = 0;
         size_t gesture_axis = 0;
         size_t gesture_step = 0;
@@ -1044,9 +1064,20 @@ private:
             }
             if (now - spectrum_at >= 100000) {
                 if (display_) {
-                    display_->UpdateStandby(Application::GetInstance().GetDeviceState(),
-                                            media_.IsPlaying() || media_.IsVideo(),
+                    const auto state = Application::GetInstance().GetDeviceState();
+                    const bool media_active = media_.IsPlaying() || media_.IsVideo();
+                    display_->UpdateStandby(state, media_active,
                                             WifiManager::GetInstance().IsConnected());
+                    const int requested_trick = pending_eye_trick_.exchange(-1);
+                    if (requested_trick >= 0) {
+                        eye_trick = requested_trick;
+                        eye_trick_until = now + 10000000;
+                    }
+                    if (eye_trick >= 0 &&
+                        (now >= eye_trick_until ||
+                         (!media_active && display_->PlayEyeTrick(eye_trick, state)))) {
+                        eye_trick = -1;
+                    }
                     const bool visible =
                         media_.IsPlaying() && !media_.IsVideo() &&
                         Application::GetInstance().GetDeviceState() == kDeviceStateIdle;
@@ -1092,6 +1123,43 @@ private:
     void InitializeTools() {
         auto& mcp = McpServer::GetInstance();
         RegisterCobTools(mcp);
+#if UTA_ENABLE_MIMO_EYES
+        if (display_) {
+            mcp.AddTool(
+                "self.eyes.list_tricks", "Liệt kê tên và mã của các trò biểu diễn bằng đôi mắt.",
+                PropertyList(), [](const PropertyList&) -> ReturnValue {
+                    std::string result;
+                    for (const auto& trick : uta::kEyeTricks) {
+                        result.append(trick.id);
+                        result.append(" — ").append(trick.label).append("\n");
+                    }
+                    return result;
+                });
+            mcp.AddTool(
+                "self.eyes.play_trick",
+                "Gọi tool này khi người dùng bảo robot diễn trò mắt. Dùng random nếu không chỉ "
+                "định trò. Ví dụ: nháy mắt trái = wink_left, giả vờ ngủ = sleep, nhảy tưng tưng = "
+                "bounce, đảo mắt vòng tròn = orbit. Gọi self.eyes.list_tricks để tra các mã khác.",
+                PropertyList({Property("effect", kPropertyTypeString, std::string("random"))}),
+                [this](const PropertyList& values) -> ReturnValue {
+                    if (!control_task_ || !display_->MimoEyesAvailable())
+                        return std::string("Robot chưa sẵn sàng diễn trò mắt.");
+                    const auto effect = values["effect"].value<std::string>();
+                    if (effect == "random") {
+                        pending_eye_trick_.store(esp_random() % uta::kEyeTrickCount);
+                        return std::string("Đã nhận lệnh diễn một trò mắt ngẫu nhiên.");
+                    }
+                    for (std::size_t i = 0; i < uta::kEyeTrickCount; ++i) {
+                        const auto& trick = uta::kEyeTricks[i];
+                        if (effect == trick.id || effect == trick.label) {
+                            pending_eye_trick_.store(static_cast<int>(i));
+                            return std::string("Đã nhận lệnh diễn: ") + trick.label;
+                        }
+                    }
+                    return std::string("Mã trò mắt không hợp lệ. Dùng self.eyes.list_tricks để tra.");
+                });
+        }
+#endif
         mcp.AddTool("self.screen.set_rotation",
                     "Xoay màn hình tới góc tuyệt đối 0, 90, 180 hoặc 270 độ và lưu góc.",
                     PropertyList({Property("degrees", kPropertyTypeInteger, 0, 270)}),
