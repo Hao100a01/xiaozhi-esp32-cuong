@@ -4,6 +4,14 @@ Ngày ghi nhận: 12/11/2026.
 
 Tài liệu bàn giao để tiếp tục triển khai trong dự án UTA-robot. **Đây là hướng dẫn và đề xuất thiết kế; phần tích hợp Mimo chưa được thực hiện, build hoặc nạp lên robot.**
 
+## Cập nhật sau bản bàn giao ban đầu: Mimo v0.4
+
+Phần trạng thái và khảo sát bên dưới ghi nhận thời điểm tạo tài liệu ban đầu. Thư viện Mimo hiện đã có **C++17 native cho đủ 85 hoạt động, 4 màn tham chiếu, 3 cảnh phụ và 4 combo**, với bộ vẽ RGB565 vào buffer. Xem [hướng dẫn API, bộ nhớ và kiểm chứng C++](https://github.com/Hao100a01/mimo-vector-eyes/blob/main/docs/CPP_PORT.md) trong repository Mimo riêng tư.
+
+Các file mới cần lấy theo cùng một phiên bản: `MimoActivities.h`, `MimoVector.h`, `MimoDrawList.h`, `MimoRasterizer.h`, thư mục `generated/` và `MimoEyes.h` v0.4. Không ghép riêng header hoạt động mới với header mắt vendored cũ mà chưa kiểm tra tương thích.
+
+Nhánh firmware `feature/atfuta-emotion-engine` đã có thêm `uta_mimo_eyes.*` và `mimo/MimoEyes.h` ở lần đồng bộ gần nhất; cần tiếp tục từ mã đó và giữ nguyên công việc đang triển khai. Lần port hoạt động này chỉ cập nhật thư viện cùng tài liệu, không thay thế renderer hoặc logic firmware hiện có. Bước tiếp theo là nối `Player`/sampling/RGB565 của hoạt động vào adapter UTA, đồng bộ khóa và quyền chiếm màn hình, rồi build và kiểm tra trên mạch. Host tests, sanitizer và đối chiếu với JavaScript đã qua; các kết quả này chưa xác nhận hiệu năng trên ESP32.
+
 ## 1. Repository và trạng thái hiện tại
 
 - Firmware: <https://github.com/Hao100a01/xiaozhi-esp32-cuong>, nhánh triển khai `feature/atfuta-emotion-engine`.
